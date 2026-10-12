@@ -216,6 +216,17 @@ objects and relationships. For each consequential operation, identify its input
 scope, the rule it owns, the result it establishes, and the outcome or downstream
 operation that uses that result. Derive dependencies from these inputs and
 results; identify which conditions permit an effect and which require it.
+Identify the business subject of each operation and where its governing rules
+belong. Use these to choose the entry point and express the required dependencies.
+Carry confirmed structural choices and user corrections into the implementation
+handoff, separately from mechanisms still open for selection.
+
+Judge each proposed representation by whether the subject, rules and relationships
+remain recognizable. Combined expressions may preserve them without separate
+queries, intermediate collections or modules. Distinguish this logical structure
+from required observable ordering and physical execution. Compare alternatives
+against the same confirmed requirements; equivalent results or fewer operations
+alone do not establish structural fit.
 
 Keep this model small enough to guide implementation directly; an inline sketch
 usually suffices. Use domain facts, task lifetime and scale to explain the
@@ -223,7 +234,8 @@ required responsibilities. Choose representations and mechanisms afterward.
 If implementation exposes a missing relationship or infeasible assumption,
 revise the model and its affected operations together while preserving confirmed
 requirements. The model is ready when its operations explain the outcome and
-each has a business reason; technical components remain choices to compare.
+required dependencies without relying on a chosen API's shape. Each operation
+needs a business reason; technical components remain choices to compare.
 
 ### Option Categories
 

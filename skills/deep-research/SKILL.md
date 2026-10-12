@@ -81,12 +81,33 @@ Pick the smallest shape that answers the decision boundary:
 
 For Standard/Deep, include only the relevant pieces: answer/core conclusion, optional body TL;DR, refined orientation with remaining `?`, key evidence, weakest point, what this does not decide (boundaries/non-goals), open questions that could change the conclusion, verification status, and artifact status. When a conclusion rests on external or versioned sources, surface version/date/channel context by default, or mark it unknown; for Mixed Investigation, surface the local applicability result.
 
-Before delivering a Standard/Deep conclusion, run a research closure check ([REFERENCE.md](REFERENCE.md#research-closure-check)): state the settled answer, strongest unresolved counterexample or rival explanation, flip condition, and stop reason; if the counterexample could flip the decision, check it or downgrade confidence. Before saving, run a save consistency check: header counts match corresponding body sections, the core-conclusion field answers the main question in one sentence, and body `## TL;DR` appears only when it adds non-duplicative scan value per [REFERENCE.md](REFERENCE.md#saved-artifact-headers).
+Before delivering a Standard/Deep conclusion, run the
+[research closure check](REFERENCE.md#research-closure-check). State the settled
+answer, strongest unresolved counterexample or rival explanation, flip condition,
+and stop reason. If the counterexample could flip the decision, check it or
+downgrade confidence.
+
+Before saving, check that header counts match the corresponding body sections
+and the core-conclusion field answers the main question in one sentence. Include
+a body `## TL;DR` only when it adds non-duplicative scan value under the
+[saved-artifact rules](REFERENCE.md#saved-artifact-headers).
 
 ## 5. Save
 Quick answers stay in chat unless the user asks for a file.
 
-For Standard/Deep, deliver findings in chat by default. Save a file only when the user asked for one, the result is a handoff into a named next workflow (use the [REFERENCE.md](REFERENCE.md#research-to-work-handoff) format), or it belongs in a research-docs taxonomy the user or project established (a `docs/research/` created by this skill's own earlier runs does not count); for merely-durable findings, offer to save in one line instead of writing the file. Classify artifacts as canonical (stable source of truth), supporting (evidence or one-time analysis), or temporary (scratch investigation).
+For Standard/Deep, deliver findings in chat by default. Save a file only when at
+least one of these conditions holds:
+
+- The user asked for a file.
+- The result is a handoff into a named next workflow. Use the
+  [research-to-work handoff format](REFERENCE.md#research-to-work-handoff).
+- The result belongs in a research-docs taxonomy established by the user or
+  project. A `docs/research/` created by this skill's own earlier runs does not count.
+
+If the findings are merely durable and none of these conditions holds, offer to
+save in one line instead of writing a file. Classify artifacts as canonical
+(stable source of truth), supporting (evidence or one-time analysis), or temporary
+(scratch investigation).
 
 When saving, match the workspace/project docs taxonomy. Never save investigation outputs inside the skill's own folder. If no taxonomy exists, use `docs/research/` under the target workspace and state that default; use OS temp only when no writable target workspace or user-facing output directory is available, and explain that fallback. Only update or recommend canonical docs such as `CONTEXT.md`, ADRs, or project profiles when the research confirms stable terminology, boundaries, decisions, or reusable facts. Use [REFERENCE.md](REFERENCE.md#saved-artifact-headers) for localized artifact headers.
 

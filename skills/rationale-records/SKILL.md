@@ -93,12 +93,14 @@ the code task, then create one unnumbered note only when a qualifying invariant
 was found; otherwise explicitly create a `none` handoff. Seal either outcome in a
 manifest with `handoff-create`.
 
-After the task commit is integrated, run `handoff-consume` from the main checkout.
-For a note, first merge its current code explanation into active rationale and write the
-small resolution file described in the reference. Consumption validates all code
-changes since the main checker's last successful HEAD and writes a user-local
-receipt. Run `worktree-finish` immediately; its exact receipt is required before
-the linked worktree and optional branch can be removed.
+After the task commit is integrated, complete the handoff from the main checkout:
+
+1. If the handoff contains a note, merge its current code explanation into active
+   rationale. Write the small resolution file described in the reference.
+2. Run `handoff-consume`. It validates all code changes since the main checker's
+   last successful HEAD and writes a user-local receipt.
+3. Run `worktree-finish` immediately. It requires that exact consumption receipt
+   before the linked worktree and optional branch can be removed.
 
 Read [REFERENCE.md](REFERENCE.md) for commands, record format, note format, and
 failure semantics.

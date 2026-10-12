@@ -86,13 +86,21 @@ problem: a flow can expose meaningful order, a state model can express lifecycle
 constraints, and a relation can express scope or membership. Use the existing
 representation when it already makes the relevant meaning clear.
 
-Develop this understanding and the code together. Where a design choice is
-unclear, refine a business-level sketch or a thin implementation until the
-responsibilities and dependencies can be explained. Adapt reused mechanisms to
-confirmed intent; revise assumptions when implementation supplies contrary
-evidence. Keep logical dependencies distinct from physical execution, choosing
-call boundaries, materialization and scheduling for ownership, validity and cost.
-One expression or query may preserve the relevant business relationships.
+Before reusing an existing query, interface or helper, trace through its
+implementation how the required business scopes and prerequisites are established
+and used. Adapt its representation or boundary when a matching result hides
+those relationships or leaves consumers to reconstruct a decision.
+
+Choose the entry point from the operation's business subject and rule ownership,
+not merely the output shape of an available helper. Preserve confirmed structural
+choices; where representation remains open, use a sketch or thin implementation
+to compare how clearly each option expresses those responsibilities.
+
+A combined expression or query can suffice when its subject, governing rules
+and downstream relationships remain recognizable. Separate calls, intermediate
+values and modules need a reason in ownership, validity or cost. Keep logical
+structure distinct from physical execution, while preserving observable order
+where it is part of the contract. Revise assumptions when source facts require it.
 
 For repeated data access, derive acquisition and reuse from what keys determine
 a result, which consumers share it, and what can invalidate it. Batch or reuse
@@ -137,11 +145,14 @@ intermediate states valid for the callers and data that can encounter them.
 
 Read the changed code as an explanation of the requested behavior. Check that
 its governing rules and relationships are visible where they are owned. For a
-required scope or prerequisite, locate how it is established and what consumes
-or relies on it. Reshape meaning carried only by names or comments. Where work
-repeats, follow helpers and loops on effectful and no-effect paths; relate keys,
-sharing scope, validity and execution counts to input growth. Preparation or
-preview alone cannot establish the effectful path's structure or cost.
+required scope or prerequisite, trace the owning subject, its governing rules
+and downstream relationships through called helpers and queries. These may be
+expressed together without a separately stored result. Correct a missing or
+misrepresented required relationship even when result tests pass; names and
+comments alone do not establish it. Where work repeats, follow helpers and loops on effectful and
+no-effect paths. Relate keys, sharing scope, validity and execution counts to
+input growth. Preparation or preview alone cannot establish the effectful path's
+structure or cost.
 
 Run focused verification and inspect the diff after each meaningful slice.
 If a new affected path or contract appears, update the scope and design before
@@ -184,11 +195,15 @@ script, or applying a fault by hand, read
 [targeted mutation and fault injection](references/VERIFICATION.md#targeted-mutation-and-fault-injection)
 for the selection, passing-baseline, isolation, and differential-verdict rules.
 
-Obtain one independent review before reporting completion when the task or
-repository rules require it, or when the change touches concurrency or
-authorization semantics, data spanning versions or effects that are difficult
-to recover, or deletes or consolidates a shared guard; otherwise report the
-change as self-reviewed.
+If any of these conditions holds, obtain one independent review before reporting
+completion:
+
+- The task or repository rules require it.
+- The change touches concurrency or authorization semantics.
+- The change touches data spanning versions or effects that are difficult to recover.
+- The change deletes or consolidates a shared guard.
+
+Otherwise, report the change as self-reviewed.
 
 The review protocol belongs to the installed review skill. To obtain a review
 or act on its report, read the caller section of
@@ -203,17 +218,20 @@ Local or mechanical edits preserving these contracts need focused verification
 only. Review is additional evidence, not a substitute for execution.
 
 Reuse evidence only while its relevant source, inputs, and environment remain
-unchanged. Rerun invalidated checks and all required repository gates. A
-finding that falsifies one evidence claim (a fixture's stated source, a
-claimed reproduction, a reported detection), whoever raises it, reopens every
-claim of the same kind in the slice: re-derive each from its source before
-reporting, and list the claims rechecked.
+unchanged. Rerun invalidated checks and all required repository gates.
+
+If a finding falsifies an evidence claim, recheck every claim of the same kind
+in the current slice. This applies regardless of who raised the finding.
+Re-derive each claim from its source before reporting. List the claims rechecked.
+Examples include a fixture's stated source, a claimed reproduction, and a
+reported detection.
 
 When two or more confirmed findings point at one seam, or the candidate repair
 amounts to picking which of several authoritative sources or mechanisms wins,
-write one root-cause hypothesis that explains them all and run the cheapest
-check that could refute it before repairing. If it holds, repair the shared cause and recheck each
-finding against the repair; otherwise repair them as independent defects.
+write one root-cause hypothesis that explains all the findings. Before repairing,
+run the cheapest check that could refute that hypothesis. If it holds, repair the
+shared cause and recheck each finding against the repair. Otherwise, repair the
+findings as independent defects.
 
 ## Close the requested outcomes
 

@@ -35,19 +35,25 @@ then merge them as [REPORT.md](REPORT.md#independent-reads) describes. A
 finding stands on its own read's evidence: agreement between reads adds
 nothing to it, and a read that missed it takes nothing from it.
 
-The caller, whichever session invokes this skill, first checks the review
-lifecycle: a completed review that covers the same candidate content, scope,
-and supporting inputs is reused; an active review that applies is awaited
-rather than duplicated. For a new review the caller writes the brief
-[HANDOFF.md](HANDOFF.md) defines from the request, the repository rules, the
-Git state, and the diff the lens selection reads, checks it with that file's
-validator, launches the reviewer through the host mechanism the file names as
-soon as the diff is reviewable, continues the remaining checks while the
-review runs, and delivers the reviewer's report — mechanically checked as
-[REPORT.md](REPORT.md) requires when the reviewer could not run that check
-itself, and changed only as its delivered-record rule allows — rather than
-performing the review first. Only an explicit user decision changes a
-user-owned review requirement.
+The caller is the session invoking this skill. First check the review lifecycle:
+
+- If a completed review covers the same candidate content, scope, and supporting
+  inputs, reuse it.
+- If an active review applies, await it instead of starting another.
+
+For a new review, the caller follows this sequence:
+
+1. Write the brief defined in [HANDOFF.md](HANDOFF.md), using the request,
+   repository rules, Git state, and the diff used for lens selection.
+   Check the brief with that file's validator.
+2. As soon as the diff is reviewable, launch the reviewer through the host
+   mechanism named in HANDOFF.md. Do not perform the review before dispatch.
+3. While the review runs, continue the remaining checks.
+4. If the reviewer could not mechanically check its report, run the check
+   required by [REPORT.md](REPORT.md). Deliver the reviewer's report, changed
+   only as that file's delivered-record rule allows.
+
+Only an explicit user decision changes a user-owned review requirement.
 
 When acting on a report, the builder verifies each finding before changing
 code, its trigger's producer as well as its mechanism. A finding whose
@@ -171,8 +177,21 @@ where the repository provides them.
 Select checks from the threatened contracts: results, guards, error handling,
 authorization, state, retries, concurrency, compatibility, resource use, and
 recovery. For structural work, inspect rule ownership, caller obligations,
-dependency direction, and obsolete paths. Report complexity through a concrete
-maintenance consequence or an unmet structural goal, not a preferred pattern.
+dependency direction, and obsolete paths. Trace the business subject, governing
+rules and required dependencies through executable code, including helpers and
+queries. Compare the representation with the request's confirmed structural
+choices; where it leaves choices open, judge whether those roles remain clear.
+Combined expressions need no separate intermediate result merely to match a
+verbal sequence. Distinguish logical structure from physical execution and from
+observable ordering the contract requires.
+
+For a missing or misrepresented required relationship, cite the requirement and
+the exact mismatch even when result tests pass. Equivalent results alone do not
+establish structural fit; a different syntax, query count or class layout alone
+does not establish a defect. Uninspected code is a coverage limit, not proof of
+absence.
+Report complexity through a concrete maintenance consequence or an unmet
+structural goal, not a preferred pattern.
 Prioritize high-consequence paths; disclose material surfaces left unexamined.
 Answer every lens section the brief carries, and report each one the brief
 excluded that this change in fact triggers. A brief without lenses, or a
@@ -296,17 +315,21 @@ with evidence. Preserve competing evidence when the conclusion remains disputed.
 
 ## Report and re-review
 
-Write the review record first, from the template in
-[REPORT.md](REPORT.md#record), then render the prose report from it in the
-user's language, findings first: that file defines both, and the record is the
-one the caller reconciles rounds by. Each actionable finding carries a stable identifier, a source location at
-the reviewed revision with the triggering line quoted verbatim so the reference
-survives later edits, trigger or structural mechanism, violated contract,
-consequence, evidence class, and decisive evidence, with repair constraints
-when useful. Check the record mechanically before returning it, as REPORT.md's
-last rule sets out. The caller preserves the reviewer's findings and unresolved
-limits when relaying the report. Avoid credentials and unnecessary sensitive
-content in examples or logs.
+First write the review record using the template in [REPORT.md](REPORT.md#record).
+Then render the prose report from that record in the user's language, findings
+first. REPORT.md defines both artifacts; the caller uses the record to reconcile
+rounds.
+
+For each actionable finding, include a stable identifier, the source location at
+the reviewed revision, and the triggering line quoted verbatim so the reference
+survives later edits. Include the trigger or structural mechanism, violated
+contract, consequence, evidence class, and decisive evidence. Add repair
+constraints when useful.
+
+Before returning the record, check it mechanically as REPORT.md's last rule
+requires. When relaying the report, preserve the reviewer's findings and
+unresolved limits. Avoid credentials and unnecessary sensitive content in
+examples or logs.
 
 Say "no confirmed findings in the inspected scope" when appropriate. Keep
 findings and coverage separate: unavailable inputs, failed tools, timeouts, or

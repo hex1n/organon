@@ -270,24 +270,32 @@ In review-and-revise mode, read [REVISION.md](REVISION.md) before editing
 the candidate or scheduling another revision round.
 
 For a resolved verification gap, preserve its original payload and scope.
-Record the resolving evidence or rebuttal in the parent validation, use `fix`
-for supplied evidence or `rebut` for a reviewer-accepted challenge, and close
-it only after the originating reviewer gives a later complete GO on the
-current revision. Evidence-only resolution may keep the candidate hash;
+Record the resolving evidence or rebuttal in the parent validation. Use `fix`
+for supplied evidence or `rebut` for a reviewer-accepted challenge.
+Close the gap only after the originating reviewer gives a later complete GO on
+the current revision. Evidence-only resolution may keep the candidate hash;
 changes to the candidate still require a new revision. See
 [gap closure](REFERENCE.md#verification-gap-closure).
 
 ### 5. Close Or Continue
 
 Within the resolved budget, new or narrowing findings are progress and continue
-the loop; a bare round count outside the frozen budget never closes or suspends
-the gate — an expiring frozen budget is a budget event, not a round count. Each continued
-round also requires an active request for this review and an expectation that the next
-round closes a gate-blocking finding or changes the technical or implementation
-decision. Suspend when a required reviewer remains unavailable, reviewers
-disagree, the same blocker survives three consecutive revisions, budget
-expires, the authorization envelope is invalidated in implementation-authorization scope, or user input is required; when
-continuing is no longer justified while the gate is unpassed, the outcome is
+the loop. Each continued round also requires an active request for this review
+and an expectation that the next round closes a gate-blocking finding or changes
+the technical or implementation decision. A bare round count outside the frozen
+budget never closes or suspends the gate. An expiring frozen budget is a budget
+event, not a round count.
+
+Suspend when any of these conditions holds:
+
+- A required reviewer remains unavailable.
+- Reviewers disagree.
+- The same blocker survives three consecutive revisions.
+- The budget expires.
+- In implementation-authorization scope, the authorization envelope is invalidated.
+- User input is required.
+
+If continuing is no longer justified while the gate is unpassed, report
 `SUSPENDED` or `WITHDRAWN`, never a pass.
 
 Before reporting GO in either mode, apply the Exact Gate mechanically with

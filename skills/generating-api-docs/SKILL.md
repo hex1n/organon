@@ -83,7 +83,7 @@ Common decisions:
 - Completion criterion: each documented fact has a source; unresolved type, requiredness, or behavior is explicitly unknown with a next check. Distinguish declared intent from enforced behavior when they disagree.
 
 ### 5. Write Markdown
-- Use the profile output directory. If absent, find the majority location of existing `*_API_Doc.md` files with a filesystem glob; do not use `git ls-files` because it misses untracked docs. Fall back to `docs/facade/`.
+- If the profile specifies an output directory, use it. Otherwise, use a filesystem glob to find the majority location of existing `*_API_Doc.md` files. Use `docs/facade/` as the final fallback. Do not use `git ls-files` for discovery because it misses untracked docs.
 - Read `TEMPLATE.md` and fill it using profile facts.
 - File names: `{Interface}_API_Doc.md`, `{feature}_API_Doc.md`, or `API_Changes_{date}.md`.
 - Output language: write the generated API document in the language explicitly requested by the user; if none is explicit, match the user's prompt language. Use a project documentation convention only when the user is silent. Keep code identifiers, field names, operation keys, and literal enum values unchanged.
@@ -144,11 +144,15 @@ guarantee. These are investigation prompts, not automatic verdicts:
 | Type, enum, or validation changed | Old valid inputs remain accepted and new outputs remain within consumers' supported domain |
 | Route or operation replaced | The old entry remains supported, or report breaking and name its replacement |
 
-A proven old-contract violation is `breaking`; all affected contract obligations
-established preserved is `compatible`; otherwise use `not-assessed` and name
-the undecidable obligation and missing evidence. Aggregate interfaces as breaking if any change is
-breaking, otherwise not-assessed if any remains unknown. Describe the breaking
-interaction and migration, not just the changed declaration.
+Assign each compatibility verdict in this order:
+
+1. If an old-contract violation is proven, use `breaking`.
+2. If all affected contract obligations are established as preserved, use `compatible`.
+3. Otherwise, use `not-assessed`. Name the undecidable obligation and missing evidence.
+
+For an interface with multiple changes, any `breaking` change makes the interface
+`breaking`. If none is breaking but any remains unknown, use `not-assessed`.
+Describe the breaking interaction and migration, not just the changed declaration.
 
 **Protocol-specific facts** such as auth, requiredness, address, request envelope, response wrapper, parameter position, and ID type live in adapters and the project profile. Do not duplicate those rules in this spine.
 

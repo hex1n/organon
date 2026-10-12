@@ -35,16 +35,21 @@ operands. Without one, infer the mode from the whole ask:
 | render | Render an existing plan or report, nothing else | `render`, or an ask for the HTML view of an existing artifact |
 | brief | A one-page brief of an existing report, delivered with it | `brief`, or an ask for a 摘要 / 一页纸 / 汇报页 of a finished report |
 
-For run, render, and brief, the artifact is the plan (`*-e2e-test-plan.md`) or
-execution report (`*-e2e-test-report.md`) the ask names, otherwise the newest one under
-`.scratch/{feature}/e2e/` — plans there, reports under its `runs/`. Resolve the feature
-from the ask, then from the task the conversation is already about; only when neither
-names one, take the newest across `.scratch/*/e2e/`, say which feature that was, and
-ask when two are equally recent. A report means a continuation. A named artifact that does not exist is reported as missing, and render
-never creates a substitute plan. A scenario described only in the ask is planning
-input, however complete it reads; the planning rules scale a plan down to one
-scenario. State the mode and the artifacts it starts from before reading any stage's
-rules.
+For run, render, and brief, select the starting artifact in this order:
+
+1. If the ask names a plan (`*-e2e-test-plan.md`) or execution report
+   (`*-e2e-test-report.md`), use that artifact. If it does not exist, report it as missing.
+2. Otherwise, resolve the feature from the ask, then from the task already in the
+   conversation. If a feature is known, select the newest artifact under
+   `.scratch/{feature}/e2e/`: plans are there, and reports are under its `runs/`.
+3. If neither the ask nor the conversation names a feature, select the newest
+   artifact across `.scratch/*/e2e/`. State which feature it belongs to.
+   If two artifacts are equally recent, ask the user to choose.
+
+A report means a continuation. In render mode, never create a substitute plan.
+A scenario described only in the ask is planning input, however complete it
+reads. The planning rules scale a plan down to one scenario.
+Before reading any stage's rules, state the mode and its starting artifacts.
 
 ## Run the stages
 
