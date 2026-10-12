@@ -59,6 +59,35 @@ repositories the session read.
 skills and shared agent instructions. Apply its wording, information hierarchy,
 context-pointer, and pruning guidance while preserving the intended behavior.
 
+### Improvement Method
+
+**Diagnose the decision:** trace a reported failure through the original request,
+relevant instructions, and actual artifacts. Separate the observed mismatch from
+its hypothesized cause. Consider missing guidance, execution omissions, and
+misleading inherited assumptions before deciding what the skill should change.
+
+**Generalize with evidence:** target the reasoning or observable property that
+should transfer across tasks. When the method is uncertain or wording changes
+repeatedly fail, consult primary engineering sources; check their problem,
+assumptions, and limits, and distinguish their findings from the proposed
+adaptation. Preserve confirmed requirements and governing contracts; keep
+proposals and replaceable technical choices open.
+
+**Revise and prune:** prefer replacing, merging, or removing existing guidance
+over appending rules. Give open-ended work decision criteria and conditional
+techniques; fixed steps earn their specificity through an established contract
+or demonstrated risk. Keep modeling and evidence proportional to the change.
+This method does not require another document, approval, or evaluation format.
+
+**Evaluate behavior:** define the intended change and acceptance evidence before
+the trial; inspect actual work products against that criterion. Format checks
+and passing tests do not establish an untested property such as structural fit.
+When comparing revisions, keep inputs and conditions fixed where possible and
+disclose differences that limit attribution. Count prompted repairs separately
+from first-attempt success. For generalization claims, probe contrasting task
+shapes and limit conclusions to what ran. When revisions repeatedly fail the same
+criterion, revisit the diagnosis and evaluation setup.
+
 ## Scripts
 
 A script's prefix decides what runs it, and `scripts/gate.mjs` discovers both
