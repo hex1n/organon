@@ -1,0 +1,344 @@
+#!/usr/bin/env node
+
+import assert from "node:assert/strict";
+import fs from "node:fs";
+import os from "node:os";
+import path from "node:path";
+import { spawnSync } from "node:child_process";
+import { fileURLToPath } from "node:url";
+
+const SCRIPT_DIR = path.dirname(fileURLToPath(import.meta.url));
+const ROOT = path.join(SCRIPT_DIR, "..");
+const STAGED_CLI = path.join(SCRIPT_DIR, "skill", "scripts", "rationale.mjs");
+const CLI = fs.existsSync(STAGED_CLI)
+  ? STAGED_CLI
+  : path.join(ROOT, "skills", "scholion", "scripts", "rationale.mjs");
+const STAGED_SKILL = path.join(SCRIPT_DIR, "skill", "SKILL.md");
+const SKILL = fs.existsSync(STAGED_SKILL)
+  ? STAGED_SKILL
+  : path.join(ROOT, "skills", "scholion", "SKILL.md");
+
+function run(args, cwd, stateRoot, extraEnv = {}) {
+  return spawnSync(process.execPath, [CLI, ...args], {
+    cwd,
+    encoding: "utf8",
+    windowsHide: true,
+    env: { ...process.env, ASDF_AGENT_STATE_ROOT: stateRoot, ...extraEnv },
+  });
+}
+
+function expect(result, status, label) {
+  if (result.status !== status) {
+    throw new Error(`${label} exited ${result.status} instead of ${status}\n${result.error?.message || ""}\n${result.stdout || ""}${result.stderr || ""}`);
+  }
+  return String(result.stdout || "") + String(result.stderr || "");
+}
+
+function git(repo, args) {
+  const result = spawnSync("git", args, { cwd: repo, encoding: "utf8", windowsHide: true });
+  expect(result, 0, `git ${args.join(" ")}`);
+  return String(result.stdout || "").trim();
+}
+
+function initRepo(repo) {
+  fs.mkdirSync(repo, { recursive: true });
+  git(repo, ["init", "-q", "-b", "main"]);
+  git(repo, ["config", "user.email", "rationale@example.invalid"]);
+  git(repo, ["config", "user.name", "Rationale Contract"]);
+  fs.writeFileSync(path.join(repo, ".gitignore"), "docs/rationale/\n.scratch/\n", "utf8");
+}
+
+function activeRecord(shape = "apply(first, second);") {
+  return [
+    "# Execution ordering",
+    "> TL;DR：Records call-order invariants shared by the execution path.",
+    "",
+    "## W-001 · 调用顺序保持先一后二",
+    "",
+    "- **文件路径** `src/main/java/sample/Alpha.java`",
+    `- **代码片段** \`${shape}\``,
+    "- **文件路径** `src/main/java/sample/Beta.java`",
+    "- **代码片段** `alpha.preserveOrder();`",
+    "- **实现理由** 第一行先建立状态，第二行再读取它。流程是 first → state → second；交换顺序会读到未初始化值。",
+    "",
+  ].join("\n");
+}
+
+function listFiles(root) {
+  const files = [];
+  if (!fs.existsSync(root)) return files;
+  for (const entry of fs.readdirSync(root, { withFileTypes: true })) {
+    const target = path.join(root, entry.name);
+    if (entry.isDirectory()) files.push(...listFiles(target));
+    else files.push(target);
+  }
+  return files;
+}
+
+function stage(name) {
+  process.stderr.write(`[contract] ${name}\n`);
+}
+
+const temporary = fs.mkdtempSync(path.join(os.tmpdir(), "asdf-rationale-v6-"));
+try {
+  const skill = fs.readFileSync(SKILL, "utf8");
+  for (const contract of ["personal", "Git-ignored", "current", "linked worktree", "handoff-consume"]) {
+    assert.match(skill, new RegExp(contract, "i"), `skill must state ${contract}`);
+  }
+  stage("skill contract");
+
+  const repo = path.join(temporary, "contract-repo");
+  const stateRoot = path.join(temporary, "state");
+  initRepo(repo);
+  const sourceDir = path.join(repo, "src", "main", "java", "sample");
+  const rationaleDir = path.join(repo, "docs", "rationale", "execution");
+  fs.mkdirSync(sourceDir, { recursive: true });
+  fs.mkdirSync(rationaleDir, { recursive: true });
+  const alpha = path.join(sourceDir, "Alpha.java");
+  const beta = path.join(sourceDir, "Beta.java");
+  const rationale = path.join(rationaleDir, "01-ordering.md");
+  fs.writeFileSync(alpha, "class Alpha { void preserveOrder() { apply(first, second); } }\n", "utf8");
+  fs.writeFileSync(beta, "class Beta { void callRule() { alpha.preserveOrder(); } }\n", "utf8");
+  fs.writeFileSync(rationale, activeRecord(), "utf8");
+  git(repo, ["add", "."]);
+  git(repo, ["commit", "-qm", "baseline"]);
+  assert.equal(git(repo, ["ls-files", "docs/rationale"]), "", "active rationale must stay ignored");
+  stage("fixture committed");
+
+  const full = JSON.parse(expect(run(["check", "--full", "--json"], repo, stateRoot), 0, "full check"));
+  assert.equal(full.failures.length, 0);
+  assert.equal(full.anchors, 2);
+  for (const query of ["W-001", "Alpha#preserveOrder", "src/main/java/sample/Alpha.java:1", "调用顺序"]) {
+    const found = expect(run(["find", query], repo, stateRoot), 0, `find ${query}`);
+    assert.match(found, /W-001/);
+    if (query.includes("#")) assert.match(found, /近邻导航/);
+  }
+  stage("full check and navigation");
+
+  const linkPreview = JSON.parse(expect(run(["links", "--json"], repo, stateRoot), 0, "links preview"));
+  assert.equal(linkPreview.links[0].href, "../../../src/main/java/sample/Alpha.java#L1");
+  assert.equal(fs.readFileSync(rationale, "utf8"), activeRecord(), "preview leaves records unchanged");
+  const interruption = path.join(temporary, "interrupt-write.cjs");
+  fs.writeFileSync(interruption, `
+    const fs = require("node:fs");
+    const original = fs.renameSync;
+    fs.renameSync = function (from, to) {
+      const result = original.apply(this, arguments);
+      if (from === process.env.RATIONALE_TEST_RECORD || to === process.env.RATIONALE_TEST_RECORD) process.exit(86);
+      return result;
+    };
+  `);
+  expect(run(["links", "--apply"], repo, stateRoot, {
+    NODE_OPTIONS: `${process.env.NODE_OPTIONS || ""} --require="${interruption.replaceAll("\\", "/")}"`,
+    RATIONALE_TEST_RECORD: rationale,
+  }), 86, "interrupt immediately after a record rename");
+  assert.ok(fs.existsSync(rationale), "the original record name must remain visible after abrupt termination");
+  assert.match(fs.readFileSync(rationale, "utf8"), /#L1>/, "the visible record contains the complete replacement");
+  expect(run(["links", "--apply"], repo, stateRoot), 0, "generate links");
+  assert.match(fs.readFileSync(rationale, "utf8"), /\[`apply\(first, second\);`\]\(<\.\.\/\.\.\/\.\.\/src\/main\/java\/sample\/Alpha.java#L1>\)/);
+  expect(run(["check", "--full"], repo, stateRoot), 0, "linked records retain schema and anchors");
+  expect(run(["find", "W-001"], repo, stateRoot), 0, "find linked record");
+  expect(run(["links", "--check"], repo, stateRoot), 0, "links are current");
+  fs.writeFileSync(alpha, "\n\n" + fs.readFileSync(alpha, "utf8"));
+  expect(run(["links", "--check"], repo, stateRoot), 1, "line drift detected");
+  expect(run(["links", "--apply"], repo, stateRoot), 0, "refresh moved anchor");
+  assert.match(fs.readFileSync(rationale, "utf8"), /Alpha.java#L3/);
+  const secondApply = JSON.parse(expect(run(["links", "--apply", "--json"], repo, stateRoot), 0, "idempotent links"));
+  assert.deepEqual(secondApply.changedFiles, []);
+  const linkedBeforeFailure = fs.readFileSync(rationale, "utf8");
+  fs.writeFileSync(beta, "class Beta {}\n");
+  expect(run(["links", "--apply"], repo, stateRoot), 1, "invalid anchor prevents writes");
+  assert.equal(fs.readFileSync(rationale, "utf8"), linkedBeforeFailure);
+  fs.writeFileSync(alpha, "class Alpha { void preserveOrder() { apply(first, second); } }\n");
+  fs.writeFileSync(beta, "class Beta { void callRule() { alpha.preserveOrder(); } }\n");
+  const crlf = activeRecord().replaceAll("\n", "\r\n");
+  fs.writeFileSync(rationale, crlf);
+  expect(run(["links", "--apply"], repo, stateRoot), 0, "CRLF links");
+  assert.ok(!/(?<!\r)\n/.test(fs.readFileSync(rationale, "utf8")), "keep CRLF");
+  fs.writeFileSync(rationale, activeRecord());
+  stage("preview links, refresh, failure isolation, and CRLF preservation");
+
+  const rebuilt = JSON.parse(expect(run(["check", "--incremental", "--json"], repo, stateRoot), 0, "initial incremental"));
+  assert.equal(rebuilt.mode, "full-rebuild");
+  const stateFile = listFiles(stateRoot).find((file) => file.endsWith(".json"));
+  assert.ok(stateFile, "incremental check must create user-local state");
+  stage("incremental state");
+
+  const lookup = expect(run(["find", "W-001", "--full"], repo, stateRoot), 0, "record lookup");
+  assert.match(lookup, /实现理由 第一行先建立状态/);
+
+  for (const [label, content, error] of [
+    ["retired label is not a field", activeRecord() + "- **解释** 第二份理由\n", /unsupported active-record content/],
+    ["duplicate rationale", activeRecord() + "- **实现理由** 第二份理由\n", /duplicate \*\*实现理由\*\*/],
+    ["snippet without its own path", activeRecord().replace("- **文件路径** `src/main/java/sample/Beta.java`",
+      "- **代码片段** `apply(first, second);`\n- **文件路径** `src/main/java/sample/Beta.java`"), /\*\*代码片段\*\* must follow/],
+    ["missing snippet", activeRecord().replace("- **代码片段** `apply(first, second);`\n", ""), /missing \*\*代码片段\*\*/],
+    ["path after rationale", activeRecord() + "- **文件路径** `src/main/java/sample/Beta.java`\n- **代码片段** `alpha.preserveOrder();`\n",
+      /\*\*文件路径\*\* must precede \*\*实现理由\*\*/],
+  ]) {
+    fs.writeFileSync(rationale, content, "utf8");
+    const rejected = JSON.parse(expect(run(["check", "--full", "--json"], repo, stateRoot), 1, label));
+    assert.match(JSON.stringify(rejected.failures), error);
+  }
+  fs.writeFileSync(rationale, activeRecord(), "utf8");
+  expect(run(["check", "--incremental", "--json"], repo, stateRoot), 0, "canonical record restored");
+  stage("field label validation");
+
+  // An id names what the record anchors, so it is not always a number and not
+  // always ASCII; lookup matches it without regard to case, and a name may hold
+  // a `\u00b7` because the separator is the `\u00b7` that follows blank space.
+  for (const [id, query] of [["W-\u8c03\u7528\u987a\u5e8f", "W-\u8c03\u7528\u987a\u5e8f"], ["W-Call-Order", "w-call-order"],
+    ["W-\u9a6c\u514b\u00b7\u5410\u6e29\u89c4\u5219", "W-\u9a6c\u514b\u00b7\u5410\u6e29\u89c4\u5219"]]) {
+    fs.writeFileSync(rationale, activeRecord().replace("## W-001 \u00b7", `## ${id} \u00b7`), "utf8");
+    const named = JSON.parse(expect(run(["check", "--full", "--json"], repo, stateRoot), 0, `named id ${id}`));
+    assert.equal(named.failures.length, 0);
+    assert.equal(named.anchors, 2);
+    const found = expect(run(["find", query, "--full"], repo, stateRoot), 0, `find ${query}`);
+    assert.ok(found.includes(id), `find must resolve ${query} to ${id}`);
+  }
+  // Without blank space before it the `·` belongs to the name, so the heading has
+  // no separator and is refused rather than silently split.
+  fs.writeFileSync(rationale, activeRecord().replace("## W-001 · ", "## W-001·"), "utf8");
+  const unseparated = JSON.parse(expect(run(["check", "--full", "--json"], repo, stateRoot), 1, "heading without a separator"));
+  assert.match(JSON.stringify(unseparated.failures), /unsupported heading/);
+  // Uniqueness and find share one id equality: two ids differing only in case
+  // are the same id, since find would return both.
+  const caseVariant = path.join(rationaleDir, "02-case-variant.md");
+  fs.writeFileSync(rationale, activeRecord().replace("## W-001 ·", "## W-Call-Order ·"), "utf8");
+  fs.writeFileSync(caseVariant, activeRecord().replace("## W-001 ·", "## W-call-order ·"), "utf8");
+  const caseDuplicate = JSON.parse(expect(run(["check", "--full", "--json"], repo, stateRoot), 1, "case-variant duplicate"));
+  assert.match(JSON.stringify(caseDuplicate.failures), /duplicated across W-Call-Order in .*W-call-order in /);
+  fs.rmSync(caseVariant);
+  fs.writeFileSync(rationale, activeRecord(), "utf8");
+  expect(run(["check", "--full", "--json"], repo, stateRoot), 0, "numeric id restored");
+  stage("ids are names, not positions");
+
+  fs.writeFileSync(alpha, [
+    "class Alpha {",
+    "    void preserveOrder() {",
+    "        apply(",
+    "            first,",
+    "            second",
+    "        );",
+    "    }",
+    "}",
+    "",
+  ].join("\n"), "utf8");
+  const whitespaceOnly = JSON.parse(expect(run(["check", "--incremental", "--json"], repo, stateRoot), 0, "whitespace-only source change"));
+  assert.equal(whitespaceOnly.failures.length, 0, "line wrapping must not invalidate a code anchor");
+  assert.match(expect(run(["find", "W-001"], repo, stateRoot), 0, "find formatted anchor"), /Alpha\.java:3/);
+  stage("whitespace-insensitive anchor");
+
+  const explanationFlow = "first -> state -> second";
+  fs.writeFileSync(rationale, activeRecord() + `  \`\`\`text\n  ${explanationFlow}\n  \`\`\`\n`, "utf8");
+  const continued = JSON.parse(expect(run(["check", "--full", "--json"], repo, stateRoot), 0,
+    "single-line snippet with multiline source and explanation"));
+  assert.equal(continued.anchors, 2);
+  assert.ok(expect(run(["find", "W-001", "--full"], repo, stateRoot), 0,
+    "find continued explanation").includes(explanationFlow), "navigation must preserve explanation continuation");
+  fs.writeFileSync(rationale, activeRecord(), "utf8");
+  stage("explanation continuation with single-line snippet");
+
+  fs.writeFileSync(alpha, "class Alpha { void preserveOrder() { apply(firstsecond); } }\n", "utf8");
+  const tokenBoundaryFailure = JSON.parse(expect(run(["check", "--incremental", "--json"], repo, stateRoot), 1, "token boundary mutation"));
+  assert.match(JSON.stringify(tokenBoundaryFailure.failures), /code snippet occurs 0/,
+    "different tokens must not match merely because whitespace is ignored");
+  fs.writeFileSync(alpha, "class Alpha { void preserveOrder() { apply(first, second); } }\n", "utf8");
+  expect(run(["check", "--incremental", "--json"], repo, stateRoot), 0, "token boundary repair");
+  stage("token boundary preservation");
+
+  fs.writeFileSync(rationale, activeRecord("apply(second, first);"), "utf8");
+  const ignoredEdit = JSON.parse(expect(run(["check", "--incremental", "--json"], repo, stateRoot), 1, "ignored rationale edit"));
+  assert.equal(ignoredEdit.failures.length > 0, true, "ignored rationale edits must still be checked");
+  stage("ignored rationale edit");
+
+  fs.writeFileSync(rationale, activeRecord(), "utf8");
+  expect(run(["check", "--incremental", "--json"], repo, stateRoot), 0, "rationale repair");
+  fs.writeFileSync(stateFile, "{broken", "utf8");
+  const corrupt = JSON.parse(expect(run(["check", "--incremental", "--json"], repo, stateRoot), 0, "corrupt state rebuild"));
+  assert.equal(corrupt.mode, "full-rebuild");
+  stage("corrupt state rebuild");
+
+  const beforeFailure = fs.readFileSync(stateFile, "utf8");
+  fs.writeFileSync(alpha, "class Alpha { void preserveOrder() { apply(second, first); } }\n", "utf8");
+  const sourceFailure = JSON.parse(expect(run(["check", "--incremental", "--json"], repo, stateRoot), 1, "changed source"));
+  assert.equal(sourceFailure.failures.length > 0, true);
+  assert.equal(fs.readFileSync(stateFile, "utf8"), beforeFailure, "failed checks must not advance state");
+  fs.writeFileSync(rationale, activeRecord("apply(second, first);"), "utf8");
+  expect(run(["check", "--incremental", "--json"], repo, stateRoot), 0, "shape repair");
+  stage("source change selection");
+
+  const duplicate = path.join(rationaleDir, "02-duplicate.md");
+  fs.writeFileSync(duplicate, activeRecord("apply(second, first);"), "utf8");
+  const duplicateResult = JSON.parse(expect(run(["check", "--incremental", "--json"], repo, stateRoot), 1, "cross-file duplicate"));
+  assert.match(JSON.stringify(duplicateResult.failures), /duplicated/);
+  fs.rmSync(duplicate);
+  expect(run(["check", "--incremental", "--json"], repo, stateRoot), 0, "duplicate repair");
+  stage("duplicate ID rejection");
+
+  const invalid = path.join(rationaleDir, "03-invalid.md");
+  fs.writeFileSync(invalid, "# 调研记录\n\n这里放一轮评审证据。\n", "utf8");
+  const invalidResult = JSON.parse(expect(run(["check", "--incremental", "--json"], repo, stateRoot), 1, "unsupported file content"));
+  assert.match(JSON.stringify(invalidResult.failures), /outside|unsupported/);
+  fs.rmSync(invalid);
+  stage("invalid file rejection");
+
+  const handoffRepo = path.join(temporary, "handoff-main");
+  const taskRoot = path.join(temporary, "handoff-task");
+  const handoffState = path.join(temporary, "handoff-state");
+  initRepo(handoffRepo);
+  const handoffSource = path.join(handoffRepo, "src", "main", "java", "sample", "Version.java");
+  const handoffRationale = path.join(handoffRepo, "docs", "rationale", "versioning", "01-current-version.md");
+  fs.mkdirSync(path.dirname(handoffSource), { recursive: true });
+  fs.mkdirSync(path.dirname(handoffRationale), { recursive: true });
+  fs.writeFileSync(handoffSource, "class Version { int current() { return 1; } }\n", "utf8");
+  fs.writeFileSync(handoffRationale, [
+    "# Version selection",
+    "> TL;DR：Records invariants for selecting the current version.",
+    "",
+    "## W-001 · 当前版本值保持一致",
+    "",
+    "- **文件路径** `src/main/java/sample/Version.java`",
+    "- **代码片段** `return 1;`",
+    "- **实现理由** 该常量是持久化版本的唯一当前值，返回其他值会让调用方按错误版本解码。",
+    "",
+  ].join("\n"), "utf8");
+  git(handoffRepo, ["add", "."]);
+  git(handoffRepo, ["commit", "-qm", "baseline"]);
+  const base = git(handoffRepo, ["rev-parse", "HEAD"]);
+  expect(run(["check", "--incremental", "--json"], handoffRepo, handoffState), 0, "handoff baseline state");
+  git(handoffRepo, ["worktree", "add", "-q", "-b", "task-rationale", taskRoot, "HEAD"]);
+  const linkedCheck = JSON.parse(expect(run(["check", "--incremental", "--json"], taskRoot, handoffState), 0, "linked skip"));
+  assert.equal(linkedCheck.reason, "linked-worktree");
+  stage("linked worktree skip");
+  const taskSource = path.join(taskRoot, "src", "main", "java", "sample", "Version.java");
+  fs.writeFileSync(taskSource, "class Version { int current() { return 2; } }\n", "utf8");
+  git(taskRoot, ["add", "."]);
+  git(taskRoot, ["commit", "-qm", "change version"]);
+  const manifestPath = expect(run([
+    "handoff-create", "--task", "TASK-1", "--base", base, "--note", "none",
+  ], taskRoot, handoffState), 0, "none handoff").trim();
+  assert.equal(fs.existsSync(manifestPath), true);
+  stage("none handoff sealed");
+  git(handoffRepo, ["merge", "--ff-only", "task-rationale"]);
+
+  const delayedFailure = run(["handoff-consume", "--manifest", manifestPath], handoffRepo, handoffState);
+  assert.notEqual(delayedFailure.status, 0, "none handoff must still check base-to-integrated source changes");
+  stage("post-merge stale anchor rejection");
+  fs.writeFileSync(handoffRationale, fs.readFileSync(handoffRationale, "utf8").replace("return 1;", "return 2;"), "utf8");
+  const receiptPath = expect(run(["handoff-consume", "--manifest", manifestPath], handoffRepo, handoffState), 0, "consume repaired handoff").trim();
+  assert.equal(fs.existsSync(receiptPath), true);
+  stage("main receipt");
+  assert.match(expect(run([
+    "worktree-finish", "--manifest", manifestPath, "--main-root", handoffRepo, "--branch", "task-rationale",
+  ], handoffRepo, handoffState), 0, "finish dry-run"), /READY/);
+  assert.match(expect(run([
+    "worktree-finish", "--manifest", manifestPath, "--main-root", handoffRepo,
+    "--branch", "task-rationale", "--apply",
+  ], handoffRepo, handoffState), 0, "finish apply"), /REMOVED/);
+  assert.equal(fs.existsSync(taskRoot), false, "verified linked worktree must be removed");
+
+  process.stdout.write("Personal rationale v6 contract OK\n");
+} finally {
+  fs.rmSync(temporary, { recursive: true, force: true });
+}

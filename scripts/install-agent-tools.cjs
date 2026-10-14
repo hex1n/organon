@@ -16,7 +16,7 @@ const ROOT = path.join(__dirname, "..");
 const RULES_SOURCE_NAME = "global-agent-rules.md";
 const ASSET_SPECS = [
   { name: "java-formatter", source: ["tools", "java-formatter"], install: [".agents", "tools", "java-formatter"] },
-  { name: "rationale-records", source: ["skills", "rationale-records"], install: [".agents", "skills", "rationale-records"] },
+  { name: "scholion", source: ["skills", "scholion"], install: [".agents", "skills", "scholion"] },
 ];
 const MANAGED_FRAGMENT = ".agents/tools/java-formatter/run-agent-hook.mjs";
 const STATUS = "Checking local rationale and repository gates";

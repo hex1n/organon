@@ -58,6 +58,10 @@ repositories the session read.
 **Wording and structure:** use `writing-for-agents` when writing or editing
 skills and shared agent instructions. Apply its wording, information hierarchy,
 context-pointer, and pruning guidance while preserving the intended behavior.
+Apply the [instruction design constitution](global-agent-rules.md#instruction-design-constitution)
+to the complete skill and its instruction references. Choose writing, diagrams,
+interactive HTML, or video where it improves understanding. Keep clear text
+and exact schema, command, and interface contracts intact.
 
 ### Improvement Method
 
@@ -73,11 +77,11 @@ assumptions, and limits, and distinguish their findings from the proposed
 adaptation. Preserve confirmed requirements and governing contracts; keep
 proposals and replaceable technical choices open.
 
-**Revise and prune:** prefer replacing, merging, or removing existing guidance
-over appending rules. Give open-ended work decision criteria and conditional
-techniques; fixed steps earn their specificity through an established contract
-or demonstrated risk. Keep modeling and evidence proportional to the change.
-This method does not require another document, approval, or evaluation format.
+**Revise and prune:** prefer replacing, merging, or removing guidance over
+appending rules. Apply the instruction design constitution to the complete
+path. Check which behavior each retained or removed instruction changes;
+preserve required contracts and keep evidence proportional to the change.
+This method adds no document, approval, or evaluation format.
 
 **Evaluate behavior:** define the intended change and acceptance evidence before
 the trial; inspect actual work products against that criterion. Format checks
@@ -127,9 +131,9 @@ When changing these targets:
 - `tools/java-formatter/` or its installer: read
   [tools/java-formatter/README.md](tools/java-formatter/README.md) and run
   `node scripts/contract-java-formatter.mjs`.
-- `skills/rationale-records/`: read
-  [skills/rationale-records/README.md](skills/rationale-records/README.md) and run
-  `node scripts/contract-rationale-records.mjs`.
+- `skills/scholion/`: read
+  [skills/scholion/README.md](skills/scholion/README.md) and run
+  `node scripts/contract-scholion.mjs`.
 - `global-agent-rules.md`: run `node scripts/install-agent-tools.cjs --apply` so a
   Codex copy made where a file symlink was unavailable follows the source, then
   `node scripts/gate.mjs`, whose installed-copies check reports a stale copy.

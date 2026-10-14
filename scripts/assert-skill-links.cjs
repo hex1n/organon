@@ -179,7 +179,7 @@ function checkSkill(dir, name) {
 
       // A link that leaves the skill directory is checked when it lands in a
       // sibling skill of this repository (an optional cross-skill pointer such
-      // as arborist -> scrutineer); one that leaves skills/ is out of scope.
+      // as tekton -> euthyna); one that leaves skills/ is out of scope.
       let base = dir;
       let rel = resolved;
       if (resolved === ".." || resolved.startsWith("../")) {

@@ -12,8 +12,8 @@ const TOOL_ROOT = path.dirname(fileURLToPath(import.meta.url));
 // The rationale checker is a separate asset, so this tool locates it instead of
 // assuming one layout: an explicit override, the sibling source tree, then the
 // installed skill. A missing checker is a setup failure, never a record failure.
-const RATIONALE_SOURCE_CLI = path.resolve(TOOL_ROOT, "..", "..", "skills", "rationale-records", "scripts", "rationale.mjs");
-const RATIONALE_INSTALLED_CLI = path.join(os.homedir(), ".agents", "skills", "rationale-records", "scripts", "rationale.mjs");
+const RATIONALE_SOURCE_CLI = path.resolve(TOOL_ROOT, "..", "..", "skills", "scholion", "scripts", "rationale.mjs");
+const RATIONALE_INSTALLED_CLI = path.join(os.homedir(), ".agents", "skills", "scholion", "scripts", "rationale.mjs");
 function readInput() {
   const raw = fs.readFileSync(0, "utf8").trim();
   if (!raw) return { raw: "", value: {} };
@@ -103,7 +103,7 @@ export function resolveRationaleCli(env = process.env, candidates = [RATIONALE_S
 function runRationaleGate(repoRoot) {
   const cli = resolveRationaleCli();
   if (!cli) {
-    throw new Error("This repository has docs/rationale, but the rationale-records checker is not installed.\n"
+    throw new Error("This repository has docs/rationale, but the scholion checker is not installed.\n"
       + "Install it from the asdf-skills source tree with: node scripts/install-agent-tools.cjs --apply\n"
       + "Or point ASDF_RATIONALE_CLI at an existing rationale.mjs.");
   }

@@ -174,6 +174,42 @@ function findStrays(skills, home = os.homedir(), skillsRoot = SKILLS_ROOT) {
   return strays.sort((a, b) => a.runtime.localeCompare(b.runtime) || a.skill.localeCompare(b.skill));
 }
 
+// A link of ours left behind when a source skill was renamed or retired: it
+// sits in a target runtime and its stored target names a directory directly
+// under this repository's skills/ tree that no longer exists. Provenance comes
+// from the stored target, read without resolving it, because a dangling link
+// has no realpath. A real directory, a live link, or a link elsewhere may be a
+// local override and is never touched.
+function findOrphans(home = os.homedir(), skillsRoot = SKILLS_ROOT) {
+  const fold = (value) => (process.platform === "win32" ? value.toLowerCase() : value);
+  const roots = new Set([fold(path.resolve(skillsRoot))]);
+  try {
+    roots.add(fold(fs.realpathSync(skillsRoot)));
+  } catch {}
+  const orphans = [];
+  const scanned = new Set();
+  for (const runtime of TARGET_RUNTIMES) {
+    const skillsDir = path.join(home, runtime, "skills");
+    let resolvedDir;
+    try {
+      resolvedDir = fs.realpathSync(skillsDir);
+    } catch {
+      continue;
+    }
+    // ~/.claude/skills may alias ~/.agents/skills; one directory is scanned once.
+    if (scanned.has(resolvedDir)) continue;
+    scanned.add(resolvedDir);
+    for (const child of fs.readdirSync(skillsDir, { withFileTypes: true })) {
+      if (!child.isSymbolicLink()) continue;
+      const installPath = path.join(skillsDir, child.name);
+      const target = path.resolve(skillsDir, fs.readlinkSync(installPath));
+      if (!roots.has(fold(path.dirname(target))) || fs.existsSync(target)) continue;
+      orphans.push({ runtime, skill: child.name, installPath, target });
+    }
+  }
+  return orphans.sort((a, b) => a.runtime.localeCompare(b.runtime) || a.skill.localeCompare(b.skill));
+}
+
 function main(argv) {
   const apply = argv.includes("--apply");
   const pruneStray = argv.includes("--prune-stray");
@@ -202,14 +238,19 @@ function main(argv) {
     );
     if (apply && pruneStray) fs.rmSync(stray.installPath, { recursive: true, force: true });
   }
+  const orphans = findOrphans();
+  for (const orphan of orphans) {
+    process.stdout.write(`${apply ? "DO remove" : "would remove"} orphaned link: ${orphan.skill} @ ${orphan.runtime}\n`);
+    if (apply) fs.unlinkSync(orphan.installPath);
+  }
 
   const linked = plan.length - changes.length;
   process.stdout.write(
     `${apply ? "applied" : "plan"}: ${skills.length} skills, ${plan.length} install paths across ` +
       `${TARGET_RUNTIMES.join(", ")} — ${linked} already linked, ${changes.length} to change, ` +
-      `${strays.length} stray\n`,
+      `${strays.length} stray, ${orphans.length} orphaned\n`,
   );
-  if (!apply && (changes.length || (pruneStray && prunable.length))) {
+  if (!apply && (changes.length || orphans.length || (pruneStray && prunable.length))) {
     process.stdout.write("re-run with --apply to make these changes\n");
   }
 }

@@ -29,8 +29,8 @@ const path = require("node:path");
 const ROOT = path.join(__dirname, "..");
 
 const TEMPLATES = [
-  { doc: "skills/scrutineer/HANDOFF.md", schema: "skills/scrutineer/handoff-schema.json" },
-  { doc: "skills/scrutineer/REPORT.md", schema: "skills/scrutineer/review-record-schema.json" },
+  { doc: "skills/euthyna/HANDOFF.md", schema: "skills/euthyna/handoff-schema.json" },
+  { doc: "skills/euthyna/REPORT.md", schema: "skills/euthyna/review-record-schema.json" },
 ];
 
 function readTemplate(markdown) {

@@ -20,6 +20,51 @@ spec is looked for in the repository's plans or task scratch folder, and the
 axis is skipped when none exists; a failure that cannot be reproduced is
 marked "no loop" and analysis continues statically.
 
+## Instruction design constitution
+
+Apply this constitution when creating, auditing, or editing skills,
+`AGENTS.md`, `CLAUDE.md`, prompts, and referenced rule documents.
+Write for a capable model: keep outcomes, non-obvious context, decision
+criteria and required constraints. Prefer the shortest sufficient instruction.
+Remove generic tutorials, repetition and obsolete rules; use fixed steps only
+for a real dependency or demonstrated risk. Keep essential conditions visible
+and load branch-specific detail when needed. Review the complete instruction
+path, including references. Check behavior after pruning; brevity alone is not
+evidence of improvement.
+
+Adapted from [Karpathy's four explanation formats](https://x.com/karpathy/status/2105819303471976479):
+
+- **Writing:** use clear, direct prose as the default. Borrow
+  [ASD-STE100](https://www.asd-ste100.org/STE_faq.html): prefer short sentences,
+  explicit actions, and consistent terms. Keep conditions and exceptions with
+  their actions. "About 80%" means flexible adoption, not a compliance score.
+  Write naturally in the document's language; use longer wording when clearer.
+- **Diagrams or images:** use them when relationships, boundaries, order, or
+  state are easier to inspect visually. Show the relevant subjects, rule
+  owners, and dependencies. Mark unknown relationships where they appear.
+- **Interactive HTML:** use it when changing inputs, comparing alternatives,
+  or exploring branches helps the reader understand a decision. Make inputs,
+  assumptions, and resulting behavior visible. Check the interactions used
+  to support the explanation.
+- **Explainer videos:** use them when a paced sequence, movement, or narration
+  adds material understanding, or when requested. Keep scenes and narration
+  consistent with the source. Inspect the rendered sequence; disclose any
+  unverified playback or narration.
+
+Choose and combine formats by the reader's question, understanding gained,
+and creation and maintenance cost. A short answer can be enough. These formats
+are options; every task need not produce all four. Honor the requested form,
+artifact scope, available tools, and existing authorization.
+
+Keep executable instructions and authoritative facts in their canonical text
+or record. Each derived view carries its source identity, scope, and material
+uncertainties. Separate observed behavior, assumptions, and proposals.
+Preserve technical terms, identifiers, permissions, rule strength, business
+intent, and required dependencies. A view must not imply an order or guarantee
+the source does not establish. Check the relevant content and rendering before
+delivery, and state what remains unverified. Explanation quality does not
+substitute for evidence that the required behavior and structure hold.
+
 ## Autonomy boundary
 
 **Proceed without asking:**
