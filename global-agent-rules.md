@@ -38,10 +38,20 @@ Adapted from [Karpathy's four explanation formats](https://x.com/karpathy/status
   [ASD-STE100](https://www.asd-ste100.org/STE_faq.html): prefer short sentences,
   explicit actions, and consistent terms. Keep conditions and exceptions with
   their actions. "About 80%" means flexible adoption, not a compliance score.
+  Apply these principles to prose, headings, labels, legends and annotations.
   Write naturally in the document's language; use longer wording when clearer.
+  Shorten wording without omitting required information.
 - **Diagrams or images:** use them when relationships, boundaries, order, or
   state are easier to inspect visually. Show the relevant subjects, rule
   owners, and dependencies. Mark unknown relationships where they appear.
+  Separate overview from reference detail. Each node represents one role, state
+  or action. Put field lists, predicates and caveats in keyed adjacent notes;
+  keep conditions that change a relationship with that relationship. Make the
+  reading path clear. Choose grouping and direction for the relationships;
+  align related items, give them space and reduce crossing or backtracking edges.
+  If the overview is still dense, revise its abstraction or split complementary
+  views rather than shrink the text. Use restrained colour with sufficient
+  contrast; convey status in text too.
 - **Interactive HTML:** use it when changing inputs, comparing alternatives,
   or exploring branches helps the reader understand a decision. Make inputs,
   assumptions, and resulting behavior visible. Check the interactions used
@@ -56,13 +66,21 @@ and creation and maintenance cost. A short answer can be enough. These formats
 are options; every task need not produce all four. Honor the requested form,
 artifact scope, available tools, and existing authorization.
 
+For visual explanations, prefer a suitable installed skill such as `show-me`
+when available. Pass it the source model, scope and unknowns. The originating
+workflow retains factual correctness, required formats and visual acceptance,
+and supplies the view directly when no suitable helper is available.
+
 Keep executable instructions and authoritative facts in their canonical text
 or record. Each derived view carries its source identity, scope, and material
 uncertainties. Separate observed behavior, assumptions, and proposals.
 Preserve technical terms, identifiers, permissions, rule strength, business
 intent, and required dependencies. A view must not imply an order or guarantee
-the source does not establish. Check the relevant content and rendering before
-delivery, and state what remains unverified. Explanation quality does not
+the source does not establish. Check content and inspect the rendered view at
+its intended reading size, including dense branches and long labels. Fix
+unreadable text, collisions, clipping and connections that are hard to trace;
+a successful render alone is insufficient. Revise grouping, layout or format
+when needed. State what remains unverified. Explanation quality does not
 substitute for evidence that the required behavior and structure hold.
 
 ## Autonomy boundary

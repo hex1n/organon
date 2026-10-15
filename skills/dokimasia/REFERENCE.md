@@ -57,8 +57,26 @@ reuse it for subsequent rounds. Keep existing audit directories and links intact
 The parent maintains `review-ledger.json` as the authoritative machine record
 of receipts, reviewer payloads, validations, dispositions, and gate state.
 `review.md` presents the current two-track outcome and complete findings with
-parent validations, linking the ledger rather than embedding its JSON. Before
-a later round replaces that report, preserve the completed round as
+parent validations. Link the authoritative ledger and exact candidate revision
+rather than embedding the ledger's JSON. Optional derived views identify those
+sources, their scope and material uncertainties. Preserve reviewer claims, parent judgments,
+rule ownership and required dependencies. Show order or guarantees only when
+the candidate establishes them. For diagrams, separate overview from reference
+detail. Give each node one role, state or action with a short, consistent label.
+Put field lists, predicates and caveats in keyed adjacent notes; keep conditions
+that change a relationship with that relationship. Group related claims, align
+items and leave space. If the overview stays dense, revise its abstraction or
+split complementary views rather than shrink text. Choose direction for the
+dependencies and avoid edges
+that obscure them. Use restrained colour, readable contrast and text for status.
+Check content and inspect the view at its intended reading size. Fix unreadable
+labels, collisions, clipping and connections that are hard to trace; successful
+rendering alone is insufficient. Exercise interactions used to explain a
+conclusion and disclose unverified behavior.
+A derived view does not replace the report, change either outcome track or
+satisfy the Exact Gate.
+
+Before a later round replaces that report, preserve the completed round as
 `review-r1.md`, `review-r2.md`, and so on. Keep original reviewer claims and
 parent judgments distinguishable, including challenges and later resolutions;
 retain prior receipt and report payloads in the cumulative ledger. Report
@@ -119,9 +137,9 @@ authorizes a duplicate invocation. Every retry gets a new handle and receipt.
 
 Helpers do not count as required reviewers and default to zero. A helper requires
 a pre-declared, non-overlapping evidence lane. Its lane must not repeat source
-inspection already owned by the parent reviewer, and its output is evidence for
-the parent—not an independent verdict. Include each helper's usage in the round
-receipt exactly once.
+inspection already owned by the parent reviewer. Its output supplies evidence
+to the required reviewer; it is not an independent verdict. Include each helper's
+usage in the round receipt exactly once.
 
 ## Focused Recheck
 

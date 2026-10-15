@@ -216,11 +216,31 @@ severity, evidence class, limit and re-review disposition with its evidence.
 For an empty entry kind, use one sentence instead of a section; always include
 verdict and coverage.
 
-Derived views stay within the requested scope and use the record and cited
-evidence. Preserve the verdict and each shown item's id, kind, severity and
-evidence status; label unknown relationships and retain material limits.
-A scoped summary labels its scope and links the complete record or report;
-it does not replace them. The JSON record remains authoritative.
+Derived views use the delivered record and cited evidence within the requested
+scope. Identify the record, reviewed revision, view scope and material limits.
+Preserve the verdict and each shown item's id, kind, severity and evidence status.
+When showing behavior or structure, preserve business subjects, rule owners and
+required dependencies. Distinguish logical dependencies from execution order;
+add no unsupported order or guarantee. Keep observations, assumptions and
+proposed remedies distinguishable. Label unknown relationships where they appear.
+
+For diagrams, make the defect and affected boundary easy to find. Separate
+overview from reference detail. Give each node one role, state or action with
+a short, consistent label. Put field lists, predicates and caveats in keyed
+adjacent notes; keep conditions that change a relationship with that relationship.
+Group related roles, align items and leave space. If the overview stays dense,
+revise its abstraction or split complementary views rather than shrink text.
+Choose direction for the
+relationships and avoid edges that obscure them. Use restrained colour,
+readable contrast and text for status. Inspect the view at its intended reading
+size, including dense branches and long labels. Fix crowding, clipping,
+unreadable text and connections that are hard to trace; successful rendering
+alone is insufficient.
+
+Check content and exercise interactions used to support a conclusion. State
+what remains unverified. A scoped summary links
+the complete record or report and does not replace them. The JSON record remains
+authoritative.
 
 ## Rules
 

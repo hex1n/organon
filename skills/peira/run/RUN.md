@@ -35,8 +35,8 @@ the whole scenario.
 Resolve each selected scenario's starting inputs/state, legitimate trigger, final
 observation/completion predicate, expected result and authority, and resources it
 reads or changes. `execution-anchors/v1` plans supply these as Preconditions, Actions,
-Observes, and State Footprint plus verdict facts. Missing business authority or a
-contradictory marked anchor is a plan gap; missing live commands, credentials, probes,
+Observes, State Footprint, and Capabilities plus verdict facts. Missing business
+authority or a contradictory marked anchor is a plan gap; missing live commands, credentials, probes,
 or fixtures is an execution blocker. Derive mechanics from available sources before
 asking for facts; keep unresolved facts explicit.
 

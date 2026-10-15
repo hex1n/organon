@@ -54,9 +54,13 @@ the user needs them to understand scope. Express the Bestness Check naturally;
 a fixed heading is optional. For Light decisions, keep the first line compact.
 Add external sources only when they help the decision.
 
-Choose the smallest presentation that makes the decision checkable. Link
-decisive claims to sources and distinguish facts, assumptions and proposals.
-Use [Evidence Conventions](REFERENCE.md#evidence-conventions) for material claims.
+Choose the smallest presentation that makes the decision checkable. Clear prose
+can be enough. Use a diagram when relationships are easier to inspect visually;
+use an interactive comparison when changing assumptions clarifies the choice.
+Weigh that benefit against creation and maintenance cost. For these views, use
+[Decision Views](REFERENCE.md#decision-views). Link decisive claims to sources
+and distinguish facts, assumptions and proposals. Use
+[Evidence Conventions](REFERENCE.md#evidence-conventions) for material claims.
 
 | Mode | Use when | Shape |
 |---|---|---|

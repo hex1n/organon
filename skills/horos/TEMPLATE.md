@@ -1,7 +1,8 @@
 # {Interface or Feature} API Documentation
 
 > Scope: {interfaces or business chain covered}.
-> Baseline: branch `{branch}` compared with `{base}`. Protocol: `{rpc|http}`.
+> Protocol: `{rpc|http}`.
+> Comparison baseline: branch `{branch}` compared with `{base}`. Omit this line when no change comparison was requested.
 > Contract authority: {applicable approved contract/design or designated code revision, or unknown}.
 > Implementation evidence: {inspected source revision or snapshot}.
 > Change legend: added / modified / deleted / unchanged.
@@ -95,4 +96,18 @@ Repeat the interface section until the inventory is complete.
 
 ## Integration Notes, If Needed
 
-Centralize cross-interface migration rules, fallback behavior, or parameter priority here. Include caller-visible business constraints at the operation or field they govern. If a confirmed defect affects integration, mention it briefly and point to the issue or test; keep the main body as the target contract.
+Centralize cross-interface migration rules, fallback behavior, or parameter
+priority here. Include caller-visible business constraints at the operation or
+field they govern. If a confirmed defect affects integration, mention it briefly
+and point to the issue or test; keep the main body as the target contract.
+
+Add an interaction diagram only when it clarifies the caller's contract.
+Separate overview from reference detail. Give each node one role, state or
+action with a short, consistent label. Put field lists, predicates and caveats
+in keyed adjacent notes; keep conditions that change a relationship with that
+relationship. Group participants by responsibility and choose direction for the
+interaction. If the overview stays dense, revise its abstraction or split
+complementary views rather than shrink text. Align items, leave space and use restrained colour with readable
+contrast. Label status and unknowns in text. Inspect the rendered diagram at its
+intended reading size. Fix unreadable labels, clipping and ambiguous connections;
+successful rendering alone is insufficient.

@@ -17,7 +17,7 @@ ordering, normalization, replacement or transaction effects. Run that boundary
 for real when the fake cannot reproduce the deciding behavior. Keep unavailable
 semantics explicit rather than treating the substitute's result as proof.
 
-Pair this positive control with a plausible contract violation. Passing an
+Pair the contract-preserving change with a plausible contract violation. Passing an
 equivalent change alone does not show that the check detects a defect; a rejected
 defect alone does not show that the check permits valid implementations.
 Keep the source, inputs and controls with the verification evidence.

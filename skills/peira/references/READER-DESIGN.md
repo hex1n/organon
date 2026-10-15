@@ -94,7 +94,13 @@ the generation-time Markdown contract belongs to report/v1.
 An optional Mermaid diagram may load externally; keep an equivalent readable
 sequence or dependency description when it cannot render. Preserve actual branch
 ownership and order. Add a diagram only when it explains flow, dependency, or
-recovery better than the text.
+recovery better than the text. Separate overview from reference detail. Give
+each node one role, state or action with a short, consistent label. Put field
+lists, predicates and caveats in keyed adjacent notes; keep conditions that
+change a relationship with that relationship. Group by responsibility or phase;
+choose direction for the relationships. If the overview stays dense, revise
+its abstraction or split complementary views rather than shrink text. Align items, leave space and reduce crossing or backtracking
+edges. Use restrained colour and readable contrast.
 
 Write headings, paragraphs, lists, and numeric comparisons as those HTML elements.
 Reserve `<pre>` for code or raw evidence whose whitespace matters. Convert Markdown
@@ -171,8 +177,8 @@ Later run findings never silently rewrite a historical plan.
 
 Preserve the business scenario tree. The comparison gives concise inputs and
 expected outcomes; each case's detail retains complete
-effective preconditions, actions, observations, state footprint, expected results,
-authority, implementation evidence, and coverage links. Its data/context and sources
+effective preconditions, actions, observations, state footprint, capabilities,
+expected results, authority, implementation evidence, and coverage links. Its data/context and sources
 disclosures include fixture preparation, environment assumptions, planned evidence,
 and lifecycle/cleanup obligations. Distinguish these planned arrangements from
 observed runtime facts. Link inherited setup from each applicable case.
@@ -225,7 +231,8 @@ result or the concrete access failure. A source inspection is not a visual check
 
 1. **Fidelity**: compare every scenario's effective fields with the Markdown and,
    for a report, its consumed plan: inputs, expectations, authority, observations,
-   footprint, dispositions, actual values, oracle, diagnosis, evidence, and cleanup.
+   footprint, capabilities, dispositions, actual values, oracle, diagnosis,
+   evidence, and cleanup.
    Include shared facts and which scenarios inherit them. Matching IDs or counts
    alone is insufficient; never change an expectation to match an actual result.
 2. **Completeness**: reconcile inventories in both directions: coverage, gaps, and
@@ -246,7 +253,10 @@ result or the concrete access failure. A source inspection is not a visual check
    a narrower desktop width, including the opening, longest scenario expanded, and
    any diagrams. The conclusion, material issue, and next step should be findable
    before reading the evidence. Check heading hierarchy, column allocation, text
-   wrapping, clipping, and page overflow. Exercise scenario links, disclosures,
+   wrapping, clipping, and page overflow. For diagrams, inspect dense branches
+   and long labels at the intended reading size. Fix crowding, unreadable text
+   and connections that are hard to trace. Revise grouping, layout or format when
+   needed; successful rendering alone is insufficient. Exercise scenario links, disclosures,
    keyboard focus, and evidence links. Check the page with external resources
    unavailable: basic layout and facts must remain usable, with a readable diagram
    alternative. Distinguish verified network conditions from source-only inference.

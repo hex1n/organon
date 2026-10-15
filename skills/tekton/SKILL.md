@@ -227,5 +227,24 @@ not run, report the implementation as not fully verified and leave the affected
 claim open. Continue independent work when one part is blocked.
 
 Hand off the outcome, concrete structural gains, decisive verification and
-material gaps in the requested form. Derived views link to final source or
-checks and distinguish implemented behavior, target design and unobserved paths.
+material gaps in the requested form. Prose can be enough. Use a diagram when
+roles, boundaries or dependencies are easier to inspect visually; use an
+interactive view when changing inputs or exploring branches clarifies a decision.
+
+Derived views identify the final source revision or checks, their scope and
+material uncertainties. Distinguish implemented behavior, target design and
+unobserved paths. Preserve business subjects, rule owners, required dependencies
+and contractually observable order; add no unsupported sequence or guarantee.
+For diagrams, separate overview from reference detail. Give each node one role,
+state or action with a short, consistent label. Put field lists, predicates and
+caveats in keyed adjacent notes; keep conditions that change a relationship
+with that relationship. Group by responsibility or phase, align items and leave
+space. If the overview stays dense, revise its abstraction or split complementary
+views rather than shrink text. Choose direction for the dependencies and avoid
+edges that obscure them.
+Use restrained colour, readable contrast and text for status. Check content and
+inspect the view at its intended reading size, including dense branches and long
+labels. Fix crowding, clipping, unreadable text and hard-to-trace connections;
+revise grouping, layout or format when needed. Successful rendering alone is
+insufficient. Exercise interactions used in the explanation and disclose what
+remains unverified.

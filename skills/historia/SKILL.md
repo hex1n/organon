@@ -66,7 +66,11 @@ For Standard/Deep:
    [background evidence lane](REFERENCE.md#background-evidence-lane).
    For exploratory or strategic questions, consider a
    [perspective scan](REFERENCE.md#perspective-scan) after the source inventory.
-3. Build a source inventory, then orient before deep evidence gathering: choose the smallest orientation form that clarifies the decision boundary — a diagram, a table, or one structural sentence ([REFERENCE.md](REFERENCE.md#orientation-diagrams)) — and share it early as the scaffold. Ground every element in what you have read; mark unverified elements with `?` and keep remaining `?` marks in the final answer.
+3. Build a source inventory. Before deep evidence gathering, share the smallest
+   orientation that clarifies the decision boundary: a diagram, table or structural
+   sentence ([Orientation Diagrams](REFERENCE.md#orientation-diagrams)).
+   Ground each element in what you have read. Mark unverified elements with `?`
+   and keep unresolved marks in the final answer.
 4. State the key unknown and what would change the conclusion.
    For a contained Standard question, that statement can fit in one line.
    For Deep work, multiple lanes, or an expanding investigation, write a short
@@ -83,7 +87,13 @@ For Standard/Deep:
 Follow the uncertainty that could change the answer rather than treating these
 techniques as a fixed sequence.
 
-Stop when the material questions are answered, the strongest plausible counterexample has been checked where it matters, and remaining unknowns cannot change the scoped conclusion or are explicitly left open. Repeated supporting reads are a signal to choose a distinguishing check, not proof of closure. Before a new read, identify which uncertainty it could resolve. For Quick depth, skip the diagram unless one line of structure clarifies the answer.
+Stop when the material questions are answered and the strongest plausible
+counterexample has been checked where it matters. Remaining unknowns must be
+unable to change the scoped conclusion or be explicitly left open.
+Repeated supporting reads are a signal to choose a distinguishing check,
+not proof of closure. Before a new read, identify which uncertainty it could
+resolve. For Quick depth, skip the diagram unless one line of structure
+clarifies the answer.
 
 Escalate mid-flight, not only at entry, when the real task has shifted out of research: a live bug reproduction belongs to a diagnosis workflow and an approved implementation to the implementation workflow — carry the evidence forward and continue the authorized task. An adopt/replace/upgrade decision belongs to a first-principles planning workflow: carry the evidence findings into that workflow and complete the requested decision without asking the user to repeat the request.
 
@@ -102,6 +112,9 @@ Use [REFERENCE.md](REFERENCE.md) for diagram examples, a compressed worked examp
 
 ## 4. Output Modes
 Use the user's language for chat and saved artifacts; for localized headings and fixed labels, use [REFERENCE.md](REFERENCE.md#localized-request-and-output-rules). Lead with the conclusion, then evidence.
+
+For diagrams and other derived views, follow the layout and visual checks in
+[Output Patterns](REFERENCE.md#output-patterns).
 
 Pick the smallest shape that answers the decision boundary:
 - Causal trace: conclusion, mechanism, evidence chain, weakest point.

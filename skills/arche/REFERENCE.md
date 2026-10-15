@@ -424,6 +424,29 @@ economics, run that gate again before review:
 Lead with the recommendation, decision, oracle, and next check.
 Put analysis after that content. State each piece of reasoning once.
 
+## Decision Views
+
+For a derived diagram or interactive comparison, identify its source plan or
+decision record, revision, scope and material uncertainties. Keep governing
+requirements and confirmed decisions in their authoritative text or record.
+Preserve business subjects, rule owners, conditions, permissions and required
+dependencies. Distinguish observations, assumptions and proposals. Show order
+or guarantees only when the source establishes them.
+
+Make the recommendation and option split easy to scan. Separate overview from
+reference detail. Give each node one role, state or action with a short,
+consistent label. Put field lists, predicates and caveats in keyed adjacent
+notes; keep conditions that change a relationship with that relationship.
+Group related roles, align items and leave space. If the overview stays dense,
+revise its abstraction or split complementary views rather than shrink text. Choose direction for the dependencies, with few crossing or backtracking
+edges. Use restrained colour and readable contrast; label status in text.
+
+Check the view against its source. Inspect it at the intended reading size,
+including dense branches and long labels. Fix crowding, clipping, unreadable
+text and connections that are hard to trace. Revise grouping, layout or format
+when needed; successful rendering alone is insufficient. Exercise the inputs
+and controls used to explain a comparison. State what remains unverified.
+
 ## Evidence Conventions
 
 - `verified`: source evidence whose identity and relevant version/environment have been established, including still-applicable prior receipts.

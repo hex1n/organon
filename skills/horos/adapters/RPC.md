@@ -13,10 +13,10 @@ RPC path. Use project facts rather than assumed framework defaults.
 ## Address And Envelope
 
 + Operation identifier: if the method has a gateway or dispatch annotation whose value is the external operation key, use that value; otherwise use service interface plus method name.
-+ Base endpoint: read configuration, gateway setup, README, or deployment docs; ask only when it cannot be discovered.
++ Base endpoint: read configuration, gateway setup, README, or deployment docs. If it remains unknown, name the missing source. Ask only when finishing the scope requires a user-owned decision.
 + Request envelope: if calls go through a gateway dispatch object, read the outer request object that carries operation identifier and business payload.
 + Response envelope: read the common wrapper returned by the interface or implementation, including success flag, code, message, data, trace id, or equivalent fields.
-+ RPC request tables do not use parameter position columns; fields live in the request object or envelope.
++ RPC request fields live in the request object or envelope. Omit the Position column unless the verified transport envelope needs it.
 
 ## Auth
 
@@ -28,7 +28,12 @@ Ask only when finishing the requested scope needs a user-owned decision.
 
 ## Requiredness
 
-Inspect active entry validation, validation groups, schema presence semantics, custom assertions, and defaults. `@Valid` cascades into a present object; it does not require non-null. Distinguish omitted, null, empty, and conditionally required values. Record intended requirements separately from enforcement discrepancies; use unknown when the active validation path cannot be established.
+Inspect active entry validation, validation groups, schema presence semantics,
+custom assertions and defaults. `@Valid` cascades into a present object;
+it does not require non-null. Distinguish omitted, null, empty and conditionally
+required values. Record intended requirements separately from enforcement
+discrepancies. If the active validation path cannot be established, mark it
+unknown.
 
 ## ID Type
 

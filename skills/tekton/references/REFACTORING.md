@@ -88,7 +88,7 @@ forward repair, restore, or compensation path appropriate to the consequence.
 Prepare and test recovery in the authorized environment; deployment, destructive
 data changes, and live recovery remain subject to the user's authorization.
 
-## Recover the complexity
+## Verify the targets and remove obsolete paths
 
 Check the targets against the final code and evidence:
 

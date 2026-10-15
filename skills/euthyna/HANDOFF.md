@@ -118,15 +118,17 @@ The schema fixes the shape; these are the fields whose meaning it cannot carry.
 
 ## Check and dispatch
 
-`node <skill-dir>/scripts/validate-handoff.cjs <brief.json>` applies the
-schema and the rules it cannot express: every reference readable at its
-revision or carrying its text, every content identity the digest of its file
-as it is now, the lens lists partitioning LENSES.md, a re-review carrying its
-prior round. The caller runs it before dispatch; the
-reviewer runs it on acceptance whenever Node and the skill directory are
-reachable, and reads for the same things otherwise. It cannot tell a quote
-from a paraphrase: a `request.original` item that reads as a task description
-rather than a message is the reviewer's to report.
+Before dispatch, the caller runs
+`node <skill-dir>/scripts/validate-handoff.cjs <brief.json>`.
+On acceptance, the reviewer runs it when Node and the skill directory are
+reachable; otherwise inspect the same requirements manually. Each reference
+must be readable at its pinned revision or carry its text. Each content identity
+must match the current file digest. The lens lists must partition LENSES.md,
+and a re-review must include its prior round.
+
+The validator cannot distinguish a quote from a paraphrase. Report a
+`request.original` item that restates the task instead of quoting the user's
+message.
 
 The brief is a file the launch message names, or inline. The launch message
 carries the brief's location and the permissions the reviewer runs under;
