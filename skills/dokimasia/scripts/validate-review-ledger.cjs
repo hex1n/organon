@@ -614,36 +614,18 @@ function evaluateReviewLedger(ledger) {
   }
 
   // Depth must buy something. Full depth is chosen for irreversibility and blast
-  // radius, so it may not close on a same-model reviewer while a second model was
-  // available: that combination was silently passing before.
+  // radius, so it closes only on two or more independent reads. A second model
+  // joins only on the user's explicit request, which the frozen-class check above
+  // enforces; depth alone never requires one.
   if (ledger.review_depth === "full") {
-    const closesOnSecondModel = verdicts.some((verdict) => {
-      const receipt = receipts.find((item) => item?.invocation_id === verdict?.invocation_id);
-      return receipt?.independence_level === "second-model";
-    });
-    if (!closesOnSecondModel) {
-      const availability = ledger.second_model_availability;
-      if (!availability || typeof availability !== "object" || Array.isArray(availability)) {
-        failures.push("full depth closing without a second-model reviewer requires a recorded second_model_availability");
-      } else if (availability.available !== false) {
-        failures.push("full depth requires a second-model reviewer when the runtime has one");
-      } else if (!nonEmptyString(availability.basis)) {
-        failures.push("recorded second-model unavailability needs a basis");
-      } else {
-        // Unavailability is a fact to be traced, not a sentence to be asserted:
-        // hold it to the same standard as the diagnostic fallback — a real
-        // attempt that really failed. Otherwise an agent avoiding an expensive
-        // second-model call just writes `available: false` and full depth
-        // quietly decays into shallow.
-        const probeId = availability.probe_invocation_id;
-        const probe = receipts.find((item) => item?.invocation_id === probeId);
-        if (!nonEmptyString(probeId) || !attempts.includes(probeId)) {
-          failures.push("second-model unavailability must name an attempted probe invocation");
-        } else if (!probe || probe.independence_level !== "second-model" ||
-                   !["FAILED", "TIMED-OUT"].includes(probe.verdict)) {
-          failures.push("second-model unavailability must link a second-model probe receipt that FAILED or TIMED-OUT");
-        }
-      }
+    if (required.length < 2) {
+      failures.push("full depth needs at least two required reviewers");
+    }
+    // One session reading twice is one read, whatever identities it reports under.
+    const closingSessions = verdicts.map((verdict) =>
+      receipts.find((item) => item?.invocation_id === verdict?.invocation_id)?.reviewer_session_id_or_opaque_handle);
+    if (new Set(closingSessions).size !== closingSessions.length) {
+      failures.push("full depth closing verdicts must come from distinct reviewer sessions");
     }
   }
 

@@ -4,10 +4,10 @@ description: >
   Falsify one completed design or plan through independent review, iterating on
   the exact final revision when revision is requested. Use on an explicit review
   ask: 审查到通过 / 方案评审 / 计划评审 / 证伪现有方案, or a second-model review
-  before implementation. Competing options go to arche.
+  before implementation.
 ---
 
-# Plan Review
+# Dokimasia — Plan Review
 
 Falsify one completed candidate — a design, plan, or artifact describing what
 will be built and how. A plain review request authorizes inspection and reporting;
@@ -56,21 +56,17 @@ tokens; prose may qualify a token, never replace it. A `DEFERRED`,
 
 ## Exact Gate
 
-Freeze before dispatch. Reviewer class follows depth: full depth requires a
-read-only second-model reviewer whenever the runtime has one, because a
-different model is a stronger falsifier for same-model blind spots; shallow
-depth defaults to the runtime's fresh-context read-only reviewer. An explicit
-user request for a second-model reviewer overrides the default at any depth.
-When full depth has no second-model reviewer, attempt one and record the failed
-probe and its basis at freeze time, then proceed fresh-context: unavailability
-is a traced fact, never a self-written sentence, and that review is
-independence-limited in its closing report. Freeze:
+Freeze before dispatch. Required reviewers run in read-only fresh contexts.
+Depth sets how many: shallow depth needs one; full depth needs at least two,
+each in its own session with its own brief, because independent reads catch
+different failures. A second-model reviewer joins only on the user's explicit
+request, at any depth, and is then frozen as that reviewer's class. Freeze:
 
 - the exact candidate and content hash;
 - the review scope and any upstream decision resolved by the Entry Gate;
 - author identity; required reviewers, their frozen classes, explicit
   second-model selections, which reviewer holds the operator-on-call walk at
-  full depth, depth, and second-model availability with its basis;
+  full depth, and depth;
 - rubric, authority evidence, constraints, and the resolved budget;
 - a ledger for rounds, findings, parent validations, and dispositions.
 
@@ -158,9 +154,7 @@ Completion: every reviewer can access the same exact revision and gate contract.
 Dispatch each required reviewer exactly as frozen by the Exact Gate. The author
 is not an independent reviewer. For an unavailable explicitly selected
 second-model reviewer, one diagnostic fresh-context round is allowed; then
-suspend rather than repeatedly pre-converge. A depth-driven second-model lane
-that fails mid-review has no diagnostic lane: record the failed invocation,
-then close through the Exact Gate's traced-unavailability path or suspend.
+suspend rather than repeatedly pre-converge.
 
 A self-reread may prepare the packet but cannot satisfy the gate.
 

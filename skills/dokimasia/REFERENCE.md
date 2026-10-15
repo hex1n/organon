@@ -1,4 +1,4 @@
-# Plan Review Reference
+# Dokimasia Reference
 
 Load only the branch reached by the current review: entry states, artifact
 retention, compact transfer, runtime/invocation handling, focused recheck,
@@ -58,23 +58,30 @@ The parent maintains `review-ledger.json` as the authoritative machine record
 of receipts, reviewer payloads, validations, dispositions, and gate state.
 `review.md` presents the current two-track outcome and complete findings with
 parent validations. Link the authoritative ledger and exact candidate revision
-rather than embedding the ledger's JSON. Optional derived views identify those
-sources, their scope and material uncertainties. Preserve reviewer claims, parent judgments,
-rule ownership and required dependencies. Show order or guarantees only when
-the candidate establishes them. For diagrams, separate overview from reference
-detail. Give each node one role, state or action with a short, consistent label.
-Put field lists, predicates and caveats in keyed adjacent notes; keep conditions
-that change a relationship with that relationship. Group related claims, align
-items and leave space. If the overview stays dense, revise its abstraction or
-split complementary views rather than shrink text. Choose direction for the
-dependencies and avoid edges
-that obscure them. Use restrained colour, readable contrast and text for status.
-Check content and inspect the view at its intended reading size. Fix unreadable
-labels, collisions, clipping and connections that are hard to trace; successful
-rendering alone is insufficient. Exercise interactions used to explain a
-conclusion and disclose unverified behavior.
-A derived view does not replace the report, change either outcome track or
-satisfy the Exact Gate.
+rather than embedding the ledger's JSON.
+
+Optional derived views identify those sources, their scope and material
+uncertainties. Preserve reviewer claims, parent judgments, rule ownership and
+required dependencies. Show order or guarantees only when the candidate
+establishes them. A derived view does not replace the report, change either
+outcome track or satisfy the Exact Gate.
+
+<!-- >>> shared-derived-views -->
+For diagrams, separate overview from reference detail. Give each node one role,
+state or action with a short, consistent label. Put field lists, predicates and
+caveats in keyed adjacent notes; keep conditions that change a relationship with
+that relationship. Make the reading path clear: choose grouping and direction
+for the relationships, align related items, give them space and reduce crossing
+or backtracking edges. If the overview is still dense, revise its abstraction or
+split complementary views rather than shrink the text. Use restrained colour
+with sufficient contrast; convey status and unknown relationships in text.
+
+Check content and inspect the rendered view at its intended reading size,
+including dense branches and long labels. Fix unreadable text, collisions,
+clipping and connections that are hard to trace; a successful render alone is
+insufficient. Revise grouping, layout or format when needed. Exercise the
+interactions used in the explanation and state what remains unverified.
+<!-- <<< shared-derived-views -->
 
 Before a later round replaces that report, preserve the completed round as
 `review-r1.md`, `review-r2.md`, and so on. Keep original reviewer claims and
@@ -122,9 +129,7 @@ silently dropping evidence-dependent rubric criteria.
 
 Bind each reviewer class frozen by the Exact Gate without reselecting it:
 `fresh-context` uses the runtime's read-only agent capability; `second-model`
-uses the available read-only second-model capability. Resolve second-model
-availability once, at freeze time, from what this runtime actually offers — not
-from whether reaching for it feels expensive — and record the basis either way.
+uses the read-only second-model capability the user explicitly requested.
 Record reviewer identity, independence level, disclosure boundary, and every
 availability failure or diagnostic fallback.
 
@@ -201,24 +206,18 @@ every ledger finding maps back to its source manifest and records
 `parent_validation_disclosed: true`. All collection fields are explicit arrays.
 Malformed, missing, or unreconciled collections fail closed.
 
-The review ledger freezes `author_identity`, `review_depth: shallow | full`,
+The review ledger freezes `author_identity`, `review_depth: shallow | full`, and
 `explicit_second_model_reviewers` as an array of unique identities drawn from
-`required_reviewers`, and `second_model_availability: {available, basis}`; the
-author cannot be a required reviewer. A closing receipt for an identity inside
-`explicit_second_model_reviewers` must record `reviewer_role: required` and
-`independence_level: second-model`. Reviewing with a stronger independence lane
-than frozen is an upgrade, never a gate failure.
+`required_reviewers`; the author cannot be a required reviewer. A closing
+receipt for an identity inside `explicit_second_model_reviewers` must record
+`reviewer_role: required` and `independence_level: second-model`. Reviewing with
+a stronger independence lane than frozen is an upgrade, never a gate failure.
 
-Depth drives reviewer strength. A `full` depth gate may not close on
-fresh-context reviewers alone unless `second_model_availability` records
-`available: false`, a non-empty `basis`, and a `probe_invocation_id` naming an
-attempted second-model invocation whose receipt is `FAILED` or `TIMED-OUT` —
-the same evidence standard the diagnostic fallback already uses. Unavailability
-is a traced fact, never a self-written sentence; without that trace an agent
-avoiding an expensive second-model call would simply declare it, and full depth
-would decay into shallow. Such a close is independence-limited and every report
-says so. Claiming availability while closing same-model, and claiming
-unavailability without a failed probe, both fail closed. Shallow is unaffected.
+Depth drives the number of independent reads. A `full` depth gate needs at
+least two required reviewers, and their closing receipts must name distinct
+`reviewer_session_id_or_opaque_handle` values: one session reading twice is one
+read. Shallow needs one required reviewer. The gate ignores the
+`second_model_availability` field that earlier ledgers carry.
 
 A diagnostic fallback keeps the frozen reviewer identity, records
 `reviewer_role: diagnostic` and `independence_level: fresh-context`, and links

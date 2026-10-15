@@ -1,13 +1,13 @@
 ---
 name: historia
 description: >
-  Evidence-backed investigation whose deliverable is written findings, not a
-  fix. Use when the user asks to 调研 / 梳理 a system, 追踪 a behaviour across
-  components, or 对比 / 评估 options. A quick 为什么 about one file or one
-  failing test is answered directly.
+  Evidence-backed investigation that delivers written findings. Use when the
+  user asks to 调研 / 梳理 a system, 追踪 a behaviour across components, or
+  对比 / 评估 options: questions whose answer needs several sources or a
+  cross-component trace.
 ---
 
-# Deep Research
+# Historia — Deep Research
 
 ## Core Move
 Produce understanding, a decision, or a handoff. Keep a research-only request

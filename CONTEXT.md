@@ -51,7 +51,7 @@ _Avoid_: local update, manual fix
 
 ### Example dialogue
 
-> **Dev:** "Can I change the installed `deep-research` skill directly?"
+> **Dev:** "Can I change the installed `historia` skill directly?"
 > **Domain expert:** "No. That is a **Managed Installed Skill** in the shared **Installed Skill Cache** used by **Agent Runtimes** such as Codex and Claude Code; make a **Local Override Skill** if you need personal behaviour."
 > **Dev:** "What if the remote source has a newer version?"
 > **Domain expert:** "Update it only after checking the **Provenance Record** and confirming there is no **Cache Drift**."

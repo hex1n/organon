@@ -55,6 +55,13 @@ placeholders, never an identifier, code, table, or domain term from a real
 project. Before committing, search the diff for names and domain terms from the
 repositories the session read.
 
+**Descriptions:** a model-invoked description states, in positive terms, the
+requests the skill serves. It carries no exemption clause and names no sibling
+skill; scope words such as "while options are still open" mark a boundary. Check
+a description change with trigger trials: verbatim user prompts from both sides
+of each boundary, run in the repository where each was typed, on both runtimes,
+before and after.
+
 **Wording and structure:** use `writing-for-agents` when writing or editing
 skills and shared agent instructions. Apply its wording, information hierarchy,
 context-pointer, and pruning guidance while preserving the intended behavior.
@@ -87,10 +94,16 @@ This method adds no document, approval, or evaluation format.
 the trial; inspect actual work products against that criterion. Format checks
 and passing tests do not establish an untested property such as structural fit.
 When comparing revisions, keep inputs and conditions fixed where possible and
-disclose differences that limit attribution. Count prompted repairs separately
-from first-attempt success. For generalization claims, probe contrasting task
-shapes and limit conclusions to what ran. When revisions repeatedly fail the same
-criterion, revisit the diagnosis and evaluation setup.
+disclose differences that limit attribution. Run trials under the instructions
+the skill meets in use: the global rules at the revision under test, and a
+consuming repository's instructions instead of this one's. A Codex agent reads
+the installed rules copy as it stands at launch. Count prompted repairs
+separately from first-attempt success. Report each arm's run count and spread,
+and rule out other readings of a gap (runs that skipped the task, unequal
+conditions, noise) before crediting it to the revision. For generalization
+claims, probe contrasting task shapes and limit conclusions to what ran. When
+revisions repeatedly fail the same criterion, revisit the diagnosis and
+evaluation setup.
 
 ## Scripts
 

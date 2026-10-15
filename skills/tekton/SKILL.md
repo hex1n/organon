@@ -11,7 +11,7 @@ description: >
   with evidence that affected contracts hold.
 ---
 
-# Tekton
+# Tekton — Contract-Preserving Implementation
 
 Deliver the requested behavior and structural improvement with evidence that
 affected contracts hold.
@@ -159,7 +159,7 @@ not a universal checklist:
 | Compatibility | Old and new callers, payloads, and stored data, including reachable mixed states |
 | Retry and idempotency | Repeated execution and failures around effects; observe duplicates or omissions |
 | Concurrency | Controlled interleavings that can expose the suspected race |
-| Performance | The slice's operation counts and retained state at representative scale, plus measured workloads and required thresholds |
+| Performance | The slice's operation counts and retained state at representative scale, plus measured workloads and required thresholds; each measured number carries its run count, spread and limiting resource, with skipped or cached work, unexecuted code and noise ruled out |
 | Operations | Actionable diagnostics and demonstrated recovery at the affected boundary |
 | Structure | Business rules and relationships recognizable in executable structure; rule ownership, state lifetime, caller knowledge and obsolete path removal |
 
@@ -230,21 +230,4 @@ Hand off the outcome, concrete structural gains, decisive verification and
 material gaps in the requested form. Prose can be enough. Use a diagram when
 roles, boundaries or dependencies are easier to inspect visually; use an
 interactive view when changing inputs or exploring branches clarifies a decision.
-
-Derived views identify the final source revision or checks, their scope and
-material uncertainties. Distinguish implemented behavior, target design and
-unobserved paths. Preserve business subjects, rule owners, required dependencies
-and contractually observable order; add no unsupported sequence or guarantee.
-For diagrams, separate overview from reference detail. Give each node one role,
-state or action with a short, consistent label. Put field lists, predicates and
-caveats in keyed adjacent notes; keep conditions that change a relationship
-with that relationship. Group by responsibility or phase, align items and leave
-space. If the overview stays dense, revise its abstraction or split complementary
-views rather than shrink text. Choose direction for the dependencies and avoid
-edges that obscure them.
-Use restrained colour, readable contrast and text for status. Check content and
-inspect the view at its intended reading size, including dense branches and long
-labels. Fix crowding, clipping, unreadable text and hard-to-trace connections;
-revise grouping, layout or format when needed. Successful rendering alone is
-insufficient. Exercise interactions used in the explanation and disclose what
-remains unverified.
+Before delivering either, read [Derived views](references/DERIVED-VIEWS.md).

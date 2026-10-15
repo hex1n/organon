@@ -4,10 +4,10 @@ description: >
   Review code, pull requests, commits, or working-tree changes for evidence-backed
   defects and material code-quality problems. Use for code review, 代码审查,
   冷读代码, and re-review after fixes. Inspect, run authorized checks, and report
-  without repairing the reviewed version; design-only review is outside scope.
+  without repairing the reviewed version.
 ---
 
-# Euthyna
+# Euthyna — Code Review
 
 Review required behavior and structure. Establish defects through supported
 paths, then seek evidence that defeats them. Report actionable problems;
@@ -191,6 +191,17 @@ Report no confirmed findings in the inspected scope when appropriate.
 Unavailable inputs, failed tools, timeouts and truncated reviews leave coverage
 incomplete; scoped acceptance is not release or merge authorization. Keep
 credentials and unnecessary sensitive data out of examples and retained logs.
+
+The caller's delivery also accounts for known open defects on the reviewed
+surfaces: entries left open by earlier rounds or review series, defects stated
+anywhere in the task's own records, and issues the user raised. Open those
+records, nested investigations included; names and keywords miss defects
+recorded in other terms. The delivered summary lists each one beside the review
+record and report, outside the reviewer's brief, with its source, attribution
+and status: still present, resolved, or not re-checked. Any status claim about
+a known defect, then or later, needs evidence that exercises that defect's own
+trigger and mechanism; a check that shares only its subject or symptom leaves
+it not re-checked.
 
 Before repair, the builder verifies the mechanism and triggering path, completes
 an owed not-run falsification, and settles decision items affecting the premise.

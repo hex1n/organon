@@ -9,7 +9,7 @@ description: >
   worktree handoff of rationale notes.
 ---
 
-# 代码实现理由记录
+# Scholion — 代码实现理由记录
 
 Rationale is a personal reverse index from a current code snippet to the reason
 it is implemented this way. Each record names the file path (文件路径), code

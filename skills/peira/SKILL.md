@@ -2,14 +2,12 @@
 name: peira
 description: >
   Plan, execute and present source-backed acceptance scenarios: E2E / 端到端,
-  integration or regression tests. Use for scenario planning, running or
-  continuing a plan/report, rendering
-  their HTML views, or briefing a finished report. Unit or focused tests use
-  repository commands; a facade call without an acceptance scenario is an
-  ordinary call.
+  integration or regression tests against a deployed or running system. Use
+  for scenario planning, running or continuing a plan/report, rendering their
+  HTML views, or briefing a finished report.
 ---
 
-# E2E Test Workflow
+# Peira — E2E Test Workflow
 
 Arguments: `[plan | run | render | brief] [feature, plan, or report]`.
 

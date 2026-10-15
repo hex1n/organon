@@ -12,7 +12,8 @@ the repository's own instructions and the documents they point to > external
 skills and plugins. A skill supplies general method; it never grants authority
 the repository withholds, and it never waives a verification gate, staging
 rule, or confirmation. A second model or external review service runs only on
-the user's explicit request.
+the user's explicit request. A fresh-context subagent on the current model is
+neither; dispatch one whenever a skill or the task calls for it.
 
 When a skill asks for a value the task does not give, infer the project default
 and state it: a review's fixed point is the merge-base with the main branch; a
@@ -232,6 +233,11 @@ behavior and every consumer chain, not by file name or test count. A focused
 run shortens feedback; only the gate's handoff run closes delivery. A change
 matching no gate still gets focused tests plus one handoff run covering its
 domain, and the delivery says what ran and what stays unproven.
+
+When two fixes that share one premise fail the same check, write that premise
+as one sentence. Before the next fix, make an observation that comes out
+differently if the premise is false. A refuted premise moves the search
+elsewhere; a confirmed one asks the next "why".
 
 1. Format only the files this task names, review the formatted diff, and run
    the chosen checks on that final version.

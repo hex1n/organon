@@ -31,7 +31,7 @@ outside the reader-facing page.
 ## Brief
 
 A one-page brief of a finished report, for a reader who was not in the run, follows
-[the brief contract](references/READER-DESIGN.md#brief-page): design-tier authored,
+[the brief contract](references/READER-DESIGN.md#brief-page): authored in the design branch,
 every value traced to the report, delivered together with it. The renderer does not
 produce one, and a brief never stands in for the report.
 

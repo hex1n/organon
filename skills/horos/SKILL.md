@@ -3,7 +3,7 @@ name: horos
 description: Generates API docs for backend interfaces across protocols (RPC e.g. SOFABoot/Dubbo, and HTTP/REST) and across projects. Use when the user wants to document a single interface, a whole requirement's backend API, or the API changes on a branch.
 ---
 
-# API Documentation Generation
+# Horos — API Documentation
 
 API documentation is a caller contract: write only what a caller needs to invoke the interface correctly. Do not document implementation details.
 
@@ -22,6 +22,7 @@ Before writing, build the interface inventory.
 /horos --diff [baseBranch]
 /horos --batch I1 I2
 ```
+These are Claude Code forms; Codex takes the same arguments after `$horos`.
 Detect an unspecified protocol from the active interface path.
 
 ## Workflow

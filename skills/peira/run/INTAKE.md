@@ -58,4 +58,7 @@ authorized product fixes. For an explicit iterate-until-green request, retain ea
 iteration's report as an immutable handoff. Continue from actionable defects and
 affected dependents; stop when no actionable defects remain, an external decision
 blocks progress, or the user's cap is reached (default eight full E2E rerun cycles).
+When a scenario still fails after two fixes that share one premise, write that
+premise as one sentence. Before the next fix, test it with an observation that
+comes out differently if the premise is false.
 Report skipped/unverified/blocked work even when no actionable fix remains.

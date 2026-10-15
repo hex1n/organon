@@ -5,8 +5,9 @@ used by Codex and Claude Code. The formatter is Eclipse JDT 3.22 with the
 P3C-derived profile in codestyle.xml, plus the fluent-chain pass in src/.
 Maven dependencies are pinned so JDK 8 remains sufficient.
 
-The installer links this directory and the sibling rationale-records tool under
-~/.agents/tools, then merges one Stop hook into each installed runtime. Stop
+The installer links this directory under ~/.agents/tools and the
+scholion skill under ~/.agents/skills. It then merges one Stop hook
+into each installed runtime. Stop
 checks rationale anchors and invokes docs/tools/run-agent-gates.mjs when present.
 It never runs the formatter. Repository dispatchers own their own
 side effects; the shared formatter does not infer file ownership from timestamps.

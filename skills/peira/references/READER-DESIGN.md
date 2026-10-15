@@ -6,52 +6,22 @@ Routine report/v1 rendering uses [READER-VIEW.md](../READER-VIEW.md).
 ## Hand-off
 
 For the design branch, where subagents are available, a fresh-context agent
-authors and checks the page.
-Select its model using the rules below. Its brief carries this file's path, the
+authors and checks the page. Its brief carries this file's path, the
 Markdown artifact and consumed plan paths, the output path, source/workspace
 boundaries, the user's language request, and any accepted visual reference.
 It returns the page path, each check below as passed / failed / not run with its
 scope, and every unresolved finding. The parent relays these unchanged; revisions
 go back to the author with the finding. Without subagents, author and check here.
 
-### HTML model selection
-
-Apply these preferences only to the HTML author, respecting an explicit user model
-choice and the host's available models. Planning, test execution, and business
-review keep their own model selection.
-
-| Work | Claude Code preference | Codex preference |
-| --- | --- | --- |
-| New layout, visual polish, or substantial restructuring of a long report | `sonnet` | `gpt-5.6-terra`, medium effort |
-| Fill a visually accepted template or make a bounded local presentation edit | `haiku` | `gpt-5.6-luna`, medium effort |
-
-The supplied scaffold alone is not an accepted template. An unverified preview or
-user dissatisfaction with the layout stays in the design tier. Both tiers run the
-same delivery checks. Return conflicting source facts or business expectations to
-the parent for resolution; a rendering agent cannot decide a new test oracle.
-If a template task requires layout redesign or the cheaper author cannot resolve
-a delivery defect, give its artifact and concrete finding to a design-tier author.
-
-Set the model through the host's per-subagent invocation option; mentioning a model
-in the task prompt does not select it. In Claude Code, use the supported per-call
-`model` option or an HTML-specific agent definition's `model` field. In Codex, use
-the available spawn model/effort options with a fresh context. Keep the selection
-scoped to this child rather than changing the main model or a global override.
-If the host cannot select the preferred model, use an available suitable model and
-disclose the fallback.
-
-Record requested model and host-confirmed actual model in the hand-off result,
-outside the reader-facing HTML. Use invocation metadata or the host's task view
-(Claude Code: `/tasks`); if unobservable, report actual model as unknown. A child's
-self-description is not confirmation, and model selection alone proves no measured
-cost saving. Host references: [Claude Code subagents](https://code.claude.com/docs/en/sub-agents)
-and [Codex subagents](https://learn.chatgpt.com/docs/agent-configuration/subagents).
+An accepted visual reference is one the user has seen and accepted; the supplied
+scaffold or an unverified preview is not. Return conflicting source facts or business expectations to the parent for
+resolution; a rendering agent cannot decide a new test oracle.
 
 ## Brief page
 
 A brief is one page about a finished execution report, for a reader who was not in
 the run: the outcome, the evidence that decides it, and the next action. Each report
-has a different story, so the design tier authors it; the deterministic renderer does
+has a different story, so the design branch authors it; the deterministic renderer does
 not produce one.
 
 The report remains the deliverable. A brief accompanies it under these rules:
@@ -94,13 +64,24 @@ the generation-time Markdown contract belongs to report/v1.
 An optional Mermaid diagram may load externally; keep an equivalent readable
 sequence or dependency description when it cannot render. Preserve actual branch
 ownership and order. Add a diagram only when it explains flow, dependency, or
-recovery better than the text. Separate overview from reference detail. Give
-each node one role, state or action with a short, consistent label. Put field
-lists, predicates and caveats in keyed adjacent notes; keep conditions that
-change a relationship with that relationship. Group by responsibility or phase;
-choose direction for the relationships. If the overview stays dense, revise
-its abstraction or split complementary views rather than shrink text. Align items, leave space and reduce crossing or backtracking
-edges. Use restrained colour and readable contrast.
+recovery better than the text.
+
+<!-- >>> shared-derived-views -->
+For diagrams, separate overview from reference detail. Give each node one role,
+state or action with a short, consistent label. Put field lists, predicates and
+caveats in keyed adjacent notes; keep conditions that change a relationship with
+that relationship. Make the reading path clear: choose grouping and direction
+for the relationships, align related items, give them space and reduce crossing
+or backtracking edges. If the overview is still dense, revise its abstraction or
+split complementary views rather than shrink the text. Use restrained colour
+with sufficient contrast; convey status and unknown relationships in text.
+
+Check content and inspect the rendered view at its intended reading size,
+including dense branches and long labels. Fix unreadable text, collisions,
+clipping and connections that are hard to trace; a successful render alone is
+insufficient. Revise grouping, layout or format when needed. Exercise the
+interactions used in the explanation and state what remains unverified.
+<!-- <<< shared-derived-views -->
 
 Write headings, paragraphs, lists, and numeric comparisons as those HTML elements.
 Reserve `<pre>` for code or raw evidence whose whitespace matters. Convert Markdown
@@ -253,10 +234,8 @@ result or the concrete access failure. A source inspection is not a visual check
    a narrower desktop width, including the opening, longest scenario expanded, and
    any diagrams. The conclusion, material issue, and next step should be findable
    before reading the evidence. Check heading hierarchy, column allocation, text
-   wrapping, clipping, and page overflow. For diagrams, inspect dense branches
-   and long labels at the intended reading size. Fix crowding, unreadable text
-   and connections that are hard to trace. Revise grouping, layout or format when
-   needed; successful rendering alone is insufficient. Exercise scenario links, disclosures,
+   wrapping, clipping, and page overflow. Check diagrams under the
+   [page contract](#page-contract) rules. Exercise scenario links, disclosures,
    keyboard focus, and evidence links. Check the page with external resources
    unavailable: basic layout and facts must remain usable, with a readable diagram
    alternative. Distinguish verified network conditions from source-only inference.

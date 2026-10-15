@@ -1,15 +1,16 @@
-# First-Principles Planner Reference
+# Arche Reference
 
 Read the sections selected by `SKILL.md` for the current decision.
 
 ## Contents
 
 - Localized Request and Output Rules: localized routing signals, examples, and labels
-- Problem Archaeology: root trace, problem statement, assumption audit
+- Problem Archaeology: root trace, problem statement, assumption audit, constraint provenance
 - Value Gate and Decision Envelope: mechanism families, economic evidence, envelope schema
 - Solution Reconstruction: business operation model, option categories, independent context, independent option tournament, inversion test, recommendation chain
 - Bestness Check: fit criteria, closest alternative, stop point
 - Plan Synthesis: scope table, decision pricing, decision-first structure
+- Decision Views: source identity, layout and inspection of derived diagrams and comparisons
 - Evidence Conventions: verified evidence, derived conclusions, and unverified premises
 - Artifact Location: default path rules for saved Markdown plans
 - Plan File Output: saved plan output shape
@@ -433,19 +434,25 @@ Preserve business subjects, rule owners, conditions, permissions and required
 dependencies. Distinguish observations, assumptions and proposals. Show order
 or guarantees only when the source establishes them.
 
-Make the recommendation and option split easy to scan. Separate overview from
-reference detail. Give each node one role, state or action with a short,
-consistent label. Put field lists, predicates and caveats in keyed adjacent
-notes; keep conditions that change a relationship with that relationship.
-Group related roles, align items and leave space. If the overview stays dense,
-revise its abstraction or split complementary views rather than shrink text. Choose direction for the dependencies, with few crossing or backtracking
-edges. Use restrained colour and readable contrast; label status in text.
+Make the recommendation and option split easy to scan, and check the view
+against its source.
 
-Check the view against its source. Inspect it at the intended reading size,
-including dense branches and long labels. Fix crowding, clipping, unreadable
-text and connections that are hard to trace. Revise grouping, layout or format
-when needed; successful rendering alone is insufficient. Exercise the inputs
-and controls used to explain a comparison. State what remains unverified.
+<!-- >>> shared-derived-views -->
+For diagrams, separate overview from reference detail. Give each node one role,
+state or action with a short, consistent label. Put field lists, predicates and
+caveats in keyed adjacent notes; keep conditions that change a relationship with
+that relationship. Make the reading path clear: choose grouping and direction
+for the relationships, align related items, give them space and reduce crossing
+or backtracking edges. If the overview is still dense, revise its abstraction or
+split complementary views rather than shrink the text. Use restrained colour
+with sufficient contrast; convey status and unknown relationships in text.
+
+Check content and inspect the rendered view at its intended reading size,
+including dense branches and long labels. Fix unreadable text, collisions,
+clipping and connections that are hard to trace; a successful render alone is
+insufficient. Revise grouping, layout or format when needed. Exercise the
+interactions used in the explanation and state what remains unverified.
+<!-- <<< shared-derived-views -->
 
 ## Evidence Conventions
 

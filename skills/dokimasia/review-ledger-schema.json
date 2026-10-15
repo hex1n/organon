@@ -39,16 +39,6 @@
       "uniqueItems": true,
       "items": { "type": "string", "visibleContent": true }
     },
-    "second_model_availability": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": ["available"],
-      "properties": {
-        "available": { "type": "boolean" },
-        "basis": { "type": "string", "visibleContent": true },
-        "probe_invocation_id": { "type": "string", "visibleContent": true }
-      }
-    },
     "final_reviewer_verdicts": {
       "type": "array",
       "items": {

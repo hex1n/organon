@@ -2,12 +2,12 @@
 name: arche
 description: >
   Plan or decide from the root problem: compare mechanisms and return the
-  current-best path with its failure condition and next check. Use for 最佳方案 /
-  方案选型 / 要不要做（ROI） asks, and for a challenge to a recommendation just
-  given. Reviewing one existing plan is dokimasia.
+  current-best path with its failure condition and next check. Use while options
+  are still open: 最佳方案 / 方案选型 / 要不要做（ROI） asks, and a challenge to a
+  recommendation just given.
 ---
 
-# First-Principles Planner
+# Arche — First-Principles Planner
 
 ## Core Move
 

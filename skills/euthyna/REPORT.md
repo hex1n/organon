@@ -222,25 +222,28 @@ Preserve the verdict and each shown item's id, kind, severity and evidence statu
 When showing behavior or structure, preserve business subjects, rule owners and
 required dependencies. Distinguish logical dependencies from execution order;
 add no unsupported order or guarantee. Keep observations, assumptions and
-proposed remedies distinguishable. Label unknown relationships where they appear.
+proposed remedies distinguishable. In a diagram, make the defect and affected
+boundary easy to find.
 
-For diagrams, make the defect and affected boundary easy to find. Separate
-overview from reference detail. Give each node one role, state or action with
-a short, consistent label. Put field lists, predicates and caveats in keyed
-adjacent notes; keep conditions that change a relationship with that relationship.
-Group related roles, align items and leave space. If the overview stays dense,
-revise its abstraction or split complementary views rather than shrink text.
-Choose direction for the
-relationships and avoid edges that obscure them. Use restrained colour,
-readable contrast and text for status. Inspect the view at its intended reading
-size, including dense branches and long labels. Fix crowding, clipping,
-unreadable text and connections that are hard to trace; successful rendering
-alone is insufficient.
+<!-- >>> shared-derived-views -->
+For diagrams, separate overview from reference detail. Give each node one role,
+state or action with a short, consistent label. Put field lists, predicates and
+caveats in keyed adjacent notes; keep conditions that change a relationship with
+that relationship. Make the reading path clear: choose grouping and direction
+for the relationships, align related items, give them space and reduce crossing
+or backtracking edges. If the overview is still dense, revise its abstraction or
+split complementary views rather than shrink the text. Use restrained colour
+with sufficient contrast; convey status and unknown relationships in text.
 
-Check content and exercise interactions used to support a conclusion. State
-what remains unverified. A scoped summary links
-the complete record or report and does not replace them. The JSON record remains
-authoritative.
+Check content and inspect the rendered view at its intended reading size,
+including dense branches and long labels. Fix unreadable text, collisions,
+clipping and connections that are hard to trace; a successful render alone is
+insufficient. Revise grouping, layout or format when needed. Exercise the
+interactions used in the explanation and state what remains unverified.
+<!-- <<< shared-derived-views -->
+
+A scoped summary links the complete record or report and does not replace them.
+The JSON record remains authoritative.
 
 ## Rules
 

@@ -1,4 +1,4 @@
-# Deep Research Reference
+# Historia Reference
 
 Use this file only when the main skill points here. Keep the investigation focused on the user's decision boundary.
 
@@ -212,20 +212,22 @@ subjects, rule owners and required dependencies. Distinguish observations,
 assumptions and proposals. Show order or guarantees only when the sources
 establish them.
 
+<!-- >>> shared-derived-views -->
 For diagrams, separate overview from reference detail. Give each node one role,
 state or action with a short, consistent label. Put field lists, predicates and
-caveats in keyed adjacent notes; keep conditions that change a relationship
-with that relationship. Group by responsibility or phase, align items and leave
-space. If the overview stays dense, revise its abstraction or split complementary
-views rather than shrink text. Choose direction
-for the relationships and reduce crossing or backtracking edges. Use restrained
-colour, readable contrast and text for status.
+caveats in keyed adjacent notes; keep conditions that change a relationship with
+that relationship. Make the reading path clear: choose grouping and direction
+for the relationships, align related items, give them space and reduce crossing
+or backtracking edges. If the overview is still dense, revise its abstraction or
+split complementary views rather than shrink the text. Use restrained colour
+with sufficient contrast; convey status and unknown relationships in text.
 
-Check content and inspect the view at its intended reading size, including
-dense branches and long labels. Fix crowding, clipping, unreadable text and
-connections that are hard to trace. Revise grouping, layout or format when needed;
-successful rendering alone is insufficient. Exercise controls used to support
-the explanation. Report what remains unverified.
+Check content and inspect the rendered view at its intended reading size,
+including dense branches and long labels. Fix unreadable text, collisions,
+clipping and connections that are hard to trace; a successful render alone is
+insufficient. Revise grouping, layout or format when needed. Exercise the
+interactions used in the explanation and state what remains unverified.
+<!-- <<< shared-derived-views -->
 
 ### Research Closure Check
 
