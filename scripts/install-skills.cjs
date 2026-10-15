@@ -239,7 +239,10 @@ function planActions(home = os.homedir(), root = ROOT) {
     const command = state.runtime;
     if (state.marketplace === "elsewhere") cli(command, ["plugin", "marketplace", "remove", PLUGIN]);
     if (state.marketplace !== "current") cli(command, ["plugin", "marketplace", "add", root]);
-    if (command === "claude" && !state.installed) cli(command, ["plugin", "install", PLUGIN_ID]);
+    // Removing a marketplace can take its plugin with it; reinstalling an installed plugin is a no-op.
+    if (command === "claude" && (state.marketplace !== "current" || !state.installed)) {
+      cli(command, ["plugin", "install", PLUGIN_ID]);
+    }
     if (command === "codex" && (state.marketplace !== "current" || !inSync(state))) {
       cli(command, ["plugin", "add", PLUGIN_ID]);
     }

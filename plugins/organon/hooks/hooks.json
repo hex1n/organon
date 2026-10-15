@@ -1,0 +1,16 @@
+{
+  "description": "Check personal rationale records and run the repository's own delivery gates before an agent stops",
+  "hooks": {
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/stop.mjs\"",
+            "timeout": 180
+          }
+        ]
+      }
+    ]
+  }
+}

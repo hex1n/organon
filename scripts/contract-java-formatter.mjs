@@ -9,7 +9,6 @@ import { fileURLToPath } from "node:url";
 
 const ROOT = path.join(path.dirname(fileURLToPath(import.meta.url)), "..");
 const FORMATTER = path.join(ROOT, "tools", "java-formatter", "format-changed-java.mjs");
-const HOOK = path.join(ROOT, "tools", "java-formatter", "run-agent-hook.mjs");
 const CONFIG = path.join(ROOT, "tools", "java-formatter", "codestyle.xml");
 
 function run(command, args, options = {}) {
@@ -40,7 +39,6 @@ function git(repo, args) {
 
 function runShapeContracts(temporaryDir) {
   requireStatus(run(process.execPath, [FORMATTER, "--self-test"]), 0, "formatter self-test");
-  requireStatus(run(process.execPath, [HOOK, "--self-test"]), 0, "hook self-test");
   runFormatterShapeContract(temporaryDir);
 
   const linkedTool = path.join(temporaryDir, "linked-java-formatter");
@@ -396,24 +394,8 @@ function runExplicitScopeContract(temporaryDir) {
   assert.match(fs.readFileSync(nested, "utf8"), /void nested\(\) \{/);
 }
 
-function hookRun(repo, stateRoot, label, extraEnv = {}) {
-  const result = run(process.execPath, [HOOK], {
-    cwd: repo,
-    input: "{}",
-    env: { ...process.env, ASDF_AGENT_STATE_ROOT: stateRoot, ...extraEnv },
-  });
-  requireStatus(result, 0, label);
-  const output = String(result.stdout || "").trim();
-  try {
-    return JSON.parse(output);
-  } catch {
-    throw new Error(label + " returned invalid hook JSON:\n" + output + String(result.stderr || ""));
-  }
-}
-
-function runHookScopeContract(temporaryDir) {
+function runWorktreeScopeContract(temporaryDir) {
   const repo = path.join(temporaryDir, "scope-repo");
-  const stateRoot = path.join(temporaryDir, "scope-state");
   fs.mkdirSync(repo, { recursive: true });
   git(repo, ["init", "-q"]);
   git(repo, ["config", "user.email", "formatter@example.invalid"]);
@@ -427,72 +409,19 @@ function runHookScopeContract(temporaryDir) {
   git(repo, ["add", "Peer.java"]);
   const indexPath = path.join(repo, ".git", "index");
   const indexBefore = fs.readFileSync(indexPath);
-  assert.deepEqual(hookRun(repo, stateRoot, "reader A stop"), {});
-  const newerBytes = peerBytes.replace("peer", "peerEditing");
-  write(peer, newerBytes);
-  assert.deepEqual(hookRun(repo, stateRoot, "reader A after writer B"), {});
-  assert.equal(fs.readFileSync(peer, "utf8"), newerBytes);
-  assert.deepEqual(fs.readFileSync(indexPath), indexBefore, "Stop must not stage or rewrite the index");
-
-  const alternateConfig = path.join(temporaryDir, "profile-upgrade.xml");
-  write(alternateConfig, fs.readFileSync(CONFIG, "utf8").replace('value="140"', 'value="100"'));
-  assert.deepEqual(hookRun(repo, stateRoot, "profile upgrade", { ASDF_JAVA_FORMAT_CONFIG: alternateConfig }), {});
-  assert.equal(fs.readFileSync(peer, "utf8"), newerBytes, "profile changes must not widen writes");
 
   const worktree = path.join(temporaryDir, "task-worktree");
   git(repo, ["worktree", "add", "-qb", "task", worktree]);
-  const taskIndexPath = path.resolve(worktree, run("git", ["rev-parse", "--git-path", "index"], { cwd: worktree }).stdout.trim());
-  const taskIndexBefore = fs.readFileSync(taskIndexPath);
   const owned = path.join(worktree, "Owned.java");
   const ownedBytes = "class Owned { void mine( ) { } }\n";
   write(owned, ownedBytes);
-  assert.deepEqual(hookRun(worktree, stateRoot, "worktree stop"), {});
-  assert.equal(fs.readFileSync(owned, "utf8"), ownedBytes, "Stop never formats an unformatted task file");
-  assert.deepEqual(fs.readFileSync(taskIndexPath), taskIndexBefore, "worktree Stop must not stage files");
-  assert.equal(fs.readFileSync(peer, "utf8"), newerBytes, "worktree check must not write the main checkout");
   requireStatus(run(process.execPath, [FORMATTER, "--check", "--files", owned], { cwd: worktree }), 3, "read-only formatter");
   assert.equal(fs.readFileSync(owned, "utf8"), ownedBytes);
   requireStatus(run(process.execPath, [FORMATTER, "--files", owned], { cwd: worktree }), 3, "explicit owned format");
   assert.match(fs.readFileSync(owned, "utf8"), /void mine\(\) \{/);
-  assert.equal(fs.readFileSync(peer, "utf8"), newerBytes);
+  assert.equal(fs.readFileSync(peer, "utf8"), peerBytes, "a worktree format must not write the main checkout");
   assert.deepEqual(fs.readFileSync(indexPath), indexBefore);
   requireStatus(run(process.execPath, [FORMATTER, "--files"], { cwd: worktree }), 1, "empty scope must not widen");
-}
-
-// A missing checker is a setup failure. Reporting it as a record failure sends
-// the reader to inspect rationale files that were never even read.
-function runRationaleToolingContract(temporaryDir) {
-  const repo = path.join(temporaryDir, "tooling-repo");
-  const stateRoot = path.join(temporaryDir, "tooling-state");
-  fs.mkdirSync(path.join(repo, "docs", "rationale"), { recursive: true });
-  git(repo, ["init", "-q"]);
-  git(repo, ["config", "user.email", "formatter@example.invalid"]);
-  git(repo, ["config", "user.name", "Formatter Probe"]);
-  write(path.join(repo, "notes.txt"), "seed\n");
-  git(repo, ["add", "."]);
-  git(repo, ["commit", "-qm", "seed"]);
-
-  const missing = path.join(temporaryDir, "no-such-rationale.mjs");
-  const blocked = hookRun(repo, stateRoot, "missing checker", { ASDF_RATIONALE_CLI: missing });
-  assert.equal(blocked.decision, "block", "an unusable rationale checker must stop the handoff");
-  assert.match(blocked.reason, /checker is not installed/,
-    "the reason must name the missing checker, not the records");
-  assert.match(blocked.reason, /install-agent-tools\.mjs --apply|ASDF_RATIONALE_CLI/,
-    "the reason must carry the repair step");
-  assert.doesNotMatch(blocked.reason, /require attention/,
-    "a setup failure must not be reported as a record failure");
-
-  const healthy = hookRun(repo, stateRoot, "installed checker");
-  assert.deepEqual(healthy, {}, "a discoverable checker must validate an empty corpus without blocking");
-
-  const noisy = path.join(temporaryDir, "noisy-rationale.mjs");
-  write(noisy, "process.stdout.write(JSON.stringify({failures:[{id:'W-001',title:'anchor mismatch',detail:'shape occurs 0 times'}],selectedPaths:['one.java','two.java','three.java']})); process.exitCode=1;\n");
-  const compact = hookRun(repo, stateRoot, "compact rationale failure", { ASDF_RATIONALE_CLI: noisy });
-  assert.equal(compact.decision, "block", "a rationale failure must still block the handoff");
-  assert.match(compact.reason, /W-001/);
-  assert.match(compact.reason, /shape occurs 0 times/);
-  assert.doesNotMatch(compact.reason, /selectedPaths|one\.java|two\.java|three\.java/,
-    "rationale failure output must not dump selectedPaths");
 }
 
 const temporaryDir = fs.mkdtempSync(path.join(os.tmpdir(), "asdf-java-formatter-contract-"));
@@ -502,8 +431,7 @@ try {
   runSourceScopeContract(temporaryDir);
   runChangedRegionContract(temporaryDir);
   runExplicitScopeContract(temporaryDir);
-  runHookScopeContract(temporaryDir);
-  runRationaleToolingContract(temporaryDir);
+  runWorktreeScopeContract(temporaryDir);
   process.stdout.write("Portable Java formatter contract OK\n");
 } finally {
   fs.rmSync(temporaryDir, { recursive: true, force: true });

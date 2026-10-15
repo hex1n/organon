@@ -148,6 +148,9 @@ When changing these targets:
 - `tools/java-formatter/` or its installer: read
   [tools/java-formatter/README.md](tools/java-formatter/README.md) and run
   `node scripts/contract-java-formatter.mjs`.
+- `plugins/organon/hooks/`: run `node scripts/contract-organon-hook.mjs`, then
+  refresh the Codex copy with `node scripts/install-skills.cjs --apply` and
+  re-trust the changed hook in Codex.
 - `plugins/organon/skills/scholion/`: read
   [its README](plugins/organon/skills/scholion/README.md) and run
   `node scripts/contract-scholion.mjs`.

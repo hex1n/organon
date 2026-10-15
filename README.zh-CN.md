@@ -196,17 +196,22 @@ global-agent-rules.md  # 适用于任意仓库的用户级通用规则
 
 ## Agent 工具
 
-[可移植 Java formatter](tools/java-formatter/) 与
-[scholion skill](plugins/organon/skills/scholion/) 内的脚本为 Codex 和 Claude Code 共用一个 Stop Hook。
+organon 插件自带一个 Stop Hook：[`hooks/stop.mjs`](plugins/organon/hooks/stop.mjs)，Claude Code
+通过 `hooks/hooks.json` 注册，Codex 通过插件清单注册。代理结束前，仓库有 `docs/rationale` 时它运行
+[scholion](plugins/organon/skills/scholion/) 检查，仓库有 `docs/tools/run-agent-gates.mjs` 时运行该仓库自己的门禁；
+两者都没有的仓库不受任何影响。Codex 第一次运行前、以及 Hook 改动后，需要你确认信任一次。
 业务仓库可以在 `docs/rationale` 下保存 Git 忽略的个人记录，但不保存 formatter/checker 执行器、运行时 Hook 或 rationale 状态。
+
+[可移植 Java formatter](tools/java-formatter/) 仍是用户级工具，由仓库的门禁脚本调用：
 
     node scripts/install-agent-tools.cjs
     node scripts/install-agent-tools.cjs --apply
     node scripts/contract-java-formatter.mjs
+    node scripts/contract-organon-hook.mjs
     node scripts/contract-scholion.mjs
 
-安装器把 formatter 和 scholion 脚本链接到 `~/.agents/tools`（不在任何运行时加载 skill
-的目录下），合并全局运行时配置时保留已有 Hook 和其他设置。
+安装器把 formatter 链接到 `~/.agents/tools`，并清理早先安装为这个 Hook 留下的东西：各运行时
+配置里的全局 Stop Hook 和 `~/.agents/tools/scholion` 链接，其他 Hook 和设置保持不变。
 
 它还会安装 [`global-agent-rules.md`](global-agent-rules.md)，即适用于任意仓库的用户级规则：
 `~/.codex/AGENTS.md` 建成指向它的文件符号链接，建不了链接的环境（没有开发者模式的 Windows）退回逐字节相同的副本；

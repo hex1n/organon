@@ -118,9 +118,7 @@ node "<skill-dir>/scripts/rationale.mjs" find TypeName#member
 node "<skill-dir>/scripts/rationale.mjs" find path/to/File.ext:120 --full
 ```
 
-The compatibility wrappers `check-anchors.mjs` and `find-rationale.mjs` delegate
-to the same CLI. Use `--records`, repeated `--ext`, or `--src-filter /` for a
-non-default layout.
+Use `--records`, repeated `--ext`, or `--src-filter /` for a non-default layout.
 
 `check --full` validates the entire active corpus. `check --incremental` is the
 normal Stop-hook route: on the main checkout it selects changed records plus

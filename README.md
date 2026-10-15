@@ -214,19 +214,27 @@ demand, and optional `scripts/` and local-only `tests/`.
 
 ## Agent tools
 
-The [portable Java formatter](tools/java-formatter/) and the scripts inside the
-[scholion skill](plugins/organon/skills/scholion/) share one Stop hook for Codex and
-Claude Code. Business repositories may carry Git-ignored personal records under
+The organon plugin carries one Stop hook, [`hooks/stop.mjs`](plugins/organon/hooks/stop.mjs),
+registered for Claude Code in `hooks/hooks.json` and for Codex in its plugin
+manifest. Before an agent stops it runs the [scholion](plugins/organon/skills/scholion/)
+check when the repository has `docs/rationale`, and the repository's own
+`docs/tools/run-agent-gates.mjs` when present; a repository with neither is left
+untouched. Codex asks you to trust the hook once, and again after it changes.
+Business repositories may carry Git-ignored personal records under
 `docs/rationale`, but never formatter/checker executables, runtime hooks, or rationale state.
+
+The [portable Java formatter](tools/java-formatter/) stays a user-level tool that
+repository dispatchers call:
 
     node scripts/install-agent-tools.cjs
     node scripts/install-agent-tools.cjs --apply
     node scripts/contract-java-formatter.mjs
+    node scripts/contract-organon-hook.mjs
     node scripts/contract-scholion.mjs
 
-The installer links the formatter and the scholion scripts into
-`~/.agents/tools`, outside any directory a runtime loads skills from, and merges
-global runtime settings without replacing unrelated hooks or settings.
+The installer links the formatter into `~/.agents/tools`. It also removes what
+earlier installs placed for the hook: the global Stop handler in each runtime's
+settings and the `~/.agents/tools/scholion` link, keeping unrelated hooks and settings.
 
 It also installs [`global-agent-rules.md`](global-agent-rules.md), the user-level
 rules for every repository: `~/.codex/AGENTS.md` becomes a file symlink to it, or

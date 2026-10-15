@@ -5,13 +5,12 @@ used by Codex and Claude Code. The formatter is Eclipse JDT 3.22 with the
 P3C-derived profile in codestyle.xml, plus the fluent-chain pass in src/.
 Maven dependencies are pinned so JDK 8 remains sufficient.
 
-The installer links this directory and the scholion skill under
-~/.agents/tools, outside every runtime's skills directory, so the plugin
-install never loads scholion twice. It then merges one Stop hook
-into each installed runtime. Stop
-checks rationale anchors and invokes docs/tools/run-agent-gates.mjs when present.
-It never runs the formatter. Repository dispatchers own their own
-side effects; the shared formatter does not infer file ownership from timestamps.
+The installer links this directory under ~/.agents/tools. The organon
+plugin's Stop hook checks rationale anchors and invokes
+docs/tools/run-agent-gates.mjs when present, with ASDF_SHARED_JAVA_FORMATTER=1
+so a dispatcher can call this formatter. The hook never runs the formatter.
+Repository dispatchers own their own side effects; the shared formatter does
+not infer file ownership from timestamps.
 
 The formatter keeps Javadoc blocks byte-for-byte and preserves LF/CRLF layout.
 Removing unused imports stays outside its contract.

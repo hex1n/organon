@@ -16,33 +16,22 @@ const ROOT = path.join(__dirname, "..");
 const RULES_SOURCE_NAME = "global-agent-rules.md";
 const ASSET_SPECS = [
   { name: "java-formatter", source: ["tools", "java-formatter"], install: [".agents", "tools", "java-formatter"] },
-  { name: "scholion", source: ["plugins", "organon", "skills", "scholion"], install: [".agents", "tools", "scholion"] },
 ];
+// The organon plugin now carries the Stop hook and the scholion checker it
+// runs. Earlier installs linked the checker here and wrote this Stop handler
+// into both runtimes' settings; left in place, every Stop would run twice.
+const RETIRED_LINK = { source: ["plugins", "organon", "skills", "scholion"], install: [".agents", "tools", "scholion"] };
 const MANAGED_FRAGMENT = ".agents/tools/java-formatter/run-agent-hook.mjs";
-const STATUS = "Checking local rationale and repository gates";
-
-function hookHandler(runtime, platform = process.platform) {
-  const command = 'node "$HOME/.agents/tools/java-formatter/run-agent-hook.mjs"';
-  if (runtime === "claude") {
-    return { type: "command", command, timeout: 180, statusMessage: STATUS };
-  }
-  const handler = { type: "command", command, timeout: 180, statusMessage: STATUS };
-  if (platform === "win32") {
-    handler.commandWindows =
-      'powershell -NoProfile -Command "node (Join-Path $HOME \'.agents/tools/java-formatter/run-agent-hook.mjs\')"';
-  }
-  return handler;
-}
 
 function isManaged(handler) {
   return typeof handler.command === "string"
     && handler.command.replaceAll("\\", "/").includes(MANAGED_FRAGMENT);
 }
 
-function mergeStopHook(document, handler) {
+function removeManagedStopHook(document) {
   const result = structuredClone(document || {});
-  if (!result.hooks || typeof result.hooks !== "object" || Array.isArray(result.hooks)) result.hooks = {};
-  const current = Array.isArray(result.hooks.Stop) ? result.hooks.Stop : [];
+  const current = result.hooks?.Stop;
+  if (!Array.isArray(current)) return result;
   const retained = [];
   for (const group of current) {
     if (!group || !Array.isArray(group.hooks)) {
@@ -52,8 +41,8 @@ function mergeStopHook(document, handler) {
     const hooks = group.hooks.filter((candidate) => !isManaged(candidate));
     if (hooks.length > 0) retained.push({ ...group, hooks });
   }
-  retained.push({ hooks: [handler] });
-  result.hooks.Stop = retained;
+  if (retained.length > 0) result.hooks.Stop = retained;
+  else delete result.hooks.Stop;
   return result;
 }
 
@@ -173,7 +162,7 @@ function classifyRulesImport(target, source, line, io = fs) {
 }
 
 // The user's own CLAUDE.md keeps everything it has; the import line is added
-// below it, the way mergeStopHook adds one hook beside the user's hooks.
+// below it, beside the user's own content.
 function installRulesImport(target, line, io = fs) {
   io.mkdirSync(path.dirname(target), { recursive: true });
   let existing = "";
@@ -235,27 +224,27 @@ function describeRule(rule, apply) {
   }
 }
 
-function planInstall(home = os.homedir(), sourceRoot = ROOT, platform = process.platform) {
+function planInstall(home = os.homedir(), sourceRoot = ROOT) {
   const assets = ASSET_SPECS.map((spec) => {
     const source = path.join(sourceRoot, ...spec.source);
     const installPath = path.join(home, ...spec.install);
     return { name: spec.name, source, installPath, linkState: classify(installPath, source) };
   });
+  const retiredPath = path.join(home, ...RETIRED_LINK.install);
+  // Only a link back at this checkout's scholion is ours to remove.
+  const retired = classify(retiredPath, path.join(sourceRoot, ...RETIRED_LINK.source)) === "linked" ? [retiredPath] : [];
   const configs = [];
-  if (fs.existsSync(path.join(home, ".codex"))) {
-    const file = path.join(home, ".codex", "hooks.json");
+  for (const [runtime, file] of [
+    ["codex", path.join(home, ".codex", "hooks.json")],
+    ["claude", path.join(home, ".claude", "settings.json")],
+  ]) {
+    if (!fs.existsSync(path.dirname(file))) continue;
     const before = readJson(file);
-    const after = mergeStopHook(before, hookHandler("codex", platform));
-    configs.push({ runtime: "codex", file, before, after });
-  }
-  if (fs.existsSync(path.join(home, ".claude"))) {
-    const file = path.join(home, ".claude", "settings.json");
-    const before = readJson(file);
-    const after = mergeStopHook(before, hookHandler("claude", platform));
-    configs.push({ runtime: "claude", file, before, after });
+    configs.push({ runtime, file, before, after: removeManagedStopHook(before) });
   }
   return {
     assets,
+    retired,
     configs,
     rules: planRules(home, sourceRoot),
   };
@@ -265,6 +254,7 @@ function applyInstall(plan) {
   for (const asset of plan.assets) {
     if (asset.linkState !== "linked") linkSkill(asset.installPath, asset.source);
   }
+  for (const link of plan.retired || []) fs.unlinkSync(link);
   for (const config of plan.configs) {
     if (JSON.stringify(config.before) !== JSON.stringify(config.after)) {
       writeJsonAtomic(config.file, config.after);
@@ -280,10 +270,13 @@ function main(args) {
     const linkVerb = asset.linkState === "linked" ? "keep link" : "link";
     process.stdout.write((apply ? "DO " : "would ") + linkVerb + ": " + asset.installPath + "\n");
   }
+  for (const link of plan.retired) {
+    process.stdout.write((apply ? "DO " : "would ") + "remove retired link: " + link + "\n");
+  }
   for (const config of plan.configs) {
-    const changed = JSON.stringify(config.before) !== JSON.stringify(config.after);
-    process.stdout.write((apply ? "DO " : "would ") + (changed ? "merge" : "keep")
-      + " " + config.runtime + " Stop hook: " + config.file + "\n");
+    if (JSON.stringify(config.before) === JSON.stringify(config.after)) continue;
+    process.stdout.write((apply ? "DO " : "would ") + "remove retired " + config.runtime
+      + " Stop hook: " + config.file + "\n");
   }
   for (const rule of plan.rules) {
     process.stdout.write(describeRule(rule, apply) + "\n");
@@ -310,8 +303,7 @@ if (require.main === module) main(process.argv.slice(2));
 
 module.exports = {
   RULES_SOURCE_NAME,
-  hookHandler,
-  mergeStopHook,
+  removeManagedStopHook,
   writeJsonAtomic,
   importLine,
   classifyRulesCopy,

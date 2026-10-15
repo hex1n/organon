@@ -47,6 +47,31 @@ function check() {
   }
   if (claude.name !== claudeEntry.name) failures.push(`marketplace names ${claudeEntry.name}, manifest names ${claude.name}`);
 
+  // Claude reads hooks/hooks.json, Codex reads the hooks block in its manifest;
+  // both must register the same events and run scripts that ship in the plugin.
+  const claudeHooks = fs.existsSync(path.join(ROOT, pluginDir, "hooks", "hooks.json"))
+    ? readJson(path.join(pluginDir, "hooks", "hooks.json"), failures)?.hooks ?? {}
+    : {};
+  const codexHooks = codex.hooks?.hooks ?? {};
+  const events = (hooks) => Object.keys(hooks).sort().join(", ");
+  if (events(claudeHooks) !== events(codexHooks)) {
+    failures.push(`hook events differ: Claude [${events(claudeHooks)}] vs Codex [${events(codexHooks)}]`);
+  }
+  for (const hooks of [claudeHooks, codexHooks]) {
+    for (const handler of Object.values(hooks).flat().flatMap((group) => group.hooks ?? [])) {
+      for (const command of [handler.command, handler.commandWindows].filter(Boolean)) {
+        // Each runtime substitutes its own placeholder in the command text; Codex
+        // spawns the command without a shell, so $VAR and %VAR% stay literal.
+        const placeholder = hooks === claudeHooks ? "${CLAUDE_PLUGIN_ROOT}" : "${PLUGIN_ROOT}";
+        const quoted = /"([^"]+)"/u.exec(command)?.[1] ?? "";
+        const script = quoted.startsWith(placeholder + "/") ? quoted.slice(placeholder.length + 1) : null;
+        if (!script || !fs.existsSync(path.join(ROOT, pluginDir, ...script.split(/[\\/]/u)))) {
+          failures.push(`hook command runs no script inside the plugin: ${command}`);
+        }
+      }
+    }
+  }
+
   const skillsDir = path.join(ROOT, pluginDir, codex.skills ?? "skills");
   const skills = fs.existsSync(skillsDir)
     ? fs.readdirSync(skillsDir, { withFileTypes: true }).filter((entry) => entry.isDirectory()).map((entry) => entry.name)
