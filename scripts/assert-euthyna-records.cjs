@@ -11,7 +11,7 @@ const { spawnSync } = require("node:child_process");
 
 function main() {
   const root = path.join(__dirname, "..");
-  const skill = path.join(root, "skills", "euthyna");
+  const skill = path.join(root, "plugins", "organon", "skills", "euthyna");
   const { readLensHeadings, evaluateRecord } = require(path.join(skill, "scripts", "validate-review-record.cjs"));
   const schema = JSON.parse(fs.readFileSync(path.join(skill, "review-record-schema.json"), "utf8"));
   const lenses = readLensHeadings(path.join(skill, "references", "LENSES.md"));

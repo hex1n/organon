@@ -1,7 +1,0 @@
-{
-  "name": "asdf-skills",
-  "description": "Portable agent skills under eval: historia, peira, arche, and workflow skills",
-  "version": "0.0.0-eval",
-  "license": "UNLICENSED",
-  "keywords": ["skills", "evals"]
-}

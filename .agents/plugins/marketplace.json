@@ -1,0 +1,20 @@
+{
+  "name": "organon",
+  "interface": {
+    "displayName": "Organon"
+  },
+  "plugins": [
+    {
+      "name": "organon",
+      "source": {
+        "source": "local",
+        "path": "./plugins/organon"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Developer Tools"
+    }
+  ]
+}

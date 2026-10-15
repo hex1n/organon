@@ -1,12 +1,38 @@
-# asdf-skills
+# organon
 
 > English | [简体中文](README.zh-CN.md)
 
 Portable agent skills and user-level tools for Codex, Claude Code, and
-compatible agent runtimes.
+compatible agent runtimes. The skills ship as the `organon` plugin
+(ὄργανον, "instrument"): instruments of method for coding agents.
 
-Each directory under [`skills/`](skills/) is a self-contained source skill with
-task-facing instructions and optional references, scripts, or templates.
+Each directory under [`plugins/organon/skills/`](plugins/organon/skills/) is a
+self-contained source skill with task-facing instructions and optional
+references, scripts, or templates.
+
+## Install
+
+Codex:
+
+```bash
+codex plugin marketplace add ./
+codex plugin add organon@organon
+```
+
+Claude Code:
+
+```bash
+claude plugin marketplace add ./
+claude plugin install organon@organon
+```
+
+From GitHub, replace `./` with `hex1n/organon`. Installed skills are
+namespaced: `organon:tekton` in Claude Code. In this checkout,
+`node scripts/install-skills.cjs --apply` does both installs and removes the
+per-skill links an earlier link install left. Claude Code reads a local
+directory marketplace in place, so source edits apply at the next session or
+`/reload-plugins`. Codex runs a cached copy: re-run the installer after editing
+a skill, and the gate's installed-copies check reports a stale copy.
 
 ## Skills
 
@@ -16,14 +42,14 @@ for the distribution vocabulary.
 
 | Skill | Focus | Purpose |
 | --- | --- | --- |
-| [`arche`](skills/arche/) | plan | Plan or decide from the root problem: separate constraints from assumptions, compare mechanisms, and return the current-best path with its failure condition and next check; also answers whether to build at all and challenges to a recommendation just given. |
-| [`dokimasia`](skills/dokimasia/) | review | Independently falsify one completed design or plan revision: review-only ends after one complete round with GO, NO_GO, or SUSPENDED; on request, review-and-revise iterates on the exact final revision until every required reviewer returns GO or the review suspends. Depth follows the candidate's risk and decides reviewer strength. |
-| [`historia`](skills/historia/) | investigate | Evidence-backed investigation whose deliverable is written findings, not a fix: what is true, why behavior occurs, which option the evidence supports. |
-| [`tekton`](skills/tekton/) | implement | Implement, fix, refactor, or migrate code that already has callers, stored data, or tests to keep working, or land an adjudicated plan; delivers the change with evidence that affected contracts hold, structural improvement when requested, and verification matched to risk. |
-| [`euthyna`](skills/euthyna/) | review | Review code and changes through evidence-backed counterexamples; separate defects, unverified risks, decision items, and optional improvements without editing the candidate. |
-| [`peira`](skills/peira/) | verify | Plan, execute, and present end-to-end tests: source-backed scenario trees, evidence-backed execution reports that hand defects back for separately authorized fixes, with a capped iterate-until-green loop on explicit request, and HTML reader views. Typed first, `plan`, `run`, `render`, or `brief` selects the mode: plan and render it; run, planning first when no plan exists, and render; render an existing artifact; or brief a finished report for readers outside the run, delivered with it. |
-| [`horos`](skills/horos/) | land/verify | Generate backend API docs across RPC and HTTP protocols from code-backed contracts, for one interface, one requirement's backend API, or a branch's API changes. |
-| [`scholion`](skills/scholion/) | navigate | Record why current code is implemented this way and find the reason by file path or code snippet; keep records personal and Git-ignored, with worktree handoff. |
+| [`arche`](plugins/organon/skills/arche/) | plan | Plan or decide from the root problem: separate constraints from assumptions, compare mechanisms, and return the current-best path with its failure condition and next check; also answers whether to build at all and challenges to a recommendation just given. |
+| [`dokimasia`](plugins/organon/skills/dokimasia/) | review | Independently falsify one completed design or plan revision: review-only ends after one complete round with GO, NO_GO, or SUSPENDED; on request, review-and-revise iterates on the exact final revision until every required reviewer returns GO or the review suspends. Depth follows the candidate's risk and decides reviewer strength. |
+| [`historia`](plugins/organon/skills/historia/) | investigate | Evidence-backed investigation whose deliverable is written findings, not a fix: what is true, why behavior occurs, which option the evidence supports. |
+| [`tekton`](plugins/organon/skills/tekton/) | implement | Implement, fix, refactor, or migrate code that already has callers, stored data, or tests to keep working, or land an adjudicated plan; delivers the change with evidence that affected contracts hold, structural improvement when requested, and verification matched to risk. |
+| [`euthyna`](plugins/organon/skills/euthyna/) | review | Review code and changes through evidence-backed counterexamples; separate defects, unverified risks, decision items, and optional improvements without editing the candidate. |
+| [`peira`](plugins/organon/skills/peira/) | verify | Plan, execute, and present end-to-end tests: source-backed scenario trees, evidence-backed execution reports that hand defects back for separately authorized fixes, with a capped iterate-until-green loop on explicit request, and HTML reader views. Typed first, `plan`, `run`, `render`, or `brief` selects the mode: plan and render it; run, planning first when no plan exists, and render; render an existing artifact; or brief a finished report for readers outside the run, delivered with it. |
+| [`horos`](plugins/organon/skills/horos/) | land/verify | Generate backend API docs across RPC and HTTP protocols from code-backed contracts, for one interface, one requirement's backend API, or a branch's API changes. |
+| [`scholion`](plugins/organon/skills/scholion/) | navigate | Record why current code is implemented this way and find the reason by file path or code snippet; keep records personal and Git-ignored, with worktree handoff. |
 
 ## Naming
 
@@ -147,17 +173,16 @@ second-model reviewer uses the read-only second-model capability the runtime
 offers, and availability is resolved and recorded once at freeze time.
 
 `peira` is model-invoked in both hosts; typed by hand, a leading `plan`,
-`run`, `render`, or `brief` selects the mode: `/peira plan …` in Claude Code,
-`$peira plan …` in Codex. It replaces the retired `e2e-test-planner` and
+`run`, `render`, or `brief` selects the mode: `/organon:peira plan …` in Claude Code,
+`$organon:peira plan …` in Codex. It replaces the retired `e2e-test-planner` and
 `e2e-test-executor`.
 
 The eight skills were renamed from `first-principles-planner`, `assayer`,
 `arborist`, `scrutineer`, `deep-research`, `rationale-records`,
 `generating-api-docs`, and `e2e-test-workflow` (see [Naming](#naming)).
-`node scripts/install-skills.cjs --apply` links the new names and removes each
-install link a renamed or retired skill left behind: a link whose stored target
-points into this repository's `skills/` tree at a directory that no longer
-exists. Real directories and links elsewhere stay. `scholion` keeps its state
+`node scripts/install-skills.cjs --apply` removes every per-skill link into
+this repository, including those a renamed skill left behind, and installs the
+plugin. Real directories and links elsewhere stay. `scholion` keeps its state
 under `~/.agents/state/rationale-records`, so existing indexes and pending
 worktree handoffs carry over.
 
@@ -168,15 +193,18 @@ and `dokimasia` owns design/plan review; none requires the others to be installe
 ## Repository layout
 
 ```
-skills/      # source skills, one directory per skill
-tools/       # portable user-level agent tools
-scripts/     # installers and contract checks
-docs/        # research notes and plans (local-only, Git-ignored)
-evals/       # eval run artifacts (local-only, Git-ignored)
-tests/       # test suites run by the gate (local-only, Git-ignored)
-AGENTS.md    # shared repository contract
-CONTEXT.md   # canonical domain terms for skill distribution
-CLAUDE.md    # Claude Code entry: one @AGENTS.md import
+plugins/organon/       # the plugin: Claude and Codex manifests plus skills/
+  skills/              # source skills, one directory per skill
+.claude-plugin/        # Claude Code marketplace
+.agents/plugins/       # Codex marketplace
+tools/                 # portable user-level agent tools
+scripts/               # installers and contract checks
+docs/                  # research notes and plans (local-only, Git-ignored)
+evals/                 # eval run artifacts (local-only, Git-ignored)
+tests/                 # test suites run by the gate (local-only, Git-ignored)
+AGENTS.md              # shared repository contract
+CONTEXT.md             # canonical domain terms for skill distribution
+CLAUDE.md              # Claude Code entry: one @AGENTS.md import
 global-agent-rules.md  # portable user-level rules for any repository
 ```
 
@@ -187,7 +215,7 @@ demand, and optional `scripts/` and local-only `tests/`.
 ## Agent tools
 
 The [portable Java formatter](tools/java-formatter/) and the scripts inside the
-[scholion skill](skills/scholion/) share one Stop hook for Codex and
+[scholion skill](plugins/organon/skills/scholion/) share one Stop hook for Codex and
 Claude Code. Business repositories may carry Git-ignored personal records under
 `docs/rationale`, but never formatter/checker executables, runtime hooks, or rationale state.
 
@@ -196,9 +224,9 @@ Claude Code. Business repositories may carry Git-ignored personal records under
     node scripts/contract-java-formatter.mjs
     node scripts/contract-scholion.mjs
 
-The installer links the formatter into `~/.agents/tools`, the complete rationale
-skill into `~/.agents/skills`, and merges global runtime settings without
-replacing unrelated hooks or settings.
+The installer links the formatter and the scholion scripts into
+`~/.agents/tools`, outside any directory a runtime loads skills from, and merges
+global runtime settings without replacing unrelated hooks or settings.
 
 It also installs [`global-agent-rules.md`](global-agent-rules.md), the user-level
 rules for every repository: `~/.codex/AGENTS.md` becomes a file symlink to it, or

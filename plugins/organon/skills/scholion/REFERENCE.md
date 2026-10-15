@@ -107,14 +107,15 @@ item with the smallest useful text sketch. It is optional, not boilerplate:
 
 ## Commands
 
-Run inside the target Git repository:
+Run inside the target Git repository. `<skill-dir>` is this skill's base
+directory, as the runtime reports it when the skill loads:
 
 ```bash
-node "$HOME/.agents/skills/scholion/scripts/rationale.mjs" check --full
-node "$HOME/.agents/skills/scholion/scripts/rationale.mjs" check --incremental
-node "$HOME/.agents/skills/scholion/scripts/rationale.mjs" find W-001
-node "$HOME/.agents/skills/scholion/scripts/rationale.mjs" find TypeName#member
-node "$HOME/.agents/skills/scholion/scripts/rationale.mjs" find path/to/File.ext:120 --full
+node "<skill-dir>/scripts/rationale.mjs" check --full
+node "<skill-dir>/scripts/rationale.mjs" check --incremental
+node "<skill-dir>/scripts/rationale.mjs" find W-001
+node "<skill-dir>/scripts/rationale.mjs" find TypeName#member
+node "<skill-dir>/scripts/rationale.mjs" find path/to/File.ext:120 --full
 ```
 
 The compatibility wrappers `check-anchors.mjs` and `find-rationale.mjs` delegate
@@ -136,9 +137,9 @@ It is navigation only, not an AST claim that an anchor belongs to that member.
 After writing records, run the CLI from the target repository to generate links:
 
 ```bash
-node "$HOME/.agents/skills/scholion/scripts/rationale.mjs" links
-node "$HOME/.agents/skills/scholion/scripts/rationale.mjs" links --apply
-node "$HOME/.agents/skills/scholion/scripts/rationale.mjs" links --check
+node "<skill-dir>/scripts/rationale.mjs" links
+node "<skill-dir>/scripts/rationale.mjs" links --apply
+node "<skill-dir>/scripts/rationale.mjs" links --check
 ```
 
 `links` previews destinations without writing. `--apply` updates only the
@@ -182,11 +183,11 @@ current code explanations and code locations. Keep it under `.scratch`, for exam
 `.scratch/rationale-handoff.md`; do not name new W-IDs in the linked worktree.
 
 ```bash
-node "$HOME/.agents/skills/scholion/scripts/rationale.mjs" handoff-create \
+node "<skill-dir>/scripts/rationale.mjs" handoff-create \
   --task TASK-ID --base BASE-COMMIT --note .scratch/rationale-handoff.md
 
 # Use --note none when the task found no qualifying invariant.
-node "$HOME/.agents/skills/scholion/scripts/rationale.mjs" handoff-create \
+node "<skill-dir>/scripts/rationale.mjs" handoff-create \
   --task TASK-ID --base BASE-COMMIT --note none
 ```
 
@@ -204,11 +205,11 @@ rationale:
 Then consume and finish from the main checkout:
 
 ```bash
-node "$HOME/.agents/skills/scholion/scripts/rationale.mjs" handoff-consume \
+node "<skill-dir>/scripts/rationale.mjs" handoff-consume \
   --manifest /path/to/worktree/.scratch/rationale-handoff.json \
   --resolution .scratch/rationale-resolution.json
 
-node "$HOME/.agents/skills/scholion/scripts/rationale.mjs" worktree-finish \
+node "<skill-dir>/scripts/rationale.mjs" worktree-finish \
   --manifest /path/to/worktree/.scratch/rationale-handoff.json \
   --main-root /path/to/main --branch task-branch
 

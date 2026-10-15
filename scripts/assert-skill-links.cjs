@@ -28,7 +28,7 @@ const fs = require("node:fs");
 const path = require("node:path");
 
 const ROOT = path.join(__dirname, "..");
-const SKILLS = path.join(ROOT, "skills");
+const SKILLS = path.join(ROOT, "plugins", "organon", "skills");
 const MARKDOWN = /\.md$/i;
 
 // GitHub-flavoured heading -> anchor: lowercase, drop everything that is not a

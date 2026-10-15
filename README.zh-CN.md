@@ -1,11 +1,34 @@
-# asdf-skills
+# organon
 
 > [English](README.md) | 简体中文
 
-面向 Codex、Claude Code 及兼容 agent runtime 的可移植 skills 与用户级工具。
+面向 Codex、Claude Code 及兼容 agent runtime 的可移植 skills 与用户级工具。这些 skill
+以 `organon` 插件分发（ὄργανον，意为"工具"）：给编程代理的思维工具。
 
-[`skills/`](skills/) 下的每个目录都是独立的源 skill，包含面向任务的指令，以及可选的
-参考资料、脚本或模板。
+[`plugins/organon/skills/`](plugins/organon/skills/) 下的每个目录都是独立的源 skill，
+包含面向任务的指令，以及可选的参考资料、脚本或模板。
+
+## 安装
+
+Codex：
+
+```bash
+codex plugin marketplace add ./
+codex plugin add organon@organon
+```
+
+Claude Code：
+
+```bash
+claude plugin marketplace add ./
+claude plugin install organon@organon
+```
+
+从 GitHub 安装时，把 `./` 换成 `hex1n/organon`。安装后的 skill 带命名空间，Claude Code
+中为 `organon:tekton`。在本仓库中，`node scripts/install-skills.cjs --apply` 会完成两边的
+安装，并删除早先链接安装留下的逐个 skill 链接。Claude Code 直接读取本地目录 marketplace，
+改动源文件后在下一个会话或 `/reload-plugins` 后生效。Codex 运行的是缓存副本：改完 skill
+要重新运行安装器，门禁的 installed-copies 检查会报告过期副本。
 
 ## Skills
 
@@ -14,14 +37,14 @@
 
 | 技能 | 领域 | 用途 |
 | --- | --- | --- |
-| [`arche`](skills/arche/) | 规划 | 从根问题出发做规划或决策：分离约束与假设、比较机制，给出当前最佳路径及其失败条件和下一步检查；也回答值不值得做，以及对刚给出建议的质疑。 |
-| [`dokimasia`](skills/dokimasia/) | 审查 | 对同一份完整的方案或计划 revision 独立证伪：仅审查模式一轮完整审查后以 GO、NO_GO 或 SUSPENDED 结束；用户要求修订时进入审查并修订模式，在同一最终 revision 上迭代，直到所有必需 reviewer 返回 GO 或审查挂起。深度随候选风险标定，并决定 reviewer 强度。 |
-| [`historia`](skills/historia/) | 调研 | 以证据为支撑的调研，交付书面结论而非修复：判断事实真相、行为成因、证据支持哪个选项。 |
-| [`tekton`](skills/tekton/) | 实现 | 在已有调用方、存储数据或测试需要继续工作的代码上实现、修复、重构或迁移，或落地已裁决的方案；交付改动并附上受影响契约仍成立的证据，按要求改善结构，按风险选择验证。 |
-| [`euthyna`](skills/euthyna/) | 审查 | 用有证据的反例审查代码与变更，区分缺陷、未验证风险、待决事项和可选改进；只读报告，不代替实施修复。 |
-| [`peira`](skills/peira/) | 验证 | 规划、执行并呈现端到端测试：可溯源的业务场景树、把缺陷交回调用方另行授权修复的证据化执行报告，明确要求时才做有上限的直至全绿循环，以及 HTML 阅读视图。开头带 `plan`、`run`、`render` 或 `brief` 时选定模式：plan 出计划并渲染；run 执行并渲染，无计划时先规划；render 只渲染已有产物；brief 为已完成的报告出一页纸摘要，与报告一起交付。 |
-| [`horos`](skills/horos/) | 落地/验证 | 基于代码契约生成跨 RPC 与 HTTP 协议的后端 API 文档，范围可为单个接口、一个需求的后端 API 或一个分支的 API 变更。 |
-| [`scholion`](skills/scholion/) | 导航 | 记录当前代码为什么这样实现，按文件路径或代码片段查找对应的实现理由；记录由个人维护、Git 忽略，支持工作树交接。 |
+| [`arche`](plugins/organon/skills/arche/) | 规划 | 从根问题出发做规划或决策：分离约束与假设、比较机制，给出当前最佳路径及其失败条件和下一步检查；也回答值不值得做，以及对刚给出建议的质疑。 |
+| [`dokimasia`](plugins/organon/skills/dokimasia/) | 审查 | 对同一份完整的方案或计划 revision 独立证伪：仅审查模式一轮完整审查后以 GO、NO_GO 或 SUSPENDED 结束；用户要求修订时进入审查并修订模式，在同一最终 revision 上迭代，直到所有必需 reviewer 返回 GO 或审查挂起。深度随候选风险标定，并决定 reviewer 强度。 |
+| [`historia`](plugins/organon/skills/historia/) | 调研 | 以证据为支撑的调研，交付书面结论而非修复：判断事实真相、行为成因、证据支持哪个选项。 |
+| [`tekton`](plugins/organon/skills/tekton/) | 实现 | 在已有调用方、存储数据或测试需要继续工作的代码上实现、修复、重构或迁移，或落地已裁决的方案；交付改动并附上受影响契约仍成立的证据，按要求改善结构，按风险选择验证。 |
+| [`euthyna`](plugins/organon/skills/euthyna/) | 审查 | 用有证据的反例审查代码与变更，区分缺陷、未验证风险、待决事项和可选改进；只读报告，不代替实施修复。 |
+| [`peira`](plugins/organon/skills/peira/) | 验证 | 规划、执行并呈现端到端测试：可溯源的业务场景树、把缺陷交回调用方另行授权修复的证据化执行报告，明确要求时才做有上限的直至全绿循环，以及 HTML 阅读视图。开头带 `plan`、`run`、`render` 或 `brief` 时选定模式：plan 出计划并渲染；run 执行并渲染，无计划时先规划；render 只渲染已有产物；brief 为已完成的报告出一页纸摘要，与报告一起交付。 |
+| [`horos`](plugins/organon/skills/horos/) | 落地/验证 | 基于代码契约生成跨 RPC 与 HTTP 协议的后端 API 文档，范围可为单个接口、一个需求的后端 API 或一个分支的 API 变更。 |
+| [`scholion`](plugins/organon/skills/scholion/) | 导航 | 记录当前代码为什么这样实现，按文件路径或代码片段查找对应的实现理由；记录由个人维护、Git 忽略，支持工作树交接。 |
 
 ## 命名
 
@@ -138,14 +161,13 @@ agent 能力，second-model reviewer 使用 runtime 提供的只读第二模型�
 一次判定并记录；reviewer 始终只读。
 
 `peira` 在两个宿主中都由模型自动触发；手动输入时开头的 `plan`、`run`、
-`render` 或 `brief` 选定模式：Claude Code 用 `/peira plan …`，Codex 用
-`$peira plan …`。它取代已退役的 `e2e-test-planner` 与 `e2e-test-executor`。
+`render` 或 `brief` 选定模式：Claude Code 用 `/organon:peira plan …`，Codex 用
+`$organon:peira plan …`。它取代已退役的 `e2e-test-planner` 与 `e2e-test-executor`。
 
 这八个 skill 由 `first-principles-planner`、`assayer`、`arborist`、`scrutineer`、
 `deep-research`、`rationale-records`、`generating-api-docs`、`e2e-test-workflow`
-改名而来（见[命名](#命名)）。`node scripts/install-skills.cjs --apply` 会为新名建立链接，
-并删除改名或退役 skill 留下的安装链接，即链接本身记录的目标位于本仓库 `skills/` 下、
-但该目录已不存在的链接。真实目录和指向别处的链接都会保留。`scholion` 的状态仍放在
+改名而来（见[命名](#命名)）。`node scripts/install-skills.cjs --apply` 会删除所有
+指向本仓库的逐个 skill 链接（包括改名留下的），并安装插件。真实目录和指向别处的链接都会保留。`scholion` 的状态仍放在
 `~/.agents/state/rationale-records` 下，已有索引和未消费的工作树交接记录照常可用。
 
 `euthyna` 可独立调用，也可交给实现流程中的 fresh-context reviewer 使用。
@@ -154,15 +176,18 @@ agent 能力，second-model reviewer 使用 runtime 提供的只读第二模型�
 ## 仓库结构
 
 ```
-skills/      # 源技能，每个目录一个 skill
-tools/       # 可移植的用户级 agent 工具
-scripts/     # 安装器与契约检查
-docs/        # 调研笔记与计划（仅本机，Git 忽略）
-evals/       # 评测运行产物（仅本机，Git 忽略）
-tests/       # 门禁运行的测试套件（仅本机，Git 忽略）
-AGENTS.md    # 跨运行时共用仓库约定
-CONTEXT.md   # 技能分发的领域术语
-CLAUDE.md    # Claude Code 入口：一行 @AGENTS.md 导入
+plugins/organon/       # 插件：Claude 与 Codex 清单以及 skills/
+  skills/              # 源技能，每个目录一个 skill
+.claude-plugin/        # Claude Code marketplace
+.agents/plugins/       # Codex marketplace
+tools/                 # 可移植的用户级 agent 工具
+scripts/               # 安装器与契约检查
+docs/                  # 调研笔记与计划（仅本机，Git 忽略）
+evals/                 # 评测运行产物（仅本机，Git 忽略）
+tests/                 # 门禁运行的测试套件（仅本机，Git 忽略）
+AGENTS.md              # 跨运行时共用仓库约定
+CONTEXT.md             # 技能分发的领域术语
+CLAUDE.md              # Claude Code 入口：一行 @AGENTS.md 导入
 global-agent-rules.md  # 适用于任意仓库的用户级通用规则
 ```
 
@@ -172,7 +197,7 @@ global-agent-rules.md  # 适用于任意仓库的用户级通用规则
 ## Agent 工具
 
 [可移植 Java formatter](tools/java-formatter/) 与
-[scholion skill](skills/scholion/) 内的脚本为 Codex 和 Claude Code 共用一个 Stop Hook。
+[scholion skill](plugins/organon/skills/scholion/) 内的脚本为 Codex 和 Claude Code 共用一个 Stop Hook。
 业务仓库可以在 `docs/rationale` 下保存 Git 忽略的个人记录，但不保存 formatter/checker 执行器、运行时 Hook 或 rationale 状态。
 
     node scripts/install-agent-tools.cjs
@@ -180,8 +205,8 @@ global-agent-rules.md  # 适用于任意仓库的用户级通用规则
     node scripts/contract-java-formatter.mjs
     node scripts/contract-scholion.mjs
 
-安装器把 formatter 链接到 `~/.agents/tools`、完整 rationale skill 链接到
-`~/.agents/skills`，合并全局运行时配置时保留已有 Hook 和其他设置。
+安装器把 formatter 和 scholion 脚本链接到 `~/.agents/tools`（不在任何运行时加载 skill
+的目录下），合并全局运行时配置时保留已有 Hook 和其他设置。
 
 它还会安装 [`global-agent-rules.md`](global-agent-rules.md)，即适用于任意仓库的用户级规则：
 `~/.codex/AGENTS.md` 建成指向它的文件符号链接，建不了链接的环境（没有开发者模式的 Windows）退回逐字节相同的副本；

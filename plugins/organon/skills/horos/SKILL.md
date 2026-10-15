@@ -16,13 +16,14 @@ Before writing, build the interface inventory.
 ## Commands
 
 ```bash
-/horos [--rpc|--http] Interface
-/horos [--rpc|--http] Interface method
-/horos --feature <feature-or-branch>
-/horos --diff [baseBranch]
-/horos --batch I1 I2
+/organon:horos [--rpc|--http] Interface
+/organon:horos [--rpc|--http] Interface method
+/organon:horos --feature <feature-or-branch>
+/organon:horos --diff [baseBranch]
+/organon:horos --batch I1 I2
 ```
-These are Claude Code forms; Codex takes the same arguments after `$horos`.
+These are Claude Code forms; Codex takes the same arguments after
+`$organon:horos`. A standalone install drops the `organon:` prefix.
 Detect an unspecified protocol from the active interface path.
 
 ## Workflow

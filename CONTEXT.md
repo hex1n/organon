@@ -13,7 +13,7 @@ this repository into local agent runtimes such as Codex and Claude Code.
 ### Language
 
 **Source Skill**:
-A skill directory under the repository `skills/` tree that acts as the source of truth for a managed skill.
+A skill directory under the repository `plugins/organon/skills/` tree that acts as the source of truth for a managed skill.
 _Avoid_: remote copy, upstream folder
 
 **Managed Installed Skill**:

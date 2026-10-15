@@ -45,12 +45,14 @@ docs/rationale/
 
 ## 查找与校验
 
+`<skill-dir>` 是本技能的根目录，以运行环境加载技能时给出的路径为准。
+
 ```bash
-node "$HOME/.agents/skills/scholion/scripts/rationale.mjs" check --full
-node "$HOME/.agents/skills/scholion/scripts/rationale.mjs" check --incremental
-node "$HOME/.agents/skills/scholion/scripts/rationale.mjs" find W-001
-node "$HOME/.agents/skills/scholion/scripts/rationale.mjs" find TypeName#member
-node "$HOME/.agents/skills/scholion/scripts/rationale.mjs" find path/to/File.ext:120 --full
+node "<skill-dir>/scripts/rationale.mjs" check --full
+node "<skill-dir>/scripts/rationale.mjs" check --incremental
+node "<skill-dir>/scripts/rationale.mjs" find W-001
+node "<skill-dir>/scripts/rationale.mjs" find TypeName#member
+node "<skill-dir>/scripts/rationale.mjs" find path/to/File.ext:120 --full
 ```
 
 匹配代码片段时忽略空白、缩进和换行，保留字符串、注释和 token 边界。
@@ -65,7 +67,7 @@ node "$HOME/.agents/skills/scholion/scripts/rationale.mjs" find path/to/File.ext
 在目标仓库中运行：
 
 ```bash
-node "$HOME/.agents/skills/scholion/scripts/rationale.mjs" links --apply
+node "<skill-dir>/scripts/rationale.mjs" links --apply
 ```
 
 生成后，在 **IDEA、VS Code、Zed 的 Markdown 预览**中点击“代码片段”即可打开对应源码行。

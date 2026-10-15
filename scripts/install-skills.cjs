@@ -1,38 +1,44 @@
 #!/usr/bin/env node
 
-// Link source skills into the runtimes that load them.
+// Install this repository's skills as the organon plugin in the runtimes that
+// load them, and retire the per-skill links an earlier install left behind.
 //
-// Canonical targets are .agents and .claude; the other runtimes on this machine
-// read .agents rather than carrying their own copy, so a skill placed anywhere
-// else is a stray that will silently fall behind the source.
-//
-// Every installed entry is a link back at the source tree, never a copy. One
-// skill therefore exists once on disk, in this repository: editing the source
-// updates every runtime at once and drift is not representable. the gate's
-// byte-identity check keeps passing because a link reads as its own target.
+// Claude Code reads a plugin from a local directory marketplace in place, so a
+// source edit takes effect at the next session. Codex copies the plugin into
+// its own cache; re-adding the plugin replaces that copy, and the gate compares
+// it byte for byte. A per-skill link left in a runtime's skills directory
+// would load every skill twice, once bare and once as organon:<skill>.
 
 const fs = require("node:fs");
 const os = require("node:os");
 const path = require("node:path");
+const { spawnSync } = require("node:child_process");
 
 const ROOT = path.join(__dirname, "..");
-const SKILLS_ROOT = path.join(ROOT, "skills");
-
-const TARGET_RUNTIMES = [".agents", ".claude"];
+const PLUGIN = "organon";
+const PLUGIN_ID = `${PLUGIN}@${PLUGIN}`;
+const PLUGIN_ROOT = path.join(ROOT, "plugins", PLUGIN);
+// The link install pointed each runtime at a skill under one of these trees.
+const LINKED_SKILL_ROOTS = [path.join(ROOT, "skills"), path.join(PLUGIN_ROOT, "skills")];
 
 // Windows refuses directory symlinks without Developer Mode or elevation; a
 // junction needs neither, Node reports it via isSymbolicLink(), and readdir
 // resolves through it — which is all the drift check relies on.
 const LINK_TYPE = process.platform === "win32" ? "junction" : "dir";
 
-function listSourceSkills(skillsRoot = SKILLS_ROOT) {
-  return fs
-    .readdirSync(skillsRoot, { withFileTypes: true })
-    // A skill is a directory carrying SKILL.md; anything else under skills/
-    // (state directories, scratch folders) is not ours to install.
-    .filter((entry) => entry.isDirectory() && fs.existsSync(path.join(skillsRoot, entry.name, "SKILL.md")))
-    .map((entry) => entry.name)
-    .sort();
+const fold = (value) => (process.platform === "win32" ? value.toLowerCase() : value);
+
+function pathKeys(value) {
+  const keys = new Set([fold(path.resolve(value))]);
+  try {
+    keys.add(fold(fs.realpathSync(value)));
+  } catch {}
+  return keys;
+}
+
+function samePath(a, b) {
+  const right = pathKeys(b);
+  return [...pathKeys(a)].some((key) => right.has(key));
 }
 
 // Classify what currently occupies an install path, so the caller can tell a
@@ -101,95 +107,23 @@ function linkSkill(installPath, sourceDir, io = fs) {
   }
 }
 
-function planInstall(skills, home = os.homedir(), skillsRoot = SKILLS_ROOT) {
-  const plan = [];
-  for (const runtime of TARGET_RUNTIMES) {
-    const skillsDir = path.join(home, runtime, "skills");
-    // Only manage a runtime that exists; creating one would install this
-    // repository into a tool the user does not run.
-    if (!fs.existsSync(path.join(home, runtime))) continue;
-    for (const skill of skills) {
-      const sourceDir = path.join(skillsRoot, skill);
-      const installPath = path.join(skillsDir, skill);
-      plan.push({ runtime, skill, installPath, sourceDir, state: classify(installPath, sourceDir) });
-    }
-  }
-  return plan;
-}
-
-// A skill of ours under a non-target runtime. Reported by default and only
-// removed on request, and even then only when provenance is provable: a link
-// resolving back at this repository's source is ours; a same-name real
-// directory or a link elsewhere may be a user-owned local override
-// (CONTEXT.md: user-owned, separate from us) and is never removed.
-function findStrays(skills, home = os.homedir(), skillsRoot = SKILLS_ROOT) {
-  const strays = [];
-  const wanted = new Set(skills);
-  // A runtime may read the managed root through a link rather than carrying
-  // its own copy (~/.codex/skills -> ../.agents/skills), so a directory name
-  // is not evidence of a separate installation. Resolve the target roots once:
-  // an install seen through such an alias is the managed link itself, and
-  // pruning it deletes the correct install rather than a stale duplicate.
-  const managedRoots = new Set();
-  for (const runtime of TARGET_RUNTIMES) {
-    try {
-      managedRoots.add(fs.realpathSync(path.join(home, runtime, "skills")));
-    } catch {} // that runtime is not installed on this machine
-  }
+// A per-skill link of ours in any runtime's skills directory. Provenance comes
+// from the stored target, read without resolving it, because the link may
+// dangle after a move. A real directory or a link elsewhere may be a local
+// override (CONTEXT.md) and is never reported.
+function findLinkedSkills(home = os.homedir(), roots = LINKED_SKILL_ROOTS) {
+  const ours = new Set(roots.flatMap((root) => [...pathKeys(root)]));
+  const links = [];
+  const scanned = new Set();
   let entries = [];
   try {
     entries = fs.readdirSync(home, { withFileTypes: true });
   } catch {
-    return strays;
+    return links;
   }
   for (const entry of entries) {
     if (!entry.isDirectory() || !entry.name.startsWith(".")) continue;
-    if (TARGET_RUNTIMES.includes(entry.name)) continue;
     const skillsDir = path.join(home, entry.name, "skills");
-    let resolvedDir;
-    try {
-      resolvedDir = fs.realpathSync(skillsDir);
-    } catch {
-      continue; // no skills tree under this runtime
-    }
-    if (managedRoots.has(resolvedDir)) continue;
-    let children = [];
-    try {
-      children = fs.readdirSync(skillsDir, { withFileTypes: true });
-    } catch {
-      continue;
-    }
-    for (const child of children) {
-      if (!wanted.has(child.name)) continue;
-      if (!child.isDirectory() && !child.isSymbolicLink()) continue;
-      const installPath = path.join(skillsDir, child.name);
-      strays.push({
-        runtime: entry.name,
-        skill: child.name,
-        installPath,
-        ours: classify(installPath, path.join(skillsRoot, child.name)) === "linked",
-      });
-    }
-  }
-  return strays.sort((a, b) => a.runtime.localeCompare(b.runtime) || a.skill.localeCompare(b.skill));
-}
-
-// A link of ours left behind when a source skill was renamed or retired: it
-// sits in a target runtime and its stored target names a directory directly
-// under this repository's skills/ tree that no longer exists. Provenance comes
-// from the stored target, read without resolving it, because a dangling link
-// has no realpath. A real directory, a live link, or a link elsewhere may be a
-// local override and is never touched.
-function findOrphans(home = os.homedir(), skillsRoot = SKILLS_ROOT) {
-  const fold = (value) => (process.platform === "win32" ? value.toLowerCase() : value);
-  const roots = new Set([fold(path.resolve(skillsRoot))]);
-  try {
-    roots.add(fold(fs.realpathSync(skillsRoot)));
-  } catch {}
-  const orphans = [];
-  const scanned = new Set();
-  for (const runtime of TARGET_RUNTIMES) {
-    const skillsDir = path.join(home, runtime, "skills");
     let resolvedDir;
     try {
       resolvedDir = fs.realpathSync(skillsDir);
@@ -203,56 +137,147 @@ function findOrphans(home = os.homedir(), skillsRoot = SKILLS_ROOT) {
       if (!child.isSymbolicLink()) continue;
       const installPath = path.join(skillsDir, child.name);
       const target = path.resolve(skillsDir, fs.readlinkSync(installPath));
-      if (!roots.has(fold(path.dirname(target))) || fs.existsSync(target)) continue;
-      orphans.push({ runtime, skill: child.name, installPath, target });
+      if (!ours.has(fold(path.dirname(target)))) continue;
+      links.push({ runtime: entry.name, skill: child.name, installPath, target });
     }
   }
-  return orphans.sort((a, b) => a.runtime.localeCompare(b.runtime) || a.skill.localeCompare(b.skill));
+  return links.sort((a, b) => a.runtime.localeCompare(b.runtime) || a.skill.localeCompare(b.skill));
+}
+
+function listFilesRecursive(root) {
+  const out = [];
+  if (!fs.existsSync(root)) return out;
+  const walk = (dir) => {
+    for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+      const full = path.join(dir, entry.name);
+      if (entry.isDirectory()) walk(full);
+      else if (entry.isFile()) out.push(path.relative(root, full).split(path.sep).join("/"));
+    }
+  };
+  walk(root);
+  return out.sort();
+}
+
+function sameBytes(a, b) {
+  try {
+    return fs.readFileSync(a).equals(fs.readFileSync(b));
+  } catch {
+    return false;
+  }
+}
+
+function compareTree(sourceDir, installedDir) {
+  if (!fs.existsSync(installedDir)) return { installed: false, drift: [], missing: [], extra: [] };
+  const sourceFiles = listFilesRecursive(sourceDir);
+  const installedFiles = listFilesRecursive(installedDir);
+  const installedSet = new Set(installedFiles);
+  const drift = [];
+  const missing = [];
+  for (const rel of sourceFiles) {
+    if (!installedSet.has(rel)) missing.push(rel);
+    else if (!sameBytes(path.join(sourceDir, rel), path.join(installedDir, rel))) drift.push(rel);
+  }
+  const sourceSet = new Set(sourceFiles);
+  const extra = installedFiles.filter((rel) => !sourceSet.has(rel));
+  return { installed: true, drift, missing, extra };
+}
+
+function readJson(file) {
+  try {
+    return JSON.parse(fs.readFileSync(file, "utf8"));
+  } catch {
+    return {};
+  }
+}
+
+function marketplaceState(registeredPath, root) {
+  if (registeredPath == null) return "absent";
+  return samePath(registeredPath, root) ? "current" : "elsewhere";
+}
+
+function claudeState(home = os.homedir(), root = ROOT) {
+  if (!fs.existsSync(path.join(home, ".claude"))) return null;
+  const plugins = path.join(home, ".claude", "plugins");
+  const registeredPath = readJson(path.join(plugins, "known_marketplaces.json"))[PLUGIN]?.source?.path ?? null;
+  const installed = Boolean(readJson(path.join(plugins, "installed_plugins.json")).plugins?.[PLUGIN_ID]?.length);
+  return { runtime: "claude", registeredPath, marketplace: marketplaceState(registeredPath, root), installed };
+}
+
+function codexState(home = os.homedir(), root = ROOT, pluginRoot = path.join(root, "plugins", PLUGIN)) {
+  if (!fs.existsSync(path.join(home, ".codex"))) return null;
+  const manifest = readJson(path.join(pluginRoot, ".codex-plugin", "plugin.json"));
+  if (!manifest.version) return null;
+  let config = "";
+  try {
+    config = fs.readFileSync(path.join(home, ".codex", "config.toml"), "utf8");
+  } catch {}
+  const table = config.match(new RegExp(`^\\[marketplaces\\.${PLUGIN}\\]\\s*$([\\s\\S]*?)(?=^\\[|(?![\\s\\S]))`, "mu"));
+  const source = table?.[1].match(/^source\s*=\s*(?:'([^']*)'|"([^"]*)")/mu);
+  // Codex records a local marketplace as an extended-length Windows path.
+  const registeredPath = source ? (source[1] ?? source[2]).replace(/^\\\\\?\\/u, "") : null;
+  const enabled = new RegExp(`^\\[plugins\\."${PLUGIN_ID}"\\]`, "mu").test(config);
+  const cacheDir = path.join(home, ".codex", "plugins", "cache", PLUGIN, PLUGIN, manifest.version);
+  const tree = compareTree(pluginRoot, cacheDir);
+  return {
+    runtime: "codex",
+    registeredPath,
+    marketplace: marketplaceState(registeredPath, root),
+    cacheDir,
+    ...tree,
+    installed: enabled && tree.installed,
+  };
+}
+
+function inSync(state) {
+  return state.installed && !state.drift.length && !state.missing.length && !state.extra.length;
+}
+
+function planActions(home = os.homedir(), root = ROOT) {
+  const actions = findLinkedSkills(home).map((link) => ({ kind: "unlink", ...link }));
+  const cli = (runtime, args) => actions.push({ kind: "cli", runtime, args });
+  for (const state of [claudeState(home, root), codexState(home, root)].filter(Boolean)) {
+    const command = state.runtime;
+    if (state.marketplace === "elsewhere") cli(command, ["plugin", "marketplace", "remove", PLUGIN]);
+    if (state.marketplace !== "current") cli(command, ["plugin", "marketplace", "add", root]);
+    if (command === "claude" && !state.installed) cli(command, ["plugin", "install", PLUGIN_ID]);
+    if (command === "codex" && (state.marketplace !== "current" || !inSync(state))) {
+      cli(command, ["plugin", "add", PLUGIN_ID]);
+    }
+  }
+  return actions;
+}
+
+function describe(action) {
+  if (action.kind === "unlink") return `remove linked skill: ${action.skill} @ ${action.runtime}`;
+  return `run: ${action.runtime} ${action.args.join(" ")}`;
+}
+
+function runCli(action) {
+  // The runtimes install as .cmd shims on Windows, which only a shell resolves.
+  const result = process.platform === "win32"
+    ? spawnSync([action.runtime, ...action.args.map((arg) => (/\s/u.test(arg) ? `"${arg}"` : arg))].join(" "), {
+      stdio: "inherit",
+      shell: true,
+    })
+    : spawnSync(action.runtime, action.args, { stdio: "inherit" });
+  if (result.status !== 0) throw new Error(`${describe(action)} exited with ${result.status ?? result.error}`);
 }
 
 function main(argv) {
   const apply = argv.includes("--apply");
-  const pruneStray = argv.includes("--prune-stray");
-  const skills = listSourceSkills();
-  const plan = planInstall(skills);
-  const strays = findStrays(skills);
-
-  const changes = plan.filter((item) => item.state !== "linked");
-  for (const item of changes) {
-    const verb = { absent: "link", copy: "replace copy with link", relinked: "repoint link" }[item.state];
-    process.stdout.write(`${apply ? "DO" : "would"} ${verb}: ${item.skill} @ ${item.runtime}\n`);
-    if (apply) linkSkill(item.installPath, item.sourceDir);
+  const actions = planActions();
+  for (const action of actions) {
+    process.stdout.write(`${apply ? "DO" : "would"} ${describe(action)}\n`);
+    if (!apply) continue;
+    if (action.kind === "unlink") fs.unlinkSync(action.installPath);
+    else runCli(action);
   }
-  const prunable = strays.filter((stray) => stray.ours);
-  for (const stray of strays) {
-    if (!stray.ours) {
-      process.stdout.write(
-        `kept: ${stray.skill} @ ${stray.runtime} — same name but not a link to this repository; ` +
-          `possible local override, never removed\n`,
-      );
-      continue;
-    }
-    process.stdout.write(
-      `${pruneStray ? (apply ? "DO remove" : "would remove") : "stray"}: ${stray.skill} @ ${stray.runtime}` +
-        `${pruneStray ? "" : " — not a target runtime; pass --prune-stray to remove"}\n`,
-    );
-    if (apply && pruneStray) fs.rmSync(stray.installPath, { recursive: true, force: true });
-  }
-  const orphans = findOrphans();
-  for (const orphan of orphans) {
-    process.stdout.write(`${apply ? "DO remove" : "would remove"} orphaned link: ${orphan.skill} @ ${orphan.runtime}\n`);
-    if (apply) fs.unlinkSync(orphan.installPath);
-  }
-
-  const linked = plan.length - changes.length;
+  const runtimes = [claudeState(), codexState()].filter(Boolean).map((state) => state.runtime);
   process.stdout.write(
-    `${apply ? "applied" : "plan"}: ${skills.length} skills, ${plan.length} install paths across ` +
-      `${TARGET_RUNTIMES.join(", ")} — ${linked} already linked, ${changes.length} to change, ` +
-      `${strays.length} stray, ${orphans.length} orphaned\n`,
+    `${apply ? "applied" : "plan"}: ${PLUGIN_ID} for ${runtimes.join(", ") || "no runtime"} — ` +
+      `${actions.length} change(s)\n`,
   );
-  if (!apply && (changes.length || orphans.length || (pruneStray && prunable.length))) {
-    process.stdout.write("re-run with --apply to make these changes\n");
-  }
+  if (!apply && actions.length) process.stdout.write("re-run with --apply to make these changes\n");
 }
 
 // require.main is a module identity, not a path comparison, so it stays correct
@@ -263,4 +288,4 @@ function main(argv) {
 // worst failure available.
 if (require.main === module) main(process.argv.slice(2));
 
-module.exports = { TARGET_RUNTIMES, listSourceSkills, classify, linkSkill, planInstall, findStrays };
+module.exports = { PLUGIN, classify, linkSkill, findLinkedSkills, compareTree, claudeState, codexState, planActions };

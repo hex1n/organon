@@ -19,7 +19,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const REFERENCES = path.join(path.dirname(fileURLToPath(import.meta.url)),
-  '..', 'skills', 'peira', 'references');
+  '..', 'plugins', 'organon', 'skills', 'peira', 'references');
 const BEGIN = '/* shared-report-styles:begin';
 const END = '/* shared-report-styles:end */';
 

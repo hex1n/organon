@@ -1,0 +1,16 @@
+{
+  "name": "organon",
+  "metadata": {
+    "description": "Instruments of method for coding agents: planning, implementation, review, research, API docs, and acceptance testing."
+  },
+  "owner": {
+    "name": "hex1n"
+  },
+  "plugins": [
+    {
+      "name": "organon",
+      "source": "./plugins/organon",
+      "description": "Instruments for coding agents: decide from the root problem, change code without breaking its contracts, and falsify claims before trusting them."
+    }
+  ]
+}

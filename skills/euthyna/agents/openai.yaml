@@ -1,4 +1,0 @@
-interface:
-  display_name: "Euthyna"
-  short_description: "Fresh-context code review with evidence-backed findings"
-  default_prompt: "Use $euthyna to review this code or change in a fresh reviewer context, use authorized isolated tests and read-only data queries when they resolve a material question, and report findings and coverage gaps while keeping the reviewed version unchanged."

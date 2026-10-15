@@ -12,11 +12,11 @@ const ROOT = path.join(SCRIPT_DIR, "..");
 const STAGED_CLI = path.join(SCRIPT_DIR, "skill", "scripts", "rationale.mjs");
 const CLI = fs.existsSync(STAGED_CLI)
   ? STAGED_CLI
-  : path.join(ROOT, "skills", "scholion", "scripts", "rationale.mjs");
+  : path.join(ROOT, "plugins", "organon", "skills", "scholion", "scripts", "rationale.mjs");
 const STAGED_SKILL = path.join(SCRIPT_DIR, "skill", "SKILL.md");
 const SKILL = fs.existsSync(STAGED_SKILL)
   ? STAGED_SKILL
-  : path.join(ROOT, "skills", "scholion", "SKILL.md");
+  : path.join(ROOT, "plugins", "organon", "skills", "scholion", "SKILL.md");
 
 function run(args, cwd, stateRoot, extraEnv = {}) {
   return spawnSync(process.execPath, [CLI, ...args], {

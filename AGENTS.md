@@ -1,6 +1,7 @@
 # Repository Contract
 
-This repository owns portable skills under `skills/`, user-level tools under
+This repository owns portable skills under `plugins/organon/skills/`, shipped
+as the `organon` plugin for Claude Code and Codex, user-level tools under
 `tools/`, and their maintenance scripts under `scripts/`. This file defines
 shared repository rules for every agent runtime.
 
@@ -23,8 +24,11 @@ Edit repository-owned source assets. Managed installed skills must resolve to,
 or remain byte-identical with, their source. Personal divergence belongs in a
 separate override skill.
 
-Install managed skills by linking with `node scripts/install-skills.cjs`.
-The default invocation previews changes; `--apply` performs them.
+Install managed skills as the `organon` plugin with
+`node scripts/install-skills.cjs`. The default invocation previews changes;
+`--apply` performs them. Claude Code reads this checkout in place; Codex runs a
+cached copy that the installer refreshes. A release that changes the plugin
+raises `version` in both plugin manifests together.
 
 Keep user-level tool implementations and runtime hook configuration out of
 business repositories. Install tools by link and merge runtime configuration
@@ -50,7 +54,7 @@ repository's source, distribution, and verification constraints. Use the
 current runtime's official guidance for invocation settings and metadata.
 
 **Portable text:** skills here are installed into many repositories, so rules
-and examples under `skills/` state the general class and use invented
+and examples under `plugins/organon/skills/` state the general class and use invented
 placeholders, never an identifier, code, table, or domain term from a real
 project. Before committing, search the diff for names and domain terms from the
 repositories the session read.
@@ -144,8 +148,8 @@ When changing these targets:
 - `tools/java-formatter/` or its installer: read
   [tools/java-formatter/README.md](tools/java-formatter/README.md) and run
   `node scripts/contract-java-formatter.mjs`.
-- `skills/scholion/`: read
-  [skills/scholion/README.md](skills/scholion/README.md) and run
+- `plugins/organon/skills/scholion/`: read
+  [its README](plugins/organon/skills/scholion/README.md) and run
   `node scripts/contract-scholion.mjs`.
 - `global-agent-rules.md`: run `node scripts/install-agent-tools.cjs --apply` so a
   Codex copy made where a file symlink was unavailable follows the source, then

@@ -1,98 +1,44 @@
 #!/usr/bin/env node
 
-// Compare source skills against their installed runtime copies.
+// Check that every runtime loads the current organon plugin and nothing else
+// of ours.
 //
-// AGENTS.md requires every installed runtime copy to stay byte-identical with
-// its source skill. Nothing enforced that, so a copy could silently sit two
-// revisions behind while the source looked correct in review.
+// AGENTS.md requires every installed copy to stay byte-identical with its
+// source. Claude Code reads the plugin from this checkout in place; Codex runs
+// a cached copy that can silently sit revisions behind, and a per-skill link
+// left from the earlier link install would load each skill a second time.
 
 const fs = require("node:fs");
 const os = require("node:os");
 const path = require("node:path");
 
-const { TARGET_RUNTIMES, classify } = require("./install-skills.cjs");
+const { PLUGIN, findLinkedSkills, claudeState, codexState } = require("./install-skills.cjs");
 const { RULES_SOURCE_NAME, classifyRulesCopy } = require("./install-agent-tools.cjs");
 
-// Runtimes are discovered, never hard-coded: this machine carries our skills in
-// .agents, .claude, .codex and .factory, and a hard-coded pair silently reported
-// PASS while a third runtime sat two revisions behind.
-const BACKUP_HINT = /backup|[-_]bak(\b|[-_])|\.old$/i;
+const empty = { installed: true, override: false, drift: [], missing: [], extra: [] };
 
-function listFilesRecursive(root) {
-  const out = [];
-  if (!fs.existsSync(root)) return out;
-  const walk = (dir) => {
-    for (const entry of fs.readdirSync(dir, { withFileTypes: true }).sort((a, b) => a.name.localeCompare(b.name))) {
-      const full = path.join(dir, entry.name);
-      if (entry.isDirectory()) walk(full);
-      else if (entry.isFile()) out.push(path.relative(root, full).split(path.sep).join("/"));
-    }
-  };
-  walk(root);
-  return out.sort();
-}
-
-function sameBytes(a, b) {
-  try {
-    return fs.readFileSync(a).equals(fs.readFileSync(b));
-  } catch {
-    return false;
+function scanPlugin(root, home = os.homedir()) {
+  const results = findLinkedSkills(home).map((link) => ({
+    ...empty,
+    skill: link.skill,
+    runtime: link.runtime,
+    drift: [`linked skill -> ${link.target}`],
+  }));
+  const claude = claudeState(home, root);
+  if (claude) {
+    const base = { ...empty, skill: PLUGIN, runtime: ".claude" };
+    if (!claude.installed) results.push({ ...base, installed: false });
+    else if (claude.marketplace !== "current") {
+      results.push({ ...base, drift: [`marketplace ${claude.registeredPath ?? "missing"}`] });
+    } else results.push(base);
   }
-}
-
-function compareSkillTree(sourceDir, installedDir) {
-  if (!fs.existsSync(installedDir)) return { installed: false, drift: [], missing: [], extra: [] };
-  const sourceFiles = listFilesRecursive(sourceDir);
-  const installedFiles = listFilesRecursive(installedDir);
-  const installedSet = new Set(installedFiles);
-  const drift = [];
-  const missing = [];
-  for (const rel of sourceFiles) {
-    if (!installedSet.has(rel)) missing.push(rel);
-    else if (!sameBytes(path.join(sourceDir, rel), path.join(installedDir, rel))) drift.push(rel);
-  }
-  const sourceSet = new Set(sourceFiles);
-  const extra = installedFiles.filter((rel) => !sourceSet.has(rel));
-  return { installed: true, drift, missing, extra };
-}
-
-function scanSkills(skillsRoot, runtimeRoots) {
-  const results = [];
-  const skills = fs
-    .readdirSync(skillsRoot, { withFileTypes: true })
-    // Same boundary as install-skills: only a directory carrying SKILL.md is
-    // a source skill; state or scratch directories under skills/ are not.
-    .filter((entry) => entry.isDirectory() && fs.existsSync(path.join(skillsRoot, entry.name, "SKILL.md")))
-    .map((entry) => entry.name)
-    .sort();
-  for (const skill of skills) {
-    for (const runtime of runtimeRoots) {
-      const sourceDir = path.join(skillsRoot, skill);
-      const installedDir = path.join(runtime.skillsDir, skill);
-      // Outside the target runtimes only links back at the source are ours; a
-      // same-name real directory or foreign link may be a user-owned local
-      // override (CONTEXT.md), so it is reported, never drift-checked or
-      // overwritten by --fix — the same provenance boundary install-skills
-      // uses for --prune-stray.
-      if (
-        !TARGET_RUNTIMES.includes(runtime.label) &&
-        fs.existsSync(installedDir) &&
-        classify(installedDir, sourceDir) !== "linked"
-      ) {
-        results.push({
-          skill,
-          runtime: runtime.label,
-          runtimeSkillsDir: runtime.skillsDir,
-          installed: true,
-          override: true,
-          drift: [],
-          missing: [],
-          extra: [],
-        });
-        continue;
-      }
-      const compared = compareSkillTree(sourceDir, installedDir);
-      results.push({ skill, runtime: runtime.label, runtimeSkillsDir: runtime.skillsDir, override: false, ...compared });
+  const codex = codexState(home, root);
+  if (codex) {
+    const base = { ...empty, skill: PLUGIN, runtime: ".codex" };
+    if (!codex.installed) results.push({ ...base, installed: false });
+    else {
+      const drift = codex.marketplace === "current" ? codex.drift : [`marketplace ${codex.registeredPath ?? "missing"}`, ...codex.drift];
+      results.push({ ...base, drift, missing: codex.missing, extra: codex.extra });
     }
   }
   return results;
@@ -101,23 +47,12 @@ function scanSkills(skillsRoot, runtimeRoots) {
 // The user-level rules file has one installed copy the installer may have had
 // to make instead of a link: ~/.codex/AGENTS.md on a Windows account without
 // symlink privilege. A link reads as its source and needs no comparison; a
-// copy is compared byte for byte like a skill file, and content the installer
-// did not write is a local override, reported and never fixed.
+// copy is compared byte for byte, and content the installer did not write is
+// a local override, reported and never fixed.
 function scanRules(sourceFile, home = os.homedir()) {
   if (!fs.existsSync(sourceFile)) return null;
   const target = path.join(home, ".codex", "AGENTS.md");
-  const base = {
-    kind: "rules",
-    skill: RULES_SOURCE_NAME,
-    runtime: ".codex",
-    source: sourceFile,
-    target,
-    installed: true,
-    override: false,
-    drift: [],
-    missing: [],
-    extra: [],
-  };
+  const base = { kind: "rules", skill: RULES_SOURCE_NAME, runtime: ".codex", source: sourceFile, target, ...empty };
   switch (classifyRulesCopy(target, sourceFile)) {
     case "absent":
       return { ...base, installed: false };
@@ -139,109 +74,22 @@ function summarize(results) {
   return { clean, dirty, absent, overrides, pass: dirty.length === 0 };
 }
 
-function discoverRuntimes(explicit, skillsRoot, home = os.homedir()) {
-  if (explicit.length) {
-    return explicit.map((dir) => ({
-      label: path.basename(path.dirname(dir)) || dir,
-      skillsDir: dir,
-      installedCount: null,
-      looksLikeBackup: false,
-    }));
-  }
-  const sourceSkills = new Set(
-    fs
-      .readdirSync(skillsRoot, { withFileTypes: true })
-      .filter((entry) => entry.isDirectory())
-      .map((entry) => entry.name),
-  );
-  const found = [];
-  let entries = [];
-  try {
-    entries = fs.readdirSync(home, { withFileTypes: true });
-  } catch {
-    return found;
-  }
-  for (const entry of entries) {
-    if (!entry.isDirectory() || !entry.name.startsWith(".")) continue;
-    const skillsDir = path.join(home, entry.name, "skills");
-    let installedCount = 0;
-    try {
-      for (const child of fs.readdirSync(skillsDir, { withFileTypes: true })) {
-        // A runtime may symlink a skill straight back at the source tree; that
-        // counts as installed (and compares as identical), so isDirectory alone
-        // would undercount the runtime.
-        if (!sourceSkills.has(child.name)) continue;
-        if (child.isDirectory() || child.isSymbolicLink()) installedCount += 1;
-      }
-    } catch {
-      continue;
-    }
-    if (installedCount === 0) continue;
-    found.push({
-      label: entry.name,
-      skillsDir,
-      installedCount,
-      looksLikeBackup: BACKUP_HINT.test(entry.name),
-    });
-  }
-  return found.sort((a, b) => a.label.localeCompare(b.label));
-}
-
-function applyFix(result, skillsRoot) {
-  if (result.kind === "rules") {
-    fs.copyFileSync(result.source, result.target);
-    return ["AGENTS.md"];
-  }
-  const sourceDir = path.join(skillsRoot, result.skill);
-  const targetDir = result.runtimeSkillsDir ? path.join(result.runtimeSkillsDir, result.skill) : null;
-  if (!targetDir) return [];
-  const fixed = [];
-  for (const rel of [...result.drift, ...result.missing]) {
-    const from = path.join(sourceDir, rel);
-    const to = path.join(targetDir, rel);
-    fs.mkdirSync(path.dirname(to), { recursive: true });
-    fs.copyFileSync(from, to);
-    fixed.push(rel);
-  }
-  return fixed;
-}
-
 function main(argv) {
   const fix = argv.includes("--fix");
   const json = argv.includes("--json");
-  const skillsRoot = path.resolve(
-    argv.find((a) => a.startsWith("--skills-dir="))?.split("=")[1] ??
-      path.join(__dirname, "..", "skills"),
-  );
-  if (!fs.existsSync(skillsRoot)) {
-    process.stderr.write(`skills directory not found: ${skillsRoot}\n`);
-    process.exitCode = 2;
-    return;
-  }
-  const explicit = argv.filter((a) => a.startsWith("--runtime=")).map((a) => path.resolve(a.split("=")[1]));
+  const root = path.resolve(argv.find((a) => a.startsWith("--root="))?.split("=")[1] ?? path.join(__dirname, ".."));
   const home = argv.find((a) => a.startsWith("--home="))?.split("=")[1] ?? os.homedir();
-  const rulesSource = path.join(path.dirname(skillsRoot), RULES_SOURCE_NAME);
-  const runtimes = discoverRuntimes(explicit, skillsRoot, home);
+  const rulesSource = path.join(root, RULES_SOURCE_NAME);
 
-  if (!runtimes.length) {
-    process.stderr.write("no runtime carries any skill from this repository\n");
-    process.exitCode = 2;
-    return;
-  }
-
-  const scanAll = () => [...scanSkills(skillsRoot, runtimes), scanRules(rulesSource, home)].filter(Boolean);
+  const scanAll = () => [...scanPlugin(root, home), scanRules(rulesSource, home)].filter(Boolean);
   let results = scanAll();
   const fixedLog = [];
-  const skippedBackups = [];
   if (fix) {
-    for (const result of summarize(results).dirty) {
-      const runtime = runtimes.find((entry) => entry.label === result.runtime);
-      if (runtime?.looksLikeBackup) {
-        skippedBackups.push(result);
-        continue;
-      }
-      const fixed = applyFix(result, skillsRoot);
-      if (fixed.length) fixedLog.push({ skill: result.skill, runtime: result.runtime, files: fixed });
+    // Only the rules copy is a plain file this check can sync; plugin state
+    // belongs to the runtimes' own installers.
+    for (const result of summarize(results).dirty.filter((r) => r.kind === "rules")) {
+      fs.copyFileSync(result.source, result.target);
+      fixedLog.push({ skill: result.skill, runtime: result.runtime, files: ["AGENTS.md"] });
     }
     results = scanAll();
   }
@@ -249,20 +97,10 @@ function main(argv) {
   const { clean, dirty, absent, overrides, pass } = summarize(results);
 
   if (json) {
-    process.stdout.write(
-      `${JSON.stringify({ pass, runtimes, dirty, absent, overrides, fixed: fixedLog, skippedBackups }, null, 2)}\n`,
-    );
+    process.stdout.write(`${JSON.stringify({ pass, dirty, absent, overrides, fixed: fixedLog }, null, 2)}\n`);
   } else {
-    process.stdout.write(
-      `runtimes: ${runtimes
-        .map((r) => `${r.label}${r.installedCount == null ? "" : ` (${r.installedCount})`}${r.looksLikeBackup ? " [backup]" : ""}`)
-        .join(", ")}\n`,
-    );
     for (const entry of fixedLog) {
       process.stdout.write(`synced ${entry.skill} @ ${entry.runtime}: ${entry.files.join(", ")}\n`);
-    }
-    for (const result of skippedBackups) {
-      process.stdout.write(`skipped ${result.skill} @ ${result.runtime}: looks like a backup, not overwriting\n`);
     }
     for (const result of dirty) {
       const parts = [];
@@ -272,19 +110,18 @@ function main(argv) {
       process.stdout.write(`DRIFT ${result.skill} @ ${result.runtime} — ${parts.join("; ")}\n`);
     }
     for (const result of overrides) {
-      const reason = result.kind === "rules"
-        ? "content the installer did not write"
-        : "not a link to this repository";
-      process.stdout.write(`local override: ${result.skill} @ ${result.runtime} — ${reason}; not checked\n`);
+      process.stdout.write(`local override: ${result.skill} @ ${result.runtime} — content the installer did not write; not checked\n`);
     }
     for (const result of absent) {
       process.stdout.write(`not installed: ${result.skill} @ ${result.runtime}\n`);
     }
     process.stdout.write(
-      `${pass ? "PASS" : "FAIL"}: ${clean.length} byte-identical, ${dirty.length} drifted, ${absent.length} not installed` +
+      `${pass ? "PASS" : "FAIL"}: ${clean.length} current, ${dirty.length} drifted, ${absent.length} not installed` +
         `${overrides.length ? `, ${overrides.length} local override(s) not checked` : ""}\n`,
     );
-    if (!pass) process.stdout.write("run with --fix to sync source into the installed copies\n");
+    if (!pass) {
+      process.stdout.write("run node scripts/install-skills.cjs --apply for the plugin, --fix for the rules copy\n");
+    }
   }
   process.exitCode = pass ? 0 : 1;
 }
@@ -297,4 +134,4 @@ function main(argv) {
 // worst failure available.
 if (require.main === module) main(process.argv.slice(2));
 
-module.exports = { compareSkillTree, scanSkills, scanRules, summarize, discoverRuntimes };
+module.exports = { scanPlugin, scanRules, summarize };

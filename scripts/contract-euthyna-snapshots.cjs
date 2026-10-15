@@ -16,7 +16,7 @@ function main(argv) {
     process.exitCode = 2; return;
   }
   const root = path.join(__dirname, "..");
-  const skill = path.join(root, "skills", "euthyna");
+  const skill = path.join(root, "plugins", "organon", "skills", "euthyna");
   const { readLensHeadings } = require(path.join(skill, "scripts", "validate-review-record.cjs"));
   const lenses = readLensHeadings(path.join(skill, "references", "LENSES.md"));
   assert.ok(lenses?.length, "the real lens file must be readable");

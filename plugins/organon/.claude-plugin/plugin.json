@@ -1,0 +1,9 @@
+{
+  "name": "organon",
+  "version": "0.1.0",
+  "description": "Instruments for coding agents: decide from the root problem, change code without breaking its contracts, and falsify claims before trusting them.",
+  "author": {
+    "name": "hex1n"
+  },
+  "keywords": ["planning", "implementation", "code-review", "plan-review", "research", "api-docs", "e2e-testing", "rationale"]
+}

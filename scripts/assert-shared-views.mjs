@@ -26,7 +26,7 @@ function collectMarkdown(dir) {
   return found;
 }
 
-const skillsDir = path.join(ROOT, "skills");
+const skillsDir = path.join(ROOT, "plugins", "organon", "skills");
 const copies = [];
 for (const file of fs.existsSync(skillsDir) ? collectMarkdown(skillsDir) : []) {
   const text = fs.readFileSync(file, "utf8");

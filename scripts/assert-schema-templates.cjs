@@ -29,8 +29,8 @@ const path = require("node:path");
 const ROOT = path.join(__dirname, "..");
 
 const TEMPLATES = [
-  { doc: "skills/euthyna/HANDOFF.md", schema: "skills/euthyna/handoff-schema.json" },
-  { doc: "skills/euthyna/REPORT.md", schema: "skills/euthyna/review-record-schema.json" },
+  { doc: "plugins/organon/skills/euthyna/HANDOFF.md", schema: "plugins/organon/skills/euthyna/handoff-schema.json" },
+  { doc: "plugins/organon/skills/euthyna/REPORT.md", schema: "plugins/organon/skills/euthyna/review-record-schema.json" },
 ];
 
 function readTemplate(markdown) {

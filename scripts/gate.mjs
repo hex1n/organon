@@ -36,7 +36,7 @@ function findTests(dir, seen = new Set()) {
 }
 
 const suites = [];
-const skillsDir = path.join(ROOT, "skills");
+const skillsDir = path.join(ROOT, "plugins", "organon", "skills");
 if (fs.existsSync(skillsDir)) {
   for (const skill of fs.readdirSync(skillsDir, { withFileTypes: true })) {
     if (skill.isDirectory()) suites.push(...findTests(path.join(skillsDir, skill.name, "tests")));

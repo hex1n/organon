@@ -20,8 +20,9 @@ requests another language.
 ## Pick the mode
 
 If an explicit invocation starts with an unquoted `plan`, `run`, `render`, or
-`brief`, use that mode. Examples are `/peira run …` in Claude Code
-and `$peira run …` in Codex. That mode outranks conflicting prose.
+`brief`, use that mode. Examples are `/organon:peira run …` in Claude Code
+and `$organon:peira run …` in Codex; a standalone install drops the `organon:`
+prefix. That mode outranks conflicting prose.
 Quoted feature names and paths are operands. Without an explicit mode, infer it
 from the whole ask:
 
