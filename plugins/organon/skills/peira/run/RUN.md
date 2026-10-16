@@ -63,7 +63,8 @@ or complex derived mechanics that a consumer needs.
 ## 2. Resolve the execution context
 
 Confirm a local or test target from effective configuration and actual connectivity,
-not a profile name. Restricted staging or production requires explicit instructions
+not a profile name. Start from the project's harness (`docs/verify/HARNESS.md`) when
+the repository keeps one. Restricted staging or production requires explicit instructions
 for that environment before proceeding. Record the actual entry/harness, relevant
 runtime identity, and proof that the tested process/artifact is the intended build.
 A reachable endpoint alone is insufficient; a local command can use the source bytes

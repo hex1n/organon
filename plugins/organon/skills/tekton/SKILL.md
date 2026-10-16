@@ -157,22 +157,28 @@ not a universal checklist:
 
 | Property | Useful evidence |
 | --- | --- |
-| New or corrected behavior | Requirement-based examples and failure cases; the original reproduction when feasible |
+| New or corrected behavior | Requirement-based examples and failure cases; the original reproduction on its own surface when feasible |
 | Preserved behavior | Focused regressions, characterization, differential checks, or replay |
 | Integration and effects | Real wiring, committed state, observable effects, and relevant recovery paths |
 | Compatibility | Old and new callers, payloads, and stored data, including reachable mixed states |
 | Retry and idempotency | Repeated execution and failures around effects; observe duplicates or omissions |
 | Concurrency | Controlled interleavings that can expose the suspected race |
-| Performance | The slice's operation counts and retained state at representative scale, plus measured workloads and required thresholds; each measured number carries its run count, spread and limiting resource, with skipped or cached work, unexecuted code and noise ruled out |
+| Performance | The slice's operation counts and retained state at representative scale, plus measured workloads against required thresholds; a measured number is reported only as [measured numbers](references/VERIFICATION.md#measured-numbers) allows |
 | Operations | Actionable diagnostics and demonstrated recovery at the affected boundary |
 | Structure | Business rules and relationships recognizable in executable structure; rule ownership, state lifetime, caller knowledge and obsolete path removal |
 
 Discover the repository's actual commands and test entry points. Confirm the
 relevant tests execute and observe the claimed result. For new or changed tests,
 derive expected behavior from the contract rather than the proposed patch.
-When claiming reproduction, confirm the target defect on the before-state when
-feasible and its absence after the fix. A check passing both versions can
-protect behavior but does not establish reproduction. Keep the limits of
+A defect closes on the surface where it was reproduced: confirm the target
+defect on the before-state and its absence after the fix through the same
+entry, inputs, and environment, taken from the project's verification harness
+(`docs/verify/HARNESS.md`) when the repository keeps one. A reproduction on
+another surface, a unit test alone, or an inconclusive run leaves the defect
+open, and the delivery says so. A check passing both versions can protect
+behavior but does not establish reproduction. Revert changes whose motivating
+hypothesis the evidence refuted, and list them. The delivery carries the
+failing and passing outputs verbatim or by evidence path. Keep the limits of
 intermittent or unavailable reproduction explicit.
 
 Add or strengthen tests where a missing case matters; routine reversible edits

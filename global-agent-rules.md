@@ -98,6 +98,9 @@ substitute for evidence that the required behavior and structure hold.
 - A spec ambiguity whose readings all converge on one change: state the
   assumption and continue. When readings diverge, finish the parts that do not
   depend on the answer and carry the question in the delivery.
+- A "which approach" question that a prototype, focused run, or measurement
+  can settle: run it and report the answer. Ask only for product or preference
+  decisions no experiment settles.
 
 **Confirm first:**
 
@@ -253,6 +256,34 @@ elsewhere; a confirmed one asks the next "why".
 4. When the working tree shows diffs, staged changes, or leftovers from outside
    this session, leave them in place, check whether they overlap this change,
    and report them.
+
+A finding from a review bot or scanner gets one of three dispositions: fix it,
+dismiss it with the concrete reason it does not apply here, or ask when the
+decision is the user's. Leaving it unanswered is none of these.
+
+## Long and unattended runs
+
+Keep a decision trail when the user will not watch the run (an explicit
+"don't stop", a scheduled or background run), when work is delegated to
+subagents, or when the run passes more than one keep-or-revert decision. A
+single verified slice needs none.
+
+The trail is `trail.tsv` in the task's scratch directory, one row per decision
+point or checkpoint with the columns `timestamp`, `phase`, `decision`,
+`reason`, `evidence`, `result`. Evidence is a path, commit, command, or link
+that resolves, never prose. Log a chosen approach, a completed unit with its
+verification result, a pivot or revert, a blocker, and a fixed gate; skip
+routine actions; a loop gets one row per iteration. The trail is append-only:
+a mistake is corrected by a new row naming the row it supersedes. A new run,
+pickup, or replacement agent begins with a `start` row naming the rows it did
+not write. The trail stays out of version control unless a reviewer needs it
+to trust the result.
+
+Before handing off, audit the trail against this run's transcript: every row
+reflects a real action, every evidence pointer resolves, and unlogged forks or
+reverts are added. Then have a fresh-context subagent read the trail for weak
+evidence, skipped verification, and risky choices. End the delivery with an
+`Attention` section listing each flag against its row, or `No flags`.
 
 ## Parallel work
 

@@ -42,7 +42,7 @@ claude plugin install organon@organon
 | [`historia`](plugins/organon/skills/historia/) | 调研 | 以证据为支撑的调研，交付书面结论而非修复：判断事实真相、行为成因、证据支持哪个选项。 |
 | [`tekton`](plugins/organon/skills/tekton/) | 实现 | 在已有调用方、存储数据或测试需要继续工作的代码上实现、修复、重构或迁移，或落地已裁决的方案；交付改动并附上受影响契约仍成立的证据，按要求改善结构，按风险选择验证。 |
 | [`euthyna`](plugins/organon/skills/euthyna/) | 审查 | 用有证据的反例审查代码与变更，区分缺陷、未验证风险、待决事项和可选改进；只读报告，不代替实施修复。 |
-| [`peira`](plugins/organon/skills/peira/) | 验证 | 规划、执行并呈现端到端测试：可溯源的业务场景树、把缺陷交回调用方另行授权修复的证据化执行报告，明确要求时才做有上限的直至全绿循环，以及 HTML 阅读视图。开头带 `plan`、`run`、`render` 或 `brief` 时选定模式：plan 出计划并渲染；run 执行并渲染，无计划时先规划；render 只渲染已有产物；brief 为已完成的报告出一页纸摘要，与报告一起交付。 |
+| [`peira`](plugins/organon/skills/peira/) | 验证 | 规划、执行并呈现端到端测试：可溯源的业务场景树、把缺陷交回调用方另行授权修复的证据化执行报告，明确要求时才做有上限的直至全绿循环，以及 HTML 阅读视图。开头带 `plan`、`run`、`render`、`brief` 或 `harness` 时选定模式：plan 出计划并渲染；run 执行并渲染，无计划时先规划；render 只渲染已有产物；brief 为已完成的报告出一页纸摘要，与报告一起交付；harness 在 `docs/verify/` 下写出项目的验证配方，并以一次端到端实跑证明其可用。 |
 | [`horos`](plugins/organon/skills/horos/) | 落地/验证 | 基于代码契约生成跨 RPC 与 HTTP 协议的后端 API 文档，范围可为单个接口、一个需求的后端 API 或一个分支的 API 变更。 |
 | [`scholion`](plugins/organon/skills/scholion/) | 导航 | 记录当前代码为什么这样实现，按文件路径或代码片段查找对应的实现理由；记录由个人维护、Git 忽略，支持工作树交接。 |
 

@@ -73,3 +73,31 @@ belongs to the exact test and implementation it ran against: editing,
 renaming, or retargeting a test afterwards invalidates it, so rerun the fault
 against the final test before citing it. Keep the property, decisive command
 and result, and remaining gap with the task's evidence.
+
+## Measured numbers
+
+Establish these before reporting a measured number:
+
+- **The limiter.** Profile a run that is not reported and name what bounds the
+  result: CPU, I/O, a lock, the load generator. A change that did not move the
+  number has a reason, found before the next change.
+- **Equal sides.** Each side runs as production runs it: the same build,
+  flags, settings, data, and warm-up. A side left on defaults compares
+  configurations, not implementations.
+- **Arithmetic against limits.** Check throughput against bandwidth and cores,
+  and a removed part against its share: removing work that took 10% of the run
+  gains at most about 11%. A result beyond a limit measured something else.
+- **Errors counted.** Count failures, non-success responses, and wrong output
+  on both sides; rejections make a side fast and retries make it slow.
+- **Reproducibility.** Run each side at least five times, alternating, and
+  report the median and range. A gap inside the run-to-run spread is no
+  measurable difference.
+- **End-to-end share.** State a micro-benchmark as its share of the
+  user-facing path it sits in.
+- **Work happened.** Confirm the timed region did the work: no lazy
+  evaluation, unawaited work, cached result, or timeout stood in for it.
+
+Lead with the verdict: faster, slower, no measurable difference, or
+inconclusive. Give the number with its unit, run count, range, and limiter.
+Report inconclusive when the limiter is unknown, a side ran untuned, or errors
+or completion could not be checked.

@@ -6,6 +6,12 @@ harness receipt; a named table is unnecessary unless it clarifies the run.
 
 ## Environment and dependency readiness
 
+When the repository keeps `docs/verify/HARNESS.md`, its Launch, Doctor, and Drive
+sections are the authority for starting, checking, and reaching the system; use them
+before deriving commands from source. Report an entry the system has outdated with
+the observed difference and leave the harness unchanged during a run; refreshing it
+is harness mode's work.
+
 Use effective targets for the reached stores, queues, services, and external effects.
 Verify the schema/fields actually used, the tool paths/versions the run's shell loads,
 and the intended build in the running process. Omit irrelevant capabilities. After
