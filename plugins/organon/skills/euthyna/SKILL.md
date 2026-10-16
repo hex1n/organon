@@ -20,6 +20,16 @@ host mechanisms, and caller verification. The caller reuses a completed review
 with the same content, scope, and supporting inputs, or awaits an applicable
 active review. For a new review, dispatch as soon as the diff is reviewable,
 before reviewing it in the caller's context; continue other checks while it runs.
+A diff is reviewable when the change and the tests that decide its contracts
+are the versions the builder intends to deliver. An independently stable
+surface can be reviewed earlier.
+
+Each review stays bound to its pinned revision. When the candidate changes
+after dispatch, compare the delta with the review's conclusions. A changed
+contract, production branch, test assertion, or test setup reopens the
+conclusions that rest on it; send that delta to re-review. A delta that reaches
+no conclusion keeps the review applicable; name it in delivery. Let an active
+review finish while its other conclusions remain applicable.
 
 Default to one fresh reviewer with parent history and task-specific builder
 memory excluded. Apply HANDOFF.md's isolation and access requirements.

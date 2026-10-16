@@ -32,7 +32,9 @@ Before editing, identify:
 - the observable outcome the user wants;
 - affected behavior that must remain true;
 - the relevant business objects, relationships and rule owners, including requested structural improvements;
-- evidence that distinguishes success from a plausible wrong result.
+- for each affected contract, the evidence and the plausible wrong
+  implementation it must reject, such as rollback omitted after a real state
+  change.
 
 Separate requirements from characterization of existing behavior. Agreement
 between code and tests does not settle a disputed requirement. Existing behavior
@@ -138,6 +140,8 @@ and owners above. Correct missing or misrepresented relationships even when resu
 tests pass; names and comments alone do not establish structural fit.
 
 Run focused verification and inspect the diff after each meaningful slice.
+Confirm in those runs that each new check rejects the wrong implementation named
+for its contract.
 If a new affected path or contract appears, update the scope and design before
 relying on earlier evidence. Move behavioral cases with the behavior. Retire
 assertions about old internals only after equivalent behavioral coverage exists
@@ -210,7 +214,9 @@ keep independent defects separate.
 
 Close the requested behavior and structural target using evidence applicable
 to the final code. Confirm preserved contracts and the intended decisions and
-effects. Judge behavior, structure and cost separately; equivalent results alone
+effects. Report a property as verified with its check and the wrong
+implementation that check was seen to reject; report the rest as unverified.
+Judge behavior, structure and cost separately; equivalent results alone
 establish neither structural fit nor acceptable cost. Correct unexplained
 in-scope mismatches or report their consequences.
 When review is required, acceptance also needs a completed review whose evidence

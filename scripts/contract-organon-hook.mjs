@@ -41,11 +41,11 @@ function makeRepo(dir) {
   return dir;
 }
 
-function stop(cwd, stateRoot, input = {}) {
+function stop(cwd, stateRoot, input = {}, env = process.env) {
   const result = run(process.execPath, [HOOK], {
     cwd,
     input: JSON.stringify(input),
-    env: { ...process.env, ASDF_AGENT_STATE_ROOT: stateRoot },
+    env: { ...env, ASDF_AGENT_STATE_ROOT: stateRoot },
   });
   assert.equal(result.status, 0, "the hook reports through its JSON, never its exit code\n" + result.stderr);
   return JSON.parse(String(result.stdout).trim());
@@ -55,6 +55,17 @@ function runOutsideRepository(temporaryDir, stateRoot) {
   const outside = path.join(temporaryDir, "not-a-repo");
   fs.mkdirSync(outside);
   assert.deepEqual(stop(outside, stateRoot), {});
+}
+
+// A git that cannot start, as under a sandbox that refuses the spawn, blocks
+// instead of passing as a directory outside any repository.
+function runGitUnavailable(temporaryDir, stateRoot) {
+  const repo = makeRepo(path.join(temporaryDir, "gitless"));
+  const env = Object.fromEntries(Object.entries(process.env).filter(([key]) => key.toUpperCase() !== "PATH"));
+  env.PATH = path.dirname(process.execPath);
+  const blocked = stop(repo, stateRoot, {}, env);
+  assert.equal(blocked.decision, "block");
+  assert.match(blocked.reason, /git could not start/u);
 }
 
 // A repository that opts into neither check is left exactly as it was.
@@ -111,6 +122,7 @@ const temporaryDir = fs.mkdtempSync(path.join(os.tmpdir(), "organon-hook-contrac
 try {
   const stateRoot = path.join(temporaryDir, "state");
   runOutsideRepository(temporaryDir, stateRoot);
+  runGitUnavailable(temporaryDir, stateRoot);
   runNoOptIn(temporaryDir, stateRoot);
   runRationale(temporaryDir, stateRoot);
   runDispatcher(temporaryDir, stateRoot);

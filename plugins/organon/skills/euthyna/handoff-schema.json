@@ -308,6 +308,15 @@
             "revision": { "type": "string", "visibleContent": true },
             "text": { "type": "string", "visibleContent": true }
           }
+        },
+        "previous_candidate": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "path": { "type": "string", "visibleContent": true },
+            "revision": { "type": "string", "visibleContent": true },
+            "text": { "type": "string", "visibleContent": true }
+          }
         }
       }
     }

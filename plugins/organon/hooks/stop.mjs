@@ -34,8 +34,10 @@ function blockingPayload(input, reason) {
     : { decision: "block", reason };
 }
 
+// A git that cannot start is a failed check, not a directory outside any repository.
 function findGitRoot(cwd) {
   const result = spawnSync("git", ["rev-parse", "--show-toplevel"], { cwd, encoding: "utf8", windowsHide: true });
+  if (result.error) throw new Error("git could not start: " + result.error.message);
   return result.status === 0 ? path.resolve(result.stdout.trim()) : null;
 }
 
@@ -113,12 +115,12 @@ function runRepositoryDispatcher(repoRoot, dispatcher, rawInput) {
 
 function main() {
   const input = readInput();
-  const repoRoot = findGitRoot(process.cwd());
-  if (!repoRoot) {
-    process.stdout.write("{}\n");
-    return;
-  }
   try {
+    const repoRoot = findGitRoot(process.cwd());
+    if (!repoRoot) {
+      process.stdout.write("{}\n");
+      return;
+    }
     if (fs.existsSync(path.join(repoRoot, "docs", "rationale"))) runRationaleGate(repoRoot);
     const dispatcher = path.join(repoRoot, "docs", "tools", "run-agent-gates.mjs");
     const result = fs.existsSync(dispatcher) ? runRepositoryDispatcher(repoRoot, dispatcher, input.raw) : null;

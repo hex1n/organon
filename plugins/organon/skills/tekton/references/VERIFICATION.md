@@ -13,7 +13,8 @@ fixes it.
 
 Inspect a test double at the boundary whose behavior the conclusion depends on.
 Preserve the relevant generation, storage and read semantics: identity creation,
-ordering, normalization, replacement or transaction effects. Run that boundary
+ordering, normalization, the fields a write replaces or keeps, or transaction
+effects. Run that boundary
 for real when the fake cannot reproduce the deciding behavior. Keep unavailable
 semantics explicit rather than treating the substitute's result as proof.
 
@@ -32,6 +33,10 @@ Use an available native mutation tool when its operators fit the risk. A small
 manual mutation is sufficient when it answers the question without introducing
 tooling overhead. For recovery, retries, and concurrency, inject the relevant
 dependency failure or controlled interleaving instead of forcing a source edit.
+Place the fault where the correct and faulty implementations leave different
+observable state. For rollback, the operation must change business state before
+the failure; after an idempotent rerun or other no-op, omitted rollback leaves
+the same state, so the check cannot detect it.
 
 For each selected fault:
 

@@ -27,8 +27,11 @@ export function run(command, args, options = {}) {
   });
 }
 
+// A git that cannot start, because it is missing or a sandbox refuses the spawn, is an
+// execution failure; reading it as "outside a repository" would report files as clean.
 export function findGitRoot(cwd = process.cwd()) {
   const result = run("git", ["rev-parse", "--show-toplevel"], { cwd });
+  if (result.error) throw new Error("git could not start: " + result.error.message);
   return result.status === 0 ? path.resolve(result.stdout.trim()) : null;
 }
 
@@ -209,8 +212,12 @@ export function formatterInputs(configPath = DEFAULT_CONFIG) {
 
 export function formatChangedJava(options = {}) {
   const repoRoot = options.repoRoot || findGitRoot(options.cwd);
-  if (!repoRoot) return [];
   const explicitFiles = options.explicitFiles || [];
+  if (!repoRoot && explicitFiles.length > 0) {
+    throw new Error("--files names paths the formatter cannot take:\n  "
+      + [...new Set(explicitFiles)].map((named) => named + " is outside any Git repository").join("\n  "));
+  }
+  if (!repoRoot) return [];
   const configPath = options.configPath || process.env.ASDF_JAVA_FORMAT_CONFIG || DEFAULT_CONFIG;
   const base = resolveBase(repoRoot, options.base || "HEAD");
   const files = changedJavaFiles(repoRoot, explicitFiles, { includeTests: options.includeTests === true, base, cwd: options.cwd })

@@ -58,7 +58,8 @@ task-specific memory out of the brief.
   "record_output": "<path to write the review record, or \"inline\">",
   "re_review": {
     "previous_report": { "path": "<the prior record>", "revision": "<...>" },
-    "responses": { "path": "<the builder's per-id answers>", "revision": "<...>" }
+    "responses": { "path": "<the builder's per-id answers>", "revision": "<...>" },
+    "previous_candidate": { "path": "<prior round's brief file or retained snapshot manifest>", "revision": "<...>" }
   }
 }
 ```
@@ -115,6 +116,11 @@ The schema fixes the shape; these are the fields whose meaning it cannot carry.
   navigation; "this path is safe" is a finding. The reviewer derives its
   checks from the request, the diff, and the authority sources first and
   reads these after, so they focus the work without steering it.
+- `re_review.previous_candidate` lets the reviewer show which files the repair
+  left unchanged when the prior round reviewed a working tree: pin the prior
+  round's brief file, whose `content_identity` lists each file, or the
+  retained snapshot manifest. A prior commit needs none; Git compares it.
+  Prior source copies the reviewer must read go in `prior_evidence`.
 
 ## Check and dispatch
 
@@ -124,7 +130,8 @@ On acceptance, the reviewer runs it when Node and the skill directory are
 reachable; otherwise inspect the same requirements manually. Each reference
 must be readable at its pinned revision or carry its text. Each content identity
 must match the current file digest. The lens lists must partition LENSES.md,
-and a re-review must include its prior round.
+and a re-review must include its prior round, with `previous_candidate` when
+the prior record names no commit.
 
 The validator cannot distinguish a quote from a paraphrase. Report a
 `request.original` item that restates the task instead of quoting the user's
@@ -133,8 +140,13 @@ message.
 The brief is a file the launch message names, or inline. The launch message
 carries the brief's location and the permissions the reviewer runs under;
 anything else the reviewer needs to know is a brief field, so it is checked
-like one. Those permissions keep the one falsification dispatch
-[SKILL.md](SKILL.md#test-the-failure-hypothesis) allows, and the launch
+like one. Every reference the brief pins is authorized reading, taken after
+the reviewer derives its checks; a launch restriction that covers a pinned
+path contradicts the brief. Before dispatch, confirm that the launch text and
+host read access reach every pinned path. The validator checks readability
+from the caller's filesystem only. Those permissions keep the one
+falsification dispatch [SKILL.md](SKILL.md#test-the-failure-hypothesis)
+allows, and the launch
 leaves enabled the host capability the table below names for it; a reviewer
 launched without it records `not-run` on every finding that owed the check.
 A brief that fails
@@ -172,7 +184,7 @@ visibility alone does not.
 | Host | Fresh context | Source protection and validation |
 |---|---|---|
 | Claude Code | The Agent tool with a non-fork subagent type starts an isolated context without the parent transcript. A fork inherits the conversation and does not qualify. | For active validation, use a dedicated agent whose host permissions allow execution and edits only in the isolated workspace, while protecting the pinned sources. `Explore` and `Plan` deny Write and Edit and lack the Agent tool: they support static reads but cannot write tests or dispatch the required falsification check. Observe loaded project instructions per session and carry the needed rules and scope in the brief. |
-| Codex | A new `codex exec` session receives the brief without a resumed or forked transcript. Keep `multi_agent` enabled for a `spawn_agent` falsifier with `fork_turns: "none"`; children inherit the sandbox, so verify their available access too. `codex review` uses Codex's own review prompt rather than this skill; use it only when requested and label it accordingly. | For active validation, use `--sandbox workspace-write -C <isolated-workspace>` with the pinned sources outside writable roots, or an equivalent host policy. Verify actual roots and source protection; the sandbox label alone is insufficient. Use `read-only` for static review when writable validation is unavailable. Enable only authorized data tools; filesystem sandboxing does not make a database connection read-only. |
+| Codex | A new `codex exec` session receives the brief without a resumed or forked transcript. Keep `multi_agent` enabled for a `spawn_agent` falsifier with `fork_turns: "none"`; children inherit the sandbox, so verify their available access too. `codex review` uses Codex's own review prompt rather than this skill; use it only when requested and label it accordingly. | For active validation, use `--sandbox workspace-write -C <isolated-workspace>` with the pinned sources outside writable roots, or an equivalent host policy. Verify actual roots and source protection; the sandbox label alone is insufficient. On Windows the sandbox mode comes from the user configuration's `windows.sandbox`; a launch with `--ignore-user-config` passes it with `-c`, or the session refuses every command, reads included. Use `read-only` for static review when writable validation is unavailable. Enable only authorized data tools; filesystem sandboxing does not make a database connection read-only. |
 | Other | Any launch whose configuration shows no transcript inheritance. | Protect pinned sources and shared state through the host's filesystem and tool policies; grant experiment writes only in the isolated workspace. Name the actual boundaries in the report. |
 
 When no row applies and the host offers no equivalent, the review is blocked

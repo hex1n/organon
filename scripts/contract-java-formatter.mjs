@@ -387,6 +387,17 @@ function runExplicitScopeContract(temporaryDir) {
   refused("path outside the repository", ["../Outside.java"], "../Outside.java");
   refused("test source without --include-tests", ["src/test/java/NestedTest.java"], "src/test/java/NestedTest.java");
   refused("one bad path refuses the batch", ["module/Nested.java", "module/Missing.java"], "module/Missing.java");
+
+  const outsideRun = run(process.execPath, [FORMATTER, "--files", "Outside.java"], { cwd: temporaryDir });
+  requireStatus(outsideRun, 1, "named path with no repository");
+  assert.match(outsideRun.stderr, /Outside\.java is outside any Git repository/);
+
+  // A sandbox that refuses the git spawn fails the same way as a PATH without git.
+  const env = Object.fromEntries(Object.entries(process.env).filter(([key]) => key.toUpperCase() !== "PATH"));
+  env.PATH = path.dirname(process.execPath);
+  const gitless = run(process.execPath, [FORMATTER, "--files", "module/Nested.java"], { cwd: repo, env });
+  requireStatus(gitless, 1, "git that cannot start");
+  assert.match(gitless.stderr, /git could not start/, "a git that cannot start is reported, not read as outside a repository");
   assert.match(fs.readFileSync(nested, "utf8"), /nested\( \)/, "a refused batch writes nothing");
 
   const relative = run(process.execPath, [FORMATTER, "--files", "Nested.java"], { cwd: path.dirname(nested) });

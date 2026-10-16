@@ -254,7 +254,53 @@ function collectReferences(brief) {
   add("$.report.rules", brief.report?.rules);
   add("$.re_review.previous_report", brief.re_review?.previous_report);
   add("$.re_review.responses", brief.re_review?.responses);
+  add("$.re_review.previous_candidate", brief.re_review?.previous_candidate);
   return found;
+}
+
+// The text a reference pins, or null when it cannot be read here; the
+// reference checks above report why.
+function referenceText(reference, root) {
+  if (!reference || typeof reference !== "object") return null;
+  if (typeof reference.text === "string") return reference.text;
+  if (root === null || typeof reference.path !== "string") return null;
+  const resolved = path.isAbsolute(reference.path) ? reference.path : path.join(root, reference.path);
+  if (CONTENT_HASH.test(String(reference.revision).trim())) {
+    try {
+      return fs.readFileSync(resolved, "utf8");
+    } catch {
+      return null;
+    }
+  }
+  const relative = path.relative(root, resolved).replace(/\\/gu, "/");
+  const shown = spawnSync("git", ["-C", root, "show", `${reference.revision}:${relative}`], { encoding: "utf8" });
+  return shown.status === 0 ? shown.stdout : null;
+}
+
+// A re-review keeps the evidence on files the repair left alone, and the
+// reviewer can show a file unchanged only against the prior candidate file by
+// file. A prior commit gives that through Git. A prior working tree gives it
+// only through a pinned per-file source: one real re-review received the prior
+// record's aggregate snapshot digest alone and came back blocked.
+function priorCandidateIsCommit(record) {
+  const reviewed = record && typeof record === "object" ? record.reviewed : null;
+  if (!reviewed || typeof reviewed !== "object") return false;
+  if (typeof reviewed.candidate_identity === "string") return reviewed.candidate_identity.startsWith("git:");
+  return /^(?:[0-9a-f]{40}|[0-9a-f]{64})$/u.test(String(reviewed.candidate));
+}
+
+function previousCandidateProblem(reReview, root) {
+  if (Object.hasOwn(reReview, "previous_candidate")) return null;
+  const text = referenceText(reReview.previous_report, root);
+  if (text === null) return null;
+  let record = null;
+  try {
+    record = JSON.parse(text);
+  } catch {
+    record = null;
+  }
+  if (priorCandidateIsCommit(record)) return null;
+  return "$.re_review.previous_candidate: the previous record names no commit for its candidate, so the reviewer cannot show which files are unchanged; pin the prior round's brief file or retained snapshot manifest";
 }
 
 const CONTENT_HASH = /^sha256\s+([0-9a-f]{64})$/iu;
@@ -386,6 +432,10 @@ function evaluateHandoff(brief, options = {}) {
 
     if (brief.review === "re-review" && !Object.hasOwn(brief, "re_review")) {
       fail('$.re_review: a "re-review" carries the prior report and the builder\'s responses');
+    }
+    if (brief.review === "re-review" && Object.hasOwn(brief, "re_review")) {
+      const problem = previousCandidateProblem(brief.re_review, root);
+      if (problem) fail(problem);
     }
     if (brief.review === "initial" && Object.hasOwn(brief, "re_review")) {
       fail('$.re_review: an "initial" review has no prior round to carry');
