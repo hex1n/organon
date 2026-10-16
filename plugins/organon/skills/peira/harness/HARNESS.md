@@ -31,7 +31,10 @@ Establish each fact from source and configuration, with the file that states it:
 Fix a build the repository itself breaks before writing the harness; a recipe for
 a build that does not compile documents nothing. A build that only the writing
 environment cannot run (an unreachable artifact repository, a missing service) is a
-blocker, not a reason to stop: record it with what would lift it, and continue.
+blocker, not a reason to stop: record it with what would lift it, and continue. A
+stand-in that lets the build or the start proceed (a stub artifact generated outside
+the repository, a local service answering for an external one) is recorded with every
+behaviour it removes, so a run on it never passes for a run on the real thing.
 
 Read an existing `docs/verify/` before writing: refresh the entries the code has
 outdated and keep the rest.
@@ -74,9 +77,10 @@ and confirm the evidence still exists. Fix the harness where the run deviated an
 again. Keep the run's commands and output with the task's evidence; the harness
 points to them.
 
-Anything run only in a stand-in environment, or not run at all, stays
-`derived from source`. A harness whose Launch could not run says so in its first
-line, with the blocker.
+Label by outcome, not by feature: a rejection path that ran is `verified` for that
+path and leaves the end state `derived from source`. Anything run only against a
+stand-in, or not run at all, stays `derived from source`. A harness whose Launch
+could not run says so in its first line, with the blocker.
 
 ## 5. Deliver
 
