@@ -78,7 +78,9 @@ again. Keep the run's commands and output with the task's evidence; the harness
 points to them.
 
 Label by outcome, not by feature: a rejection path that ran is `verified` for that
-path and leaves the end state `derived from source`. Anything run only against a
+path and leaves the end state `derived from source`. A feature left undriven names
+the attempt that failed and where; a reason read from source alone is a guess, and
+the first attempt often fails somewhere else. Anything run only against a
 stand-in, or not run at all, stays `derived from source`. A harness whose Launch
 could not run says so in its first line, with the blocker.
 
