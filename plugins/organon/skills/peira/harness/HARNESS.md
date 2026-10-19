@@ -42,9 +42,18 @@ outdated and keep the rest.
 ## 2. Write `docs/verify/HARNESS.md`
 
 Five sections in this order, each giving a command or predicate an agent can execute
-as written. Label every section `verified YYYY-MM-DD` when §4 ran it, or
-`derived from source` with the file and line each claim rests on and the blocker that
-kept it from running.
+as written.
+
+Status belongs to claims, not to sections. Every statement that something works,
+fails, or is required carries its own status: `verified YYYY-MM-DD` when a run in
+this task observed it, or `derived from source` with the file and line it rests on
+and, where one exists, the blocker that kept it from running. A section heading may
+summarize the claims under it, but it never vouches for a sentence the run did not
+exercise, and prose outside any section still needs a status: a reader trusts the
+nearest label, so an unlabelled or broadly labelled sentence reads as checked.
+Requirements and failures read from configuration (a JVM flag, a version pin, a
+default value) are the claims most easily written as fact; they stay derived until a
+run shows them.
 
 | Section | Content |
 |---|---|
@@ -77,8 +86,8 @@ and confirm the evidence still exists. Fix the harness where the run deviated an
 again. Keep the run's commands and output with the task's evidence; the harness
 points to them.
 
-Label by outcome, not by feature: a rejection path that ran is `verified` for that
-path and leaves the end state `derived from source`. A feature left undriven names
+A rejection path that ran is `verified` for that path and leaves the end state
+`derived from source`. A feature left undriven names
 the attempt that failed and where; a reason read from source alone is a guess, and
 the first attempt often fails somewhere else. Anything run only against a
 stand-in, or not run at all, stays `derived from source`. A harness whose Launch
@@ -86,7 +95,7 @@ could not run says so in its first line, with the blocker.
 
 ## 5. Deliver
 
-Deliver the harness files, the proof run's result, and the sections by label
-(`verified` or `derived from source`) with each blocker and what would lift it.
+Deliver the harness files, the proof run's result, which claims are `verified` and
+which `derived from source`, and each blocker with what would lift it.
 Name the conditions that call for harness mode again: a changed surface, startup,
 or dependency.
