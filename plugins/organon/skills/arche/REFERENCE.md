@@ -32,7 +32,7 @@ Use this section only when request language, route examples, or saved artifact l
 - `是否应该替换 X?` / `还有更好的吗?` / `最佳了吗?` -> Decision.
 - `先不写代码，给最佳方案` / `给一个架构演进方案` -> Plan; `给最佳方案` selects the route, `先不写代码` only bounds scope.
 - `深度分析为什么失败` -> Research-first; plan only if the user asks for a fix path.
-- `把方案转成实施计划` / `拆成切片、阶段、工单` -> run the converged-plan conversion check in `SKILL.md` Route Examples.
+- `把方案转成实施计划` / `拆成切片、阶段、工单` -> use the settled-work conversion rule in `SKILL.md`.
 - `审查这个方案有没有问题` -> use a review skill; re-plan only if asked.
 
 ### Chinese Output Labels
@@ -41,8 +41,6 @@ For Chinese requests, use Chinese prose and section labels. Keep code identifier
 
 | English label | Chinese label |
 |---|---|
-| Mode | 模式 |
-| Depth | 深度 |
 | Input sources | 输入来源 |
 | Recommendation | 建议 |
 | Current-best path | 当前最佳路径 |
@@ -105,7 +103,7 @@ P95 below 500ms without sacrificing data freshness."
 
 ### Assumption Audit
 
-State only load-bearing assumptions; a short inline account suffices for Light depth. For multiple interacting assumptions, use:
+State only load-bearing assumptions. A short inline account can suffice; for multiple interacting assumptions, use:
 
 | # | Assumption | Type | If wrong... | Verification |
 |---|---|---|---|---|
@@ -189,7 +187,7 @@ review_budget: <explicit budget, calibrated default, or user-authorized unbounde
 
 - `BUILD`: continue to option reconstruction; the envelope accompanies the
   plan into review.
-- `DEFER` / `NO_BUILD`: answer in Decision mode with the envelope and its flip
+- `DEFER` / `NO_BUILD`: give a compact decision with the envelope and its flip
   condition; plan synthesis and independent tournaments stay unrun.
   `review_scope` and `review_budget` bind only under `decision: BUILD`; for
   any other decision write `n/a` — a later technical review
@@ -272,9 +270,8 @@ external review service only when the user explicitly requests one.
 
 ### Independent Option Tournament
 
-Replaces the lightweight in-context tournament for the runs that pass the
-escalation gate in `SKILL.md` step 5 (the gate's single source of truth); the
-in-context version stays the default.
+Use this when the independent-draft trigger in `SKILL.md` applies; the compact
+in-context comparison stays the default.
 
 Options drafted in one context anchor on the first idea; independent drafts buy
 real mechanism diversity. Two biases must be closed by construction: same-model
@@ -330,7 +327,7 @@ planning. A remainder that hollows out a coverage-map row or the
 recommendation's core claim reopens the choice; any smaller remainder is
 written into the recommendation as residual scope or a named non-goal.
 
-Skip only for Light depth or obvious low-risk decisions.
+For a bounded, well-understood choice, the compact failure check in `SKILL.md` suffices.
 
 ### Recommendation Chain
 
@@ -346,11 +343,9 @@ confirms their instinct, validate it with evidence.
 
 ### Bestness Check
 
-Use this for any non-trivial planner recommendation: the default deliverable is
-the current-best option under stated constraints, even when the user only asks
-for a plan. Best/better wording and repeated localized improvement challenges make the gate
-stricter, not newly active. The goal is to prevent a sequence of slightly better
-answers by making the stopping rule explicit in the first response.
+Use this to resolve close or coupled tradeoffs that the compact comparison in
+`SKILL.md` cannot settle. It expands that comparison; it adds no fixed output
+template or second acceptance pass.
 
 Answer these five checks compactly:
 
@@ -378,8 +373,7 @@ The goal is an informed decision, not a veto.
 
 ## Plan Synthesis
 
-For Plan mode, make the plan specific enough to price and falsify the
-decision:
+For a requested plan, state the scope and evidence needed to judge the decision:
 
 - What changes, including likely files/modules when known
 - How the business operations map to responsibilities, flow and state lifetime, preserving input/result dependencies through physical execution choices

@@ -14,232 +14,129 @@ description: >
 # Tekton — Contract-Preserving Implementation
 
 Deliver the requested behavior and structural improvement with evidence that
-affected contracts hold.
-
-Implement verifiable slices. Add records and design comparison when they resolve
-a concrete decision or risk. Use the user's language; preserve identifiers and
-commands.
-
-When task artifacts need a scratch directory, use `.scratch/YYYYMMDD-task-name/`,
-with the task start date in the user's timezone and a short lowercase hyphenated
-task name. Reuse that directory when resuming the task; honor a user-specified
-output path.
+affected contracts hold. Work in verifiable slices; add records or design
+comparison only when they resolve a concrete decision or risk.
 
 ## Establish the contract
 
-Before editing, identify:
+Identify the requested outcome, what must remain true, and the evidence that
+could distinguish a plausible wrong implementation. Separate requirements from
+characterization: existing behavior can guide preservation, while a bug fix
+needs an expectation independent of the defect. When exact values are unavailable,
+use a justified invariant, comparison or replay.
 
-- the observable outcome the user wants;
-- affected behavior that must remain true;
-- the relevant business objects, relationships and rule owners, including requested structural improvements;
-- for each affected contract, the evidence and the plausible wrong
-  implementation it must reject, such as rollback omitted after a real state
-  change.
+Trace the affected entry points through decisions, state changes and effects
+to their consumers. Inspect the boundaries that establish identity, order,
+precision and scope. Include retained guards and fallbacks whose inputs change.
+Resolve assumptions that could make the next slice wrong; defer unrelated
+investigation. When reachability alone cannot settle a deciding premise,
+observe the relevant path in a focused run.
 
-Separate requirements from characterization of existing behavior. Agreement
-between code and tests does not settle a disputed requirement. Existing behavior
-can be an oracle for preservation; a bug fix needs an expectation independent of
-the defect. When an exact answer is unavailable, use a justified invariant,
-comparison, replay, or relationship between inputs and outputs.
+Preserve observation points whose freshness can change the next decision.
+Preview evidence does not establish the effectful path, and an earlier
+observation does not replace required enforcement at the effect boundary.
 
-Account for guards, errors, and effects that will be added, removed, narrowed,
-merged, or relocated. Establish each obligation and its owner before the edit.
-Use source-established invariants; an added defense needs a reachable failure
-that the owning boundary does not already exclude.
-Investigate technical unknowns directly. Ask only for missing user-owned intent
-or authority decisions, and continue work that does not depend on the answer.
+For a guard added, removed, narrowed or moved, establish the obligation and its
+owner. Reuse upstream invariants; a new defense needs a reachable failure the
+owning boundary does not already exclude. Investigate technical facts directly;
+ask for missing user intent or authority while continuing independent work.
 
-Before each meaningful slice, verify the unconfirmed assumptions that could
-make that slice wrong: dependency results, entry guards, or available tool
-capabilities. Defer unrelated investigation until a later decision needs it;
-keep unresolved load-bearing assumptions visible.
-
-## Trace the affected behavior
-
-Follow real entry points through decisions, state changes, and effects to the
-observable result. Trace the producers and consumers of values the change
-affects, including the boundaries that establish their identity, order, precision
-and scope. Check retained decisions against the inputs they will now receive.
-An unchanged guard or fallback can behave differently when an earlier operation
-changes its input. Inspect wiring, alternate entries, stored data and compatibility
-where they carry that contract.
-
-Distinguish source-level reachability from the path actually taken for the
-relevant inputs and state. When this uncertainty could change the next
-implementation decision, use a focused test or run to observe the relevant
-branches, state changes, or effects before relying on the causal claim.
-
-For several flows or release stages, keep a compact impact record connecting
-affected contracts, evidence and unresolved assumptions. A local change needs
-only a brief account.
-
-## Improve code and architecture
-
-Give the requested change a coherent home in the code. When refactoring or
-architecture improvement is requested, structural gains are part of the
-deliverable. Identify the actual source of complexity: duplicated decisions,
-coordinated edits, implicit state, mixed responsibilities, unnecessary indirection,
-or misleading domain concepts.
-
-Represent the business subjects, rules, scopes and prerequisites that explain
-the behavior. Choose the entry point from that subject and rule ownership.
-Trace reused helpers and queries through their implementations; their output
-shape alone does not establish the required relationships. Preserve confirmed
-structural choices. For open choices, compare representations by how clearly
-they express those responsibilities.
-
-A combined expression can suffice when its subject, governing rules and downstream
-relationships remain recognizable. Separate calls, intermediate values and
-modules need a reason in ownership, validity or cost. Distinguish logical
-dependencies from physical execution; preserve contractually observable order.
-
-For repeated work, identify keys, sharing scope and invalidation conditions.
-Inspect effectful and no-effect paths; relate reads, checks and retained state
-to input growth. Batch or reuse within the valid scope, preserving observation
-points whose freshness can change the next decision. Preview evidence alone
-does not establish the effectful path's structure or cost, and an observation
-does not replace enforcement at the effect boundary.
-
-Use these criteria to shape the implementation:
-
-- **One rule owner.** Each business decision has one authoritative home. Callers
-  use its result without reproducing its conditions or reconstructing the
-  decision from raw data.
-- **Deep modules.** A module hides substantial coherent complexity behind a
-  small interface. Group decisions that must change together; hide representation
-  and policy choices from callers. Processing order alone does not determine
-  module boundaries. Expose required errors, ordering, state, configuration,
-  and performance obligations.
-- **Clear dependencies.** Dependencies lead toward the owner of a decision.
-  Adapters translate external representations and effects at that boundary.
-- **Justified seams.** A seam is a replaceable boundary. Add one for demonstrated
-  variation, isolation, or a migration need; collapse it when that need expires.
-- **State ownership.** Distinguish authoritative facts from derived results and
-  execution bookkeeping. Retained state has an owner, a required lifetime, and
-  a reason to store rather than recompute it.
-
-Judge a design by how much callers must understand, how many places a rule change
-touches, and whether behavior can be tested through the relevant interface.
-Line, class, and layer counts are supporting observations. For an unsettled,
-material design choice, compare credible alternatives, including deletion or a
-direct implementation, against the actual change pressure.
-
-For requested structural work, or structural migration needed by the authorized
-implementation, read [Refactoring](references/REFACTORING.md) before choosing the
-transition. For compatibility or data migration without a structural redesign,
-read its [transition section](references/REFACTORING.md#choose-the-transition).
+A local change needs only a brief account. Keep a compact contract/evidence/gap
+record when several flows or release stages make it useful. When scratch files
+are needed, use `.scratch/YYYYMMDD-task-name/` in the user's timezone, reuse it
+on resumption, and honor an explicit output path.
 
 ## Implement coherent slices
 
-Choose a slice with an observable result that can be verified. Distinguish
-behavior-preserving movement from intentional changes to semantics. Keep
-intermediate states valid for the callers and data that can encounter them.
+Give each rule one authoritative home. Keep business subjects, relationships
+and required dependencies recognizable in executable structure. Trace reused
+helpers through their implementations; matching output shapes alone do not
+establish those relationships. Preserve confirmed structural choices and compare
+alternatives only for an unsettled, material decision.
 
-Inspect the changed execution paths against the required business relationships
-and owners above. Correct missing or misrepresented relationships even when result
-tests pass; names and comments alone do not establish structural fit.
+Hide coherent complexity behind a small interface. Dependencies lead toward
+the rule owner; adapters translate at that boundary. Add a seam for demonstrated
+variation, isolation or migration, and justify retained state by its owner,
+lifetime and need. Separate modules or intermediate values need an ownership,
+validity or cost reason. Logical dependencies and observable order constrain
+physical execution without prescribing incidental syntax.
 
-Run focused verification and inspect the diff after each meaningful slice.
-Confirm in those runs that each new check rejects the wrong implementation named
-for its contract.
-If a new affected path or contract appears, update the scope and design before
-relying on earlier evidence. Move behavioral cases with the behavior. Retire
-assertions about old internals only after equivalent behavioral coverage exists
-at the relevant interface.
+Choose a slice with an observable result and keep reachable intermediate states
+valid for callers and data. Distinguish preserved behavior from intentional
+semantic change. Move behavioral cases with the behavior; retire old-internal
+assertions after equivalent coverage exists at the relevant interface.
 
-## Select verification by risk
+After each meaningful slice, inspect the diff and run focused verification.
+A newly affected contract expands the scope before earlier evidence is reused.
+For structural work, verify the actual ownership and caller obligations as well
+as values; names and comments do not establish the requested improvement.
 
-Choose the smallest surface that can decide the claimed property. Local
-correctness carries to an end-to-end result only when intervening boundaries
-preserve its assumptions on the supported paths. Check the first missing
-connection, or leave that part of the outcome open. The following are options,
-not a universal checklist:
+## Verify the affected properties
 
-| Property | Useful evidence |
-| --- | --- |
-| New or corrected behavior | Requirement-based examples and failure cases; the original reproduction on its own surface when feasible |
-| Preserved behavior | Focused regressions, characterization, differential checks, or replay |
-| Integration and effects | Real wiring, committed state, observable effects, and relevant recovery paths |
-| Compatibility | Old and new callers, payloads, and stored data, including reachable mixed states |
-| Retry and idempotency | Repeated execution and failures around effects; observe duplicates or omissions |
-| Concurrency | Controlled interleavings that can expose the suspected race |
-| Performance | The slice's operation counts and retained state at representative scale, plus measured workloads against required thresholds; a measured number is reported only as [measured numbers](references/VERIFICATION.md#measured-numbers) allows |
-| Operations | Actionable diagnostics and demonstrated recovery at the affected boundary |
-| Structure | Business rules and relationships recognizable in executable structure; rule ownership, state lifetime, caller knowledge and obsolete path removal |
+Use the smallest surface that decides the claim. Derive assertions from the
+contract and confirm that they execute the real relevant logic and observe its
+result. Add or strengthen a test for a missing case that matters; routine
+reversible edits need no new test that repeats the implementation.
 
-Discover the repository's actual commands and test entry points. Confirm the
-relevant tests execute and observe the claimed result. For new or changed tests,
-derive expected behavior from the contract rather than the proposed patch.
-A defect closes on the surface where it was reproduced: confirm the target
-defect on the before-state and its absence after the fix through the same
-entry, inputs, and environment, taken from the project's verification harness
-(`docs/verify/HARNESS.md`) when the repository keeps one. A reproduction on
-another surface, a unit test alone, or an inconclusive run leaves the defect
-open, and the delivery says so. A check passing both versions can protect
-behavior but does not establish reproduction. Revert changes whose motivating
-hypothesis the evidence refuted, and list them. The delivery carries the
-failing and passing outputs verbatim or by evidence path. Keep the limits of
-intermittent or unavailable reproduction explicit.
+Select checks for the actual risks: committed effects and recovery, repeated
+execution, controlled concurrency, or old/new callers and stored data. A local
+result reaches an end-to-end conclusion only if intervening boundaries preserve
+its assumptions; check the first missing connection or leave that claim open.
 
-Add or strengthen tests where a missing case matters; routine reversible edits
-do not need new tests that merely repeat the implementation.
+A defect closes where it was reproduced: establish failure before and success
+after through the same entry, inputs and environment, using
+`docs/verify/HARNESS.md` when present. A different surface, a unit test alone,
+or an inconclusive run leaves the original defect open. A check passing both
+versions may protect behavior without reproducing the defect. Keep unavailable
+or intermittent reproduction explicit; revert a change whose motivating
+hypothesis the evidence refutes, preserving concurrent work.
 
-For structural assertions or a test double whose boundary semantics decide the
-result, read [checking the oracle](references/VERIFICATION.md#checking-the-oracle).
-Check that it rejects a relevant contract violation and accepts a relevant
-contract-preserving change.
+Use targeted mutation or fault injection when a plausible critical mistake
+could escape the selected checks, especially after guard changes. Before using
+one of these techniques, read its branch below. Mere compile failure or harness
+failure is not evidence that a behavioral oracle detected the intended defect.
 
-Use targeted mutation or fault injection when confidence depends on whether
-checks detect a plausible critical mistake, especially after guards are
-narrowed, consolidated, moved, or receive different inputs. Before selecting a fault, writing a mutation
-script, or applying a fault by hand, read
-[targeted mutation and fault injection](references/VERIFICATION.md#targeted-mutation-and-fault-injection)
-for the selection, passing-baseline, isolation, and differential-verdict rules.
-
-Obtain independent review when required by the task or repository, or when
-changing concurrency, authorization, data spanning versions, hard-to-recover
-effects, or a shared guard being deleted or consolidated. Follow governing
-authorization for delegation and model selection. If required review cannot
-run, leave acceptance open. Label verification for other changes self-reviewed.
-
-Use the named reviewer's protocol. When using installed
+Obtain independent review when the task or repository requires it, or for changes
+to concurrency, authorization, data spanning versions, hard-to-recover effects,
+or deletion/consolidation of a shared guard. Follow governing delegation and model
+authorization. Use the named reviewer's protocol; if using installed
 [euthyna](../euthyna/SKILL.md#enter-a-fresh-review-context), read its caller
-instructions before dispatch or remediation. No particular sibling skill is
-required. Review supplements execution evidence.
+instructions before dispatch or remediation. No sibling skill is required.
+Unavailable required review leaves acceptance open; other work is self-reviewed.
 
-Reuse evidence only while its relevant source, inputs, and environment remain
-unchanged. Rerun invalidated checks and all required repository gates.
+Reuse evidence only while its relevant source, inputs and environment remain
+applicable. Rerun invalidated checks and required repository gates on the final
+version. If a finding refutes an evidence claim, rederive claims of the same kind
+in the slice. Test a suspected shared cause before repairing several defects;
+validate each finding against the repair and keep independent defects separate.
 
-If a finding refutes an evidence claim, rederive every claim of the same kind
-in the current slice before citing it. When several confirmed defects may share
-one cause, or repair would choose between competing authorities or mechanisms,
-test that explanation before repairing. Recheck each finding against the repair;
-keep independent defects separate.
+## Load branch details when needed
+
+- **Structural refactoring:** read [Refactoring](references/REFACTORING.md) before
+  choosing the transition. For compatibility/data migration alone, start at
+  [Choose the transition](references/REFACTORING.md#choose-the-transition).
+- **Structural assertions or deciding test doubles:** read
+  [Checking the oracle](references/VERIFICATION.md#checking-the-oracle).
+- **Mutation or fault injection:** read
+  [Targeted mutation](references/VERIFICATION.md#targeted-mutation-and-fault-injection)
+  before selecting or applying a fault.
+- **Performance work:** inspect operation counts, sharing scope, invalidation and
+  retained state on effectful and no-effect paths at relevant scale. Reuse may
+  change cost only within its valid observation scope. Before reporting measured
+  numbers, read [Measured numbers](references/VERIFICATION.md#measured-numbers).
+- **Diagrams or interactive views:** before delivering one, read
+  [Derived views](references/DERIVED-VIEWS.md).
 
 ## Close the requested outcomes
 
-Close the requested behavior and structural target using evidence applicable
-to the final code. Confirm preserved contracts and the intended decisions and
-effects. Report a property as verified with its check and the wrong
-implementation that check was seen to reject; report the rest as unverified.
-Judge behavior, structure and cost separately; equivalent results alone
-establish neither structural fit nor acceptable cost. Correct unexplained
-in-scope mismatches or report their consequences.
-When review is required, acceptance also needs a completed review whose evidence
-applies to the final material revision, with every finding dispositioned. If that
-review is pending or blocked, report implementation and local verification
-separately, without claiming complete acceptance.
-For refactoring, also close the removal target or state the remaining migration
-stage. Inspect the final diff for scope and unintended changes.
+Check the final diff for scope and unintended changes. Report the requested
+outcome, decisive checks and material gaps in the user's language; prose can
+suffice. Judge behavior, structure and cost separately. Explain structural gains
+in rule ownership, caller knowledge or coordinated edit points; for migration,
+close the removal target or name the remaining stage and exit condition.
 
-Describe structural gains concretely: a decision now has one owner, callers know
-fewer details, or a rule change requires fewer coordinated edits. Classify failed
-checks as introduced, pre-existing, or environmental. If an essential check could
-not run, report the implementation as not fully verified and leave the affected
-claim open. Continue independent work when one part is blocked.
-
-Hand off the outcome, concrete structural gains, decisive verification and
-material gaps in the requested form. Prose can be enough. Use a diagram when
-roles, boundaries or dependencies are easier to inspect visually; use an
-interactive view when changing inputs or exploring branches clarifies a decision.
-Before delivering either, read [Derived views](references/DERIVED-VIEWS.md).
+Bind verification and any required completed review to the final material
+revision, with findings dispositioned. Keep failed checks classified as
+introduced, pre-existing or environmental. An essential missing check or review
+leaves the affected acceptance claim open; report implementation and local
+verification separately, and continue work independent of the blocker.
