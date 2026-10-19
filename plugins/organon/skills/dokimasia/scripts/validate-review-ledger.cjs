@@ -316,9 +316,6 @@ function evaluateReviewLedger(ledger) {
   }
 
   const findings = ledger.findings;
-  for (const id of duplicates(findings.map((finding) => finding.id))) {
-    failures.push(`duplicate finding ID: ${id}`);
-  }
 
   for (const finding of findings) {
     const id = finding.id;

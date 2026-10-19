@@ -1,13 +1,12 @@
 # Dokimasia Reference
 
-Load only the branch reached by the current review: entry states, artifact
-retention, compact transfer, runtime/invocation handling, focused recheck,
-or round receipts.
+Read the section named by the current branch. The shared review contract and
+Exact Gate live in [SKILL.md](SKILL.md).
 
 ## Decision Envelope And Entry States
 
-The upstream planner freezes its worth-building decision in this envelope;
-review consumes it unchanged and never recomputes value:
+Only an explicitly requested implementation-authorization gate consumes this
+upstream envelope; review does not recompute its worth-building decision:
 
 ```yaml
 decision: BUILD | DEFER | NO_BUILD | RESEARCH_FIRST
@@ -21,50 +20,45 @@ review_scope: implementation-authorization | correctness-only
 review_budget:
 ```
 
-Ordinary technical review defaults to `correctness-only`, with any upstream
-decision recorded as context or explicitly absent. It closes with
-`implementation_decision: UNCHANGED` and grants no implementation authorization.
-The envelope above is required only for implementation-authorization scope;
-reuse an existing user decision as `decision: BUILD, source: user` when applicable.
-Review budget is resolved at review entry in either scope.
+Reuse an existing explicit user decision as `decision: BUILD, source: user`.
+A revision changing cost, benefit, mechanism, scope or key assumptions invalidates
+the authorization envelope: suspend that gate until the user or upstream decision
+renews it. Correctness-only can continue with changed assumptions stated, unless
+the technical target itself needs a user decision.
 
-Non-pass outcomes:
-
-- `NOT_READY`: the candidate is missing, or an explicitly requested
-  implementation-authorization gate lacks a build decision.
-- `DEFERRED`: that authorization gate has a standing non-BUILD decision.
-- `WITHDRAWN`: the user withdrew the review.
-- `SUSPENDED`: unresolved material disagreement, unavailable reviewer,
-  exhausted budget, required user input, or an invalid authorization envelope.
-
-None grants technical GO or implementation authorization. A cost or scope
-change invalidates the frozen envelope only as an authorization gate; a
-correctness-only review can continue with the new assumptions explicitly stated.
+Entry outcomes are NOT_READY for a missing candidate or requested authorization
+without a build decision; DEFERRED for a standing non-BUILD authorization decision;
+WITHDRAWN when the user withdraws; SUSPENDED when a running review cannot close.
+Use the two outcome tracks defined in SKILL.md; none of these states grants GO.
 
 ## Review Artifacts
 
-For a short review needing no saved output or later continuation, keep the
-ledger in-band and disclose the complete results in chat. All receipt, cost,
-finding-validation, and Exact Gate obligations still apply; the ledger checker
-accepts stdin when no input path is supplied.
+A short review needing no saved output or continuation may keep its complete
+ledger and findings in chat. The checker accepts stdin when no path is supplied.
+Save when requested, needed for repair/re-review, or needed for complete disclosure
+too long for chat. Use the user's path, otherwise an unused
+`.scratch/review-YYYYMMDD-topic/` under the target repository; reuse it for that
+series's later rounds. Keep records separate from the candidate; saving never
+authorizes editing it.
 
-Save when requested, needed for later repair/re-review, or needed to disclose
-a complete report too long for chat. Use the user's output path; otherwise use
-`.scratch/review-YYYYMMDD-topic/` under the target repository, with the review
-start date and a short subject. Choose an unused name for a new series and
-reuse it for subsequent rounds. Keep existing audit directories and links intact.
+The parent owns `review-ledger.json`, the authoritative record of attempts,
+receipts, reviewer payloads, validations and dispositions. `review.md` presents
+the current outcomes and complete findings with parent validations, linking the
+ledger and exact candidate instead of copying its JSON. Before replacing a round's
+report, archive it as `review-r1.md`, `review-r2.md`, etc.; retain original claims,
+later parent judgments and prior payloads. Link a long reviewer report before
+remediation, then supplement it with validations rather than rewriting its claims.
 
-The parent maintains `review-ledger.json` as the authoritative machine record
-of receipts, reviewer payloads, validations, dispositions, and gate state.
-`review.md` presents the current two-track outcome and complete findings with
-parent validations. Link the authoritative ledger and exact candidate revision
-rather than embedding the ledger's JSON.
+Retain evidence needed to verify or resume the review, including recoverable
+candidate/authority snapshots when a path or hash cannot retrieve their bytes.
+Create `evidence/` or `diagnostics/` only for an actual evidence, launch-failure or
+requested-replay need. Full transcripts and startup scripts are not routine
+deliverables; keep minimal host receipts where needed to verify invocation/cost.
+Preserve existing audit records and the only reproduction evidence.
 
-Optional derived views identify those sources, their scope and material
-uncertainties. Preserve reviewer claims, parent judgments, rule ownership and
-required dependencies. Show order or guarantees only when the candidate
-establishes them. A derived view does not replace the report, change either
-outcome track or satisfy the Exact Gate.
+Optional views identify their source, scope and uncertainties, preserving reviewer
+claims, parent judgments, rule owners and dependencies. They establish no new
+outcome, ordering guarantee or gate result.
 
 <!-- >>> shared-derived-views -->
 For diagrams, separate overview from reference detail. Give each node one role,
@@ -83,199 +77,120 @@ insufficient. Revise grouping, layout or format when needed. Exercise the
 interactions used in the explanation and state what remains unverified.
 <!-- <<< shared-derived-views -->
 
-Before a later round replaces that report, preserve the completed round as
-`review-r1.md`, `review-r2.md`, and so on. Keep original reviewer claims and
-parent judgments distinguishable, including challenges and later resolutions;
-retain prior receipt and report payloads in the cumulative ledger. Report
-archives preserve what was disclosed, rather than becoming separately edited
-copies of current finding state. An early archived reviewer report is linked
-before remediation and then supplemented with the parent's validations.
-
-Create `evidence/` only for material needed to verify claims, reproduce checks,
-or resume the review. Prefer existing durable references; retain candidate and
-authority snapshots when a path or hash cannot recover the reviewed version.
-Create `diagnostics/` only for launch failures, troubleshooting, or requested
-replay. Startup scripts, full transcripts, and execution logs are not routine
-deliverables: use the existing receipt fields for invocation and cost facts,
-retaining a minimal host-evidence excerpt when those facts otherwise cannot be
-verified. A failed invocation still needs its receipt. Never discard the only
-reproduction evidence as diagnostics or delete existing files to tidy a run.
-
 ## Compact Review Packet
 
-For a long candidate, prefer one readable artifact over repeated prompt copies:
-
-```text
-candidate_path_or_exact_text
-candidate_hash
-decision_constraints
-rubric
-evidence_scope
-review_kind
-review_mode: review-only | review-and-revise
-finding_ledger_when_rechecking
-```
-
-Use a temporary artifact for a chat-only plan only when the runtime permits the
-parent to write it. The reviewer remains read-only. If a remote reviewer cannot
-read a local path, send the exact candidate once in that reviewer session and
-reuse the session for rechecks; do not send the parent transcript.
-
-Repository disclosure is a separate permission decision. When it is not
-authorized, use only supplied evidence or suspend the reviewer lane rather than
-silently dropping evidence-dependent rubric criteria.
+For a long candidate, send one readable artifact: candidate path or exact text,
+hash, constraints, rubric, evidence scope, review kind/mode and, for a recheck,
+the finding ledger. The parent may materialize a chat-only candidate where writes
+are permitted. For remote review, send exact text once and reuse that reviewer
+session for rechecks; exclude the parent transcript. Repository disclosure needs
+its own authorization. Without it, use supplied evidence or suspend the lane,
+keeping evidence-dependent criteria visible.
 
 ## Runtime And Invocation
 
-Bind each reviewer class frozen by the Exact Gate without reselecting it:
-`fresh-context` uses the runtime's read-only agent capability; `second-model`
-uses the read-only second-model capability the user explicitly requested.
-Record reviewer identity, independence level, disclosure boundary, and every
-availability failure or diagnostic fallback.
+Bind frozen `fresh-context` reviewers to the runtime's read-only agent capability
+and explicitly selected `second-model` reviewers to that capability. Record identity,
+independence, disclosure boundary and availability failures. Helpers default to
+zero; [Helper Agents](#helper-agents) defines their eligible scope.
 
-Use a persistent invocation handle. Before retrying, query the invocation and
-session, recover any result, settle descendants, and prove no invocation for the
-same revision and reviewer remains active. Unknown state suspends the lane; it never
-authorizes a duplicate invocation. Every retry gets a new handle and receipt.
+Use a persistent invocation handle. Before retrying, query the invocation/session,
+recover results, settle descendants and establish that no invocation for this
+reviewer/revision remains active. Unknown state suspends the lane. Each retry gets
+a new handle and receipt.
+
+An unavailable explicitly selected second-model reviewer permits at most one
+diagnostic fresh-context round. Keep its frozen identity, use
+`reviewer_role: diagnostic`, `independence_level: fresh-context`, and link
+`diagnostic_for_invocation_id` to its earlier FAILED or TIMED-OUT required invocation.
+The diagnostic never substitutes for that reviewer. Suspend the lane unless it
+recovers with a later second-model complete GO on the current revision.
 
 ## Helper Agents
 
-Helpers do not count as required reviewers and default to zero. A helper requires
-a pre-declared, non-overlapping evidence lane. Its lane must not repeat source
-inspection already owned by the parent reviewer. Its output supplies evidence
-to the required reviewer; it is not an independent verdict. Include each helper's
-usage in the round receipt exactly once.
+A helper needs a pre-declared, non-overlapping evidence lane that does not repeat
+the parent reviewer's source inspection. It supplies evidence, not a required
+reviewer's verdict. Count its usage exactly once in that round's receipt.
+
+## Reviewer Return
+
+```text
+revision: <hash>
+review_kind: blocker-sweep | complete
+verdict: GO | CONDITIONAL-GO | NO-GO
+coverage: {rubric_dimensions: [...], severities: [...]}
+blockers: [{id, claim, evidence, affected_section}]
+should_fix: [{id, claim, evidence, affected_section}]
+optional: [{id, claim, evidence, affected_section}]
+verification_gap: [{id, claim, missing_check, affected_section,
+                    gap_scope, gap_scope_reason}]
+```
+
+A complete return covers every frozen rubric dimension and all four severities.
+A blocker sweep covers the rubric with blocker and verification-gap severities
+only. Each gap states `gap_scope: decision_blocking | outside_closing_scope` and
+an evidence-backed reason. The parent preserves reviewer-returned payloads and
+coverage; GO may have empty finding arrays, while non-GO needs a finding.
 
 ## Focused Recheck
 
-A focused recheck is an intermediate finding-closure mechanism. It never closes
-the gate.
-
-It is eligible only when all are true:
-
-- changed sections or paths are contained by finding-linked scope;
-- goal, decision constraints, rubric, risk, dependencies, permissions, and
-  public interfaces are unchanged;
-- the request supplies before/after hashes and a cross-impact statement;
-- the reviewer confirms the edit did not escape the declared scope.
-
-Uncertainty or a cross-cutting change promotes the round to a complete review.
-For example, correcting one verification command can be focused when no other
-claim depends on it; changing a shared compatibility assumption is complete
-review work. The same rule fits a data-migration plan and a customer-onboarding
-plan: locality is determined by dependency impact, not by domain vocabulary.
+A focused recheck can close findings between revisions, never the gate. It needs
+finding-contained edits; unchanged goal, constraints, rubric, risk, dependencies,
+permissions and public interfaces; before/after hashes and cross-impact statement;
+and reviewer confirmation that the edit stayed within that scope. Uncertainty or
+cross-cutting impact requires a complete review.
 
 ## Round Receipt
 
-Immediately after every attempted review, before parent validation, record one
-receipt. Its fields and their closed vocabularies are the
-`round_receipts` items in [review-ledger-schema.json](review-ledger-schema.json),
-which `scripts/validate-review-ledger.cjs` reads: take the field list from there
-rather than from a copy, so the receipt you write and the receipt the gate
-accepts cannot be two different shapes. `diagnostic_for_invocation_id` is the
-one optional field, and it names the failed second-model invocation a
-diagnostic probes.
+Record one receipt immediately after each attempt, before parent validation,
+including failed, timed-out, cancelled and discarded attempts. Take the fields and
+closed vocabularies from `round_receipts` in
+[review-ledger-schema.json](review-ledger-schema.json), not a copied field list.
 
-Prefer runtime counters. Otherwise measure the exact submitted/returned text in
-characters and elapsed wall-clock. Snapshot cumulative counters immediately
-before and after the invocation and use the non-negative delta. A failed,
-timed-out, cancelled, or discarded invocation still gets exactly one receipt.
-The six observable fields are required; provider-only telemetry may be
-unavailable but cannot erase caller-observable measurements. Provider token
-categories may be attached when naturally available, but are optional and never
-part of the gate.
-
-Compact display:
-
-| Round | Revision | Kind | Runtime / model | Verdict | Calls | In chars | Out chars | Wall ms | Sessions | Retries | Precision |
-|---|---|---|---|---|---:|---:|---:|---:|---:|---:|---|
-| R1 | `{hash}` | complete | `{runtime} / {model}` | `{verdict}` | `{n}` | `{n}` | `{n}` | `{n}` | `{n}` | `{n}` | `{precision}` |
+Prefer runtime counters. Otherwise measure exact submitted/returned characters
+and elapsed wall-clock; use non-negative deltas for cumulative counters. The six
+caller-observable measurements are required; unavailable provider telemetry is not
+zero and cannot erase them. Provider token categories are optional. Show per-round
+revision, kind, runtime/model, verdict, calls, input/output characters, wall time,
+sessions, retries and measurement precision.
 
 ## Review-Ledger Checker
 
-The ledger uses `final_reviewer_verdicts` for exactly one authoritative closing
-verdict per required reviewer on the current revision. Prior NO-GO, focused, and
-rebuttal-check history lives in round receipts; it is not mixed into the closing
-verdict set. `round_reports` contains exactly one manifest for every receipt that
-returned `GO`, `CONDITIONAL-GO`, or `NO-GO`: invocation id, revision, verdict,
-reviewer-returned `review_kind`, `reviewer_output_disclosed: true`, the complete finding-ID array, and complete
-finding payloads (severity, claim, evidence, affected section, and missing check
-when applicable). GO may use explicit empty arrays; NO-GO and CONDITIONAL-GO
-require at least one finding. Every manifest payload maps to exactly one ledger finding;
-every ledger finding maps back to its source manifest and records
-`parent_validation_disclosed: true`. All collection fields are explicit arrays.
-Malformed, missing, or unreconciled collections fail closed.
+The schema owns field types and vocabularies. Keep its collection fields explicit
+arrays and maintain these relationships:
 
-The review ledger freezes `author_identity`, `review_depth: shallow | full`, and
-`explicit_second_model_reviewers` as an array of unique identities drawn from
-`required_reviewers`; the author cannot be a required reviewer. A closing
-receipt for an identity inside `explicit_second_model_reviewers` must record
-`reviewer_role: required` and `independence_level: second-model`. Reviewing with
-a stronger independence lane than frozen is an upgrade, never a gate failure.
+- `attempted_invocations` and `round_receipts` match one-to-one. Returned GO,
+  CONDITIONAL-GO and NO-GO receipts each have one `round_reports` manifest with
+  matching invocation, revision, verdict and kind, `reviewer_output_disclosed: true`,
+  complete finding IDs/payloads and reviewer-returned coverage.
+- Each payload maps to one ledger finding and back through `source_invocation_id`.
+  Key each record by (`source_invocation_id`, `id`); preserve repeated IDs and
+  each round's original payload.
+  Keep its claim, evidence, affected section, severity and gap scope intact;
+  store parent validation and `parent_validation_disclosed: true` separately.
+- `final_reviewer_verdicts` contains exactly one current complete GO per required
+  reviewer, bound to its required receipt and full-rubric/all-severity report.
+  Older and intermediate verdicts stay in receipt history. Full-depth closing
+  receipts use distinct session handles. An explicitly selected second-model
+  reviewer closes in that class; a diagnostic cannot close for it.
+- Preserve the frozen author, depth, reviewer classes, rubric and resolved budget.
+  A stronger independence lane is acceptable. Legacy `second_model_availability`
+  does not decide the gate.
 
-Depth drives the number of independent reads. A `full` depth gate needs at
-least two required reviewers, and their closing receipts must name distinct
-`reviewer_session_id_or_opaque_handle` values: one session reading twice is one
-read. Shallow needs one required reviewer. The gate ignores the
-`second_model_availability` field that earlier ledgers carry.
-
-A diagnostic fallback keeps the frozen reviewer identity, records
-`reviewer_role: diagnostic` and `independence_level: fresh-context`, and links
-`diagnostic_for_invocation_id` to an earlier `FAILED` or `TIMED-OUT`
-second-model receipt for that reviewer. At most one diagnostic is allowed per
-explicitly selected second-model reviewer, and its presence keeps the gate unpassed until
-that reviewer recovers — a second-model complete GO closing the current
-revision, recorded after the diagnostic; the diagnostic never substitutes for
-the reviewer it probed, and a close it postdates is a close it put in doubt.
-
-A `blocker-sweep` report contains only blocker and verification-gap payloads.
-Each verification gap declares `gap_scope: decision_blocking |
-outside_closing_scope` with an evidence-backed reason. Unresolved
-decision-blocking gaps prevent GO; only outside-closing-scope gaps may use
-`defer-gap`. Resolved gaps follow [Verification Gap Closure](#verification-gap-closure).
-
-The review ledger freezes `required_rubric_dimensions`. Every `complete` report
-includes `coverage.rubric_dimensions` matching that set and
-`coverage.severities` containing blocker, should-fix, optional, and
-verification-gap. Closing GO without this coverage evidence fails closed.
-
-The review ledger also freezes `resolved_budget`:
-`{source: explicit | calibrated-default | user-authorized-unbounded, unit,
-threshold, user_authorization}`. A bounded source requires a non-empty
-observable unit and a positive safe-integer threshold;
-`user-authorized-unbounded` requires `user_authorization: true`. A missing or
-malformed budget fails closed.
-
-When Node is available:
-
-```sh
-node scripts/validate-review-ledger.cjs review-ledger.json
-```
-
-The checker prints `{ "pass": boolean, "failures": [...] }` and exits zero only
-for a pass. Its JSON fields mirror the [Exact Gate](SKILL.md#exact-gate). It is a mechanical guard,
-not a substitute for parent finding validation or reviewer judgment.
+Run `node <skill>/scripts/validate-review-ledger.cjs <ledger.json>` or pipe the
+ledger to stdin. It prints `{ "pass": boolean, "failures": [...] }`, exits zero
+only on a pass, and checks structure and links rather than the truth of evidence.
 
 ## Verification Gap Closure
 
-Keep the original finding payload, `revision`, `source_invocation_id`, and
-`gap_scope` unchanged. Update its owner, parent validation and evidence,
-disposition, and `closed` state separately. A resolved gap uses either:
+Keep the original payload, revision, source invocation and gap scope unchanged.
+Update owner, validation/evidence, disposition and closed state separately.
+Resolution uses `confirmed` + `fix` for supplied evidence, or `challenged` +
+`rebut` with `reviewer_rebuttal_accepted: true`. Either needs a later complete GO
+from the originating reviewer on the current revision, with its receipt after the
+original gap. Evidence alone can leave the candidate hash unchanged; a candidate
+edit cannot. Parent validation establishes what the resolving evidence proves.
 
-- `validation: confirmed`, `disposition: fix`, with the supplied evidence; or
-- `validation: challenged`, `disposition: rebut`, with the contrary evidence
-  and `reviewer_rebuttal_accepted: true`.
-
-In either case, `closed: true` requires a current-revision complete GO from the
-originating reviewer, whose receipt occurs after the original gap receipt.
-The normal closing-verdict checks bind that GO to its full report and required
-reviewer class. Supplying evidence without changing the candidate may retain
-the same hash; a candidate edit still creates a new revision. The checker
-verifies these links, while parent validation establishes what the evidence
-actually proves. A closed flag alone, deferring a decision-blocking gap, or
-editing the original scope cannot establish resolution.
-
-An unresolved outside-closing-scope gap may instead be dispositioned with
-`validation: confirmed`, `disposition: defer-gap`, owner, next check, and
-`closed: true`. This closes its disposition only; report it as an outstanding
-evidence limitation, not as a resolved gap.
+An unresolved `outside_closing_scope` gap may instead use `confirmed`, `defer-gap`,
+owner, next check and `closed: true`. This closes its disposition only: report the
+remaining evidence limitation. Decision-blocking gaps cannot be deferred into GO.

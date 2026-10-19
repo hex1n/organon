@@ -1,48 +1,41 @@
 # Review-and-revise
 
-These steps apply only to `review-and-revise`. Keep the shared finding
-validation and closing rules in [SKILL.md](SKILL.md#evidence-loop).
+Read only for authorized candidate edits or another revision round. Use the shared
+[Evidence Loop](SKILL.md#evidence-loop) for disclosure, validation and disposition.
 
 ## Revise from evidence
 
-Use two disciplines when writing the fix.
+Batch compatible fixes. Verify every added or sharpened existing-system claim
+against its source and cite its locator. When a mechanism is disproven, re-derive
+it from authority and existing domain records instead of patching its unsupported
+premise. Keep the revision limited to the finding's actual scope.
 
-**Verify before you write.** Check every existing-system claim the revision adds
-or sharpens against its source. Open the file and cite the line before shipping
-the revision. An unchecked claim can become the next round's finding and require
-another full-cost review. Limit the claim to the scope needed to close the finding.
+Hash the new candidate or return evidence-backed rebuttals to their reviewers.
+An edit affecting the BUILD decision follows
+[envelope invalidation](REFERENCE.md#decision-envelope-and-entry-states).
+Use a [focused recheck](REFERENCE.md#focused-recheck) only for eligible contained
+edits; it cannot replace complete closing reviews.
 
-**Re-derive a disproven mechanism.** When a finding falsifies a mechanism the
-candidate invented, rebuild that section from authoritative sources.
-Check the domain record for an existing answer. Repair the underlying derivation;
-patching an unsupported mechanism can leave the same blocker for the next round.
+## Blocker sweep
 
-Batch compatible fixes. A focused recheck may close findings but cannot close
-the gate. Use it only for edits contained by finding-linked scope; uncertainty
-or cross-cutting change requires a complete review. See
-[REFERENCE.md](REFERENCE.md#focused-recheck).
+Complete review is the default. For a large candidate with unsettled foundational
+assumptions or interacting failure paths, an initial blocker sweep may save work;
+record that reason. It examines every rubric dimension for blockers and verification
+gaps, deferring independent should-fix and optional findings. Return the
+[reviewer payload](REFERENCE.md#reviewer-return) with that coverage. Once no blocker
+or decision-blocking gap remains, run a complete review on the same revision.
 
-For implementation-authorization scope, a revision that materially changes the
-frozen BUILD decision's cost, benefit, mechanism, scope, or key assumptions
-invalidates that envelope: suspend that authorization gate for a renewed user
-or upstream decision. For correctness-only scope, report the changed assumption
-and continue technical review while it remains useful and authorized. Ask only
-when the technical target itself needs a user decision.
+## Re-review and stop
 
-Completion: every finding is validated, owned, and dispositioned; every
-existing-system claim the revision adds carries a source verified this round;
-a new hashed revision exists or every rebuttal has returned to its reviewer.
+Send the complete revised candidate and ledger for re-review. Mid-loop, a reviewer
+that has returned GO or optional-only findings on consecutive revisions may pause
+while still-falsifying lanes continue. The closing round includes every required
+reviewer on the exact final bytes, all dimensions and severities; a justified
+non-GO does not end the search for other findings.
 
-## Re-review the revision
-
-Send the complete revised candidate and ledger to this round's reviewers:
-mid-loop, when one required reviewer has closed its lane (GO or optional-only
-findings) on consecutive revisions while another keeps returning confirmed
-defects, run only the still-falsifying lanes; the closing round still sends
-the candidate to every required reviewer, and the gate is unchanged. The
-final GO must cover the complete current revision. Record, disclose, validate,
-and disposition every new finding, then repeat. This closing review returns the
-complete set of currently known findings across all severities, grouped by root cause; it
-does not stop merely because a non-GO verdict is already justified.
-
-Then apply [Close Or Continue](SKILL.md#5-close-or-continue).
+Continue within budget only while the review request remains active and the next
+round can close a gate-blocking finding or change a technical/implementation
+decision. New or narrowing findings count as progress. Suspend when the same
+blocker survives three consecutive revisions, or under
+[the shared stop conditions](SKILL.md#close-or-continue). If a confirmed material
+defect is no longer worth fixing, suspend or withdraw; never call that GO.
