@@ -1,4 +1,4 @@
 interface:
   display_name: "Euthyna"
-  short_description: "Fresh-context code review with evidence-backed findings"
-  default_prompt: "Use $organon:euthyna to review this code or change in a fresh reviewer context, use authorized isolated tests and read-only data queries when they resolve a material question, and report findings and coverage gaps while keeping the reviewed version unchanged."
+  short_description: "Business intent and implementation quality review"
+  default_prompt: "Use $organon:euthyna to review this code or change through two independent perspectives: business and system behavior, and implementation and structure; establish what correct means, investigate material concerns, and report findings and limits."

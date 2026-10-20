@@ -1,6 +1,6 @@
 {
   "name": "organon",
-  "version": "0.4.0",
+  "version": "0.6.1",
   "description": "Instruments for coding agents: decide from the root problem, change code without breaking its contracts, and falsify claims before trusting them.",
   "author": {
     "name": "hex1n"
