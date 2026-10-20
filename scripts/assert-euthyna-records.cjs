@@ -338,7 +338,8 @@ function main() {
       const before = (x) => x >= 0 ? x : -x, after = (x) => Math.abs(x), mutant = (x) => x;
       const observes = (fn) => fn(-3) === 3 && fn(0) === 0 && fn(5) === 5;
       assert.ok(observes(before)); assert.ok(observes(after)); assert.equal(observes(mutant), false);
-      const text = fs.readFileSync(path.join(skill, "references", "LENSES.md"), "utf8");
+      const text = ["SKILL.md", path.join("references", "LENSES.md")]
+        .map((name) => fs.readFileSync(path.join(skill, name), "utf8")).join("\n");
       assert.doesNotMatch(text, /Then it protects nothing/u);
       assert.match(text, /A test\s+passing both versions may protect behavior/u);
     });

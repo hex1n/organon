@@ -1,80 +1,67 @@
 # Review Lenses
 
-Read sections whose triggers apply. Each question is a probe, not a required
-finding: establish its production path and consequence under
-[SKILL.md](../SKILL.md#test-the-failure-hypothesis). Skip questions irrelevant
-to the change. Headings are a shared schema/validator vocabulary; preserve them
-in briefs and coverage records.
+Read triggered sections. Questions are probes, not finding quotas: establish the
+production path and consequence under [SKILL.md](../SKILL.md#test-the-failure-hypothesis).
+Skip irrelevant questions. In recorded reviews, headings are schema/validator
+vocabulary: preserve them in briefs and coverage records. Ordinary prose reviews
+need only the triggered sections, without an excluded-lens ledger.
 
 ## Error handling and fallbacks
 
-Trigger: catches, error callbacks, retries, fallbacks, defaults on failure,
-or null-safe navigation that skips an operation.
+Trigger: catches, error callbacks, retries, fallbacks, failure defaults or null-safe
+navigation that skips an operation.
 
-- Trace the errors caught and the state carried forward. Can an unrelated
-  failure, partial write, missed cleanup or defeated rollback become silent?
-- Check where exhaustion and fallback reach the caller. Distinguish a valid
-  default from stale, partial or fabricated success, including production paths
-  falling back to test behavior.
-- Check that diagnostics identify the operation, relevant identity and state,
-  and that user-facing errors explain the failed action where it matters.
+- Trace caught errors and carried state: can unrelated failures, partial writes,
+  missed cleanup or defeated rollback become silent?
+- Follow exhaustion/fallback to the caller. Distinguish valid defaults from stale,
+  partial or fabricated success, including production falling back to test behavior.
+- Check diagnostics for operation, identity and state, and user-facing errors for
+  the failed action where it matters.
 
 ## Tests
 
-Trigger: test or fixture changes, a new untested branch, or a changed harness.
+Trigger: test/fixture changes, a new untested branch or changed harness.
 
-- Locate the owning test for each changed behavior. Inspect its deciding
-  predicates against a relevant violation and a contract-preserving change:
-  the violation must fail and the valid change must pass.
-- Follow each named variant into the production branch it claims to cover.
-  Fixture-only variation, a mocked core, or an output supplied by the fake
-  cannot establish the behavior that production owns.
-- For rejection tests, remove the targeted guard conceptually or in an
-  authorized probe. Another guard producing the same rejection leaves it
-  untested; a shape production cannot deliver may reveal a redundant guard.
-- For reproduction, reverting the fix must expose the target failure. A test
-  passing both versions may protect behavior without reproducing the defect.
-- Check that boundary fakes preserve the generation, storage and read semantics
-  deciding the result. Identity replacement, normalization, ordering or commit
-  behavior can bypass the real defect even with a real core. One identical fake
-  for distinct APIs can hide a call to the wrong one.
-- Reconcile deleted, skipped or weakened tests with the obligations now covered.
-  Check relevant dependence on shared state, time, order and network.
-- Verify fixture/schema compatibility and value provenance: a captured source,
-  contract derivation or declared construction must reproduce the expected
-  value. A false provenance claim is more than a coverage gap.
+- Locate the owning oracle. Follow each named variant into its production branch;
+  fixture-only variation, a mocked core or fake-supplied output proves no core behavior.
+- For rejection, remove the target guard conceptually or in an authorized probe.
+  Another guard causing the same rejection leaves it untested; an unreachable input
+  may expose a redundant guard. Apply SKILL.md's before/after reproduction rule.
+- Check boundary fakes' generation, storage, read, identity, normalization, order and
+  commit semantics. They can bypass the defect even with a real core; one fake for
+  distinct APIs can hide calling the wrong one.
+- Reconcile deleted, skipped or weakened tests with their owning obligations, and
+  check shared-state, time, order and network dependencies.
+- Check fixture/schema compatibility and value provenance: captured source, contract
+  derivation or declared construction must reproduce expectations. False provenance
+  exceeds a coverage gap.
 
 ## Comments and documentation
 
-Trigger: comments or docs changed, or code changed beneath existing text.
+Trigger: comments/docs change, or code changes beneath existing text.
 
-- Compare claims, examples and TODOs with current behavior, signatures,
-  side effects and remaining work. Include unchanged comments whose premise
-  the code change invalidates.
-- Trace documented preconditions and invariants to their actual owner or
-  enforcement; prose alone does not establish a runtime guard.
+- Compare claims, examples and TODOs with behavior, signatures, effects and remaining
+  work, including unchanged comments whose premises the change invalidates.
+- Trace documented preconditions/invariants to their actual owner or enforcement;
+  prose alone establishes no runtime guard.
 
 ## Types and invariants
 
-Trigger: types, models, enums, state machines, or values reaching a consumer change.
+Trigger: types, models, enums, state machines or values reaching a consumer change.
 
-- Trace each consumer assumption to its producer or enforcing boundary.
-  Establish the supported entry or writer before treating a constructible
-  instance as a reachable defect.
-- Check mutation points and exposed mutable internals as well as construction.
-  Consider whether the representation carries the invariant or lets callers
-  express contradictory state.
-- Follow widened types, optional values and new variants to actual consumers.
-  Name the affected paths; check switches and defaults for silently hidden cases.
+- Trace consumer assumptions to producers or enforcing boundaries, including the
+  supported entry/writer; constructible instances alone prove no reachable defect.
+- Check mutation and exposed mutable internals as well as constructors. Does the
+  representation carry the invariant or permit contradictory state?
+- Follow widened types, optional values and new variants to consumers, including
+  switches/defaults that silently hide cases; name affected paths.
 
 ## Dependencies and configuration
 
-Trigger: direct or resolved dependency changes, build/CI settings, flags,
-environment variables or defaults.
+Trigger: direct/resolved dependencies, build/CI settings, flags, environment variables
+or defaults change.
 
-- Compare resolved versions and relevant release changes, including transitives;
-  a manifest alone does not show what moved. Separate bundled changes when
-  attribution affects diagnosis.
-- Trace new, changed, renamed and removed settings through readers and
-  deployments. Establish absent-value behavior and who still uses old keys;
-  a changed default can affect deployments that never set it.
+- Inspect resolved versions and relevant release changes, including transitives;
+  manifests alone do not show what moved. Separate bundled changes for attribution.
+- Trace changed, renamed and removed settings through readers and deployments,
+  including absent values, old-key users and untouched deployments affected by defaults.

@@ -1,11 +1,9 @@
 # Reviewer Handoff
 
-The caller passes a pinned JSON brief against
-[handoff-schema.json](handoff-schema.json) as the reviewer's whole task.
-The validator checks shape and source identity; the reviewer checks the
-request and derives its own checks. Keep builder conversation, reasoning,
-advisor output, checklists, mutation results, suggested findings and
-task-specific memory out of the brief.
+Use this protocol for a recorded review selected by [SKILL.md](SKILL.md#enter-a-fresh-review-context).
+Ordinary prose reviews use its neutral brief; [Host mechanisms](#host-mechanisms)
+also applies when setting up their dispatch. The caller owns packaging and host
+verification; the reviewer independently derives checks from the pinned request.
 
 ## Brief
 
@@ -64,129 +62,65 @@ task-specific memory out of the brief.
 }
 ```
 
-The schema fixes the shape; these are the fields whose meaning it cannot carry.
+The [schema](handoff-schema.json) owns shape. Preserve these source meanings:
 
-- `request.original` and `confirmed_corrections` hold the user's messages, one
-  item per message with its date, verbatim. A plan, design, or spec the user
-  approved is a contract source by path and revision; restated here it puts
-  the builder's words where the user's belong, and the reviewer then reviews
-  the builder's framing of the request.
-- A **reference** (`skill`, the `authority` lists, `lenses.selected[].reference`,
-  `prior_evidence`, `report.rules`, `re_review`) has a `path` and `revision`.
-  For a committed file, use a Git object name. For an uncommitted or untracked
-  file, use `sha256 <hex>` of its current bytes.
-  The reviewer reads that exact version with `git show <revision>:<path>`,
-  or checks the hash before reading. The caller may keep working during review;
-  the validator checks both ways of pinning the source.
-  Use `text` only when the reviewer's filesystem cannot reach the file.
-  The brief carries no record schema. The reviewer uses the template in the
-  `report.rules` file.
-- `lenses` is the caller's selection, because selection reads the diff and the
-  reviewer has not seen it yet: each section of
-  [references/LENSES.md](references/LENSES.md) whose trigger the change meets
-  goes under `selected` with its heading, the rest under `excluded` with the
-  fact that excludes each. The two lists partition that file, every section
-  once, on one side or the other.
-- `scope.candidate.content_identity` pins the uncommitted files in scope and
-  the supporting inputs the review evidence depends on, each `identity` as
-  `sha256 <hex>` of the file as it is now, so the reviewer recomputes the
-  same digest. `coverage_plan` uses the record's `in-depth | sampled | skipped`
-  vocabulary, one row per surface, so the record's `coverage.surfaces` reports
-  the plan and its outcome instead of reconstructing them afterward. Group
-  surfaces by affected contracts and the boundaries needed to judge them.
-  Include a verification helper as source when its assertions establish one of
-  those contracts, including an untracked helper in task scratch. Raw results
-  alone do not establish that the helper checks the right property.
-- `access.evidence_sources` lists what the reviewer may read beyond the
-  repository to learn how the system actually behaves, such as captured data,
-  a test data source, or logs, each with its read-only way in; the list is
-  empty only when the project has no such source. The review establishes a
-  trigger's conditions from these and the falsification check reads the same
-  ones, so a source the brief leaves out turns the findings that need it into
-  risks.
-- `access.read_only_mechanism` protects the pinned review sources and shared
-  state; it does not require every reviewer tool to be read-only.
-  `access.isolated_copy` names the separate writable validation workspace and
-  authorized execution scope, including any local database fixture. Existing
-  fields also support static review: use `not authorized` when experiments are
-  unavailable. Missing execution access limits the affected conclusion, not
-  the source review. Each concurrent writer uses its own isolated workspace.
-- `target`, `prior_evidence`, and `re_review.responses` are builder-held
-  navigation: facts and unknowns, never conclusions. An entry point is
-  navigation; "this path is safe" is a finding. The reviewer derives its
-  checks from the request, the diff, and the authority sources first and
-  reads these after, so they focus the work without steering it.
-- `re_review.previous_candidate` lets the reviewer show which files the repair
-  left unchanged when the prior round reviewed a working tree: pin the prior
-  round's brief file, whose `content_identity` lists each file, or the
-  retained snapshot manifest. A prior commit needs none; Git compares it.
-  Prior source copies the reviewer must read go in `prior_evidence`.
+- Quote dated user requests/corrections verbatim. Pin approved plans, specs and
+  repository rules as authority; builder reasoning, proposed findings and
+  task-specific memory stay outside the brief.
+- Pin references by path and Git object, or `sha256 <hex>` for uncommitted bytes.
+  Read committed bytes with `git show <revision>:<path>`; verify other hashes.
+  Inline `text` only when files are unreachable. REPORT.md supplies the record
+  template; the brief carries no record schema.
+- Partition every lens heading once between selected and factually excluded.
+  `content_identity` includes all in-scope uncommitted files and supporting inputs,
+  including deciding assertion helpers. Keep recoverable before-state for moves
+  and deletions; coverage surfaces group contracts and deciding boundaries.
+- `target`, prior evidence and repair responses are factual navigation/unknowns,
+  not builder conclusions. The reviewer derives checks before consulting them.
+- List permitted data/log sources and their read-only entry, empty only if absent.
+  Omitted deciding evidence limits the affected conclusion to risk. Protect pinned
+  sources/shared state; authorize experiments only in a separate validation root,
+  or use `not authorized`. Give falsifiers the same access.
+- A prior working-tree review pins its brief or retained manifest so unchanged
+  bytes can be established; Git suffices for a prior commit. Keep needed old
+  source copies recoverable. Re-review inputs follow the schema.
 
 ## Check and dispatch
 
-Before dispatch, the caller runs
-`node <skill-dir>/scripts/validate-handoff.cjs <brief.json>`.
-On acceptance, the reviewer runs it when Node and the skill directory are
-reachable; otherwise inspect the same requirements manually. Each reference
-must be readable at its pinned revision or carry its text. Each content identity
-must match the current file digest. The lens lists must partition LENSES.md,
-and a re-review must include its prior round, with `previous_candidate` when
-the prior record names no commit.
+The caller runs `node <skill-dir>/scripts/validate-handoff.cjs <brief.json>` before
+dispatch. The reviewer checks actual request, source identities, access and
+misquotation. Repeat schema validation only if that caller check is absent or the
+brief changed; without an executable checker, check the requirements manually.
+Schema success proves neither truthful context nor readable protected sources.
 
-The validator cannot distinguish a quote from a paraphrase. Report a
-`request.original` item that restates the task instead of quoting the user's
-message.
-
-The brief is a file the launch message names, or inline. The launch message
-carries the brief's location and the permissions the reviewer runs under;
-anything else the reviewer needs to know is a brief field, so it is checked
-like one. Every reference the brief pins is authorized reading, taken after
-the reviewer derives its checks; a launch restriction that covers a pinned
-path contradicts the brief. Before dispatch, confirm that the launch text and
-host read access reach every pinned path. The validator checks readability
-from the caller's filesystem only. Those permissions keep the one
-falsification dispatch [SKILL.md](SKILL.md#test-the-failure-hypothesis)
-allows, and the launch
-leaves enabled the host capability the table below names for it; a reviewer
-launched without it records `not-run` on every finding that owed the check.
-A brief that fails
-the check comes back `blocked` naming the gap, and the corrected brief starts
-a new reviewer, because a context that has read builder material is not
-restored by ignoring it. Without a review-method skill the reviewer still
-derives its checks from the requirements and the diff before reading builder
-material, and reports under REPORT.md's prose rules. A length cap set by the caller
-bounds the summary, never the required sections.
+Dispatch the brief with actual permissions, retaining the host capability for the
+one bounded [falsification](SKILL.md#test-the-failure-hypothesis). If unavailable,
+record the dispatch barrier. Invalid briefs return blocked and require a corrected
+brief in a fresh context; ignoring builder material already read cannot undo
+contamination. Without a review-method skill, derive checks from request, diff and
+authority before navigation, then use REPORT.md. Summary caps never waive disclosure.
 
 ## Host mechanisms
 
-The caller owns host verification. Check the actual launch configuration and
-host receipt for context inheritance, protected review sources, writable roots
-and enabled execution and data tools. Bind the
-returned result to that reviewer/session, and record those facts in
-`mode.host_evidence`, naming each automatic context source the host offers
-for the session (memory, project instructions, a resumed transcript) and
-showing it off or empty. A role label or planned command is not execution
-evidence.
+The caller verifies actual inheritance, loaded context, protected/writable roots,
+execution/data permissions and returned session identity, bound to the brief.
+Ordinary reviews retain a compact receipt beside the prose; recorded reviews put
+these facts in `mode.host_evidence`. Inspect loaded content for excluded builder reasoning/memory;
+neutral authority and tool/skill metadata may load. Role labels or planned commands
+are insufficient. Caller-readable files do not prove reviewer/child access.
 
-When a session receipt is available only after dispatch, the reviewer may
-return its source review with `mode.host_evidence` marked pending caller
-verification. It need not discover its own process or read its startup log.
-Before delivery the caller replaces that pending value with observed evidence,
-checks the record, and renders the report. If isolation cannot be established,
-retain the findings and limits but set the overall verdict and `mode.context`
-to `blocked`, add the isolation gap to `coverage.limits`, and validate again;
-no independent acceptance claim may escape this check. Those are the only
-changes a delivery makes to the returned record, and
-[REPORT.md](REPORT.md#delivered-record) checks them. Detected
-builder-context contamination still requires a new reviewer. Missing receipt
-visibility alone does not.
+A reviewer need not locate its own receipt. Receipt-only host facts may remain
+pending caller verification in `mode.host_evidence`; this alone does not block the
+review. The caller resolves them before [recorded delivery](REPORT.md#delivered-record);
+ordinary reviews keep the raw return and verified caller conclusion beside it.
+If isolation cannot be established at delivery, retain findings, mark context/verdict
+blocked and append the gap. Actual contamination needs a new reviewer.
 
 | Host | Fresh context | Source protection and validation |
 |---|---|---|
-| Claude Code | The Agent tool with a non-fork subagent type starts an isolated context without the parent transcript. A fork inherits the conversation and does not qualify. | For active validation, use a dedicated agent whose host permissions allow execution and edits only in the isolated workspace, while protecting the pinned sources. `Explore` and `Plan` deny Write and Edit and lack the Agent tool: they support static reads but cannot write tests or dispatch the required falsification check. Observe loaded project instructions per session and carry the needed rules and scope in the brief. |
-| Codex | A new `codex exec` session receives the brief without a resumed or forked transcript. Keep `multi_agent` enabled for a `spawn_agent` falsifier with `fork_turns: "none"`; children inherit the sandbox, so verify their available access too. `codex review` uses Codex's own review prompt rather than this skill; use it only when requested and label it accordingly. | For active validation, use `--sandbox workspace-write -C <isolated-workspace>` with the pinned sources outside writable roots, or an equivalent host policy. Verify actual roots and source protection; the sandbox label alone is insufficient. On Windows the sandbox mode comes from the user configuration's `windows.sandbox`; a launch with `--ignore-user-config` passes it with `-c`, or the session refuses every command, reads included. Use `read-only` for static review when writable validation is unavailable. Enable only authorized data tools; filesystem sandboxing does not make a database connection read-only. |
-| Other | Any launch whose configuration shows no transcript inheritance. | Protect pinned sources and shared state through the host's filesystem and tool policies; grant experiment writes only in the isolated workspace. Name the actual boundaries in the report. |
+| Claude Code | Non-fork Agent context without parent transcript. | Active validation protects pinned sources and permits writes only in the isolated workspace. Explore/Plan deny Write/Edit and lack Agent: static reads work, test writes and required falsification do not. Observe loaded project instructions and supply needed rules/scope in the brief. |
+| Codex | New `codex exec`, no resume/fork inheritance; enable `multi_agent` for a falsifier with `fork_turns: "none"`. | Static review can use `read-only`. Active validation uses `workspace-write -C <isolated-workspace>` with sources outside writable roots, or verified equivalent policy. Check actual roots/child access. Windows needs configured `windows.sandbox`, including with `--ignore-user-config`. Enable only authorized data tools; filesystem policy does not make database calls read-only. `codex review` supplies its own prompt: use only when requested and label it. |
+| Other | Host establishes no transcript inheritance. | Protect source/shared state, permit writes only in an isolated validation root and record actual boundaries. |
 
-When no row applies and the host offers no equivalent, the review is blocked
-for lack of context isolation; the caller reports that rather than reviewing
-in its own context.
+Without a verified mechanism, keep isolation blocked instead of reviewing in the
+caller's context. Concurrent writers use separate workspaces.
