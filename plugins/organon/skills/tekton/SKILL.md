@@ -19,11 +19,10 @@ comparison only when they resolve a concrete decision or risk.
 
 ## Establish the contract
 
-Identify the requested outcome, what must remain true, and the evidence that
-could distinguish a plausible wrong implementation. Separate requirements from
-characterization: existing behavior can guide preservation, while a bug fix
-needs an expectation independent of the defect. When exact values are unavailable,
-use a justified invariant, comparison or replay.
+Identify the requested outcome, preserved contracts and evidence that would
+distinguish a plausible wrong implementation. Characterization supports
+preservation; a bug fix needs an expectation independent of the defect. Use a
+justified invariant, comparison or replay when exact values are unavailable.
 
 Trace the affected entry points through decisions, state changes and effects
 to their consumers. Inspect the boundaries that establish identity, order,
@@ -41,10 +40,8 @@ owner. Reuse upstream invariants; a new defense needs a reachable failure the
 owning boundary does not already exclude. Investigate technical facts directly;
 ask for missing user intent or authority while continuing independent work.
 
-A local change needs only a brief account. Keep a compact contract/evidence/gap
-record when several flows or release stages make it useful. When scratch files
-are needed, use `.scratch/YYYYMMDD-task-name/` in the user's timezone, reuse it
-on resumption, and honor an explicit output path.
+Put needed scratch files in `.scratch/YYYYMMDD-task-name/` in the user's timezone;
+reuse the folder on resumption and honor an explicit output path.
 
 ## Implement coherent slices
 
@@ -73,10 +70,9 @@ as values; names and comments do not establish the requested improvement.
 
 ## Verify the affected properties
 
-Use the smallest surface that decides the claim. Derive assertions from the
-contract and confirm that they execute the real relevant logic and observe its
-result. Add or strengthen a test for a missing case that matters; routine
-reversible edits need no new test that repeats the implementation.
+Derive checks from the contract. Use the smallest surface that exercises the
+relevant logic and observes its result. Add or strengthen a test for a missing
+case; routine reversible edits need no new test that repeats the implementation.
 
 Select checks for the actual risks: committed effects and recovery, repeated
 execution, controlled concurrency, or old/new callers and stored data. A local
@@ -92,9 +88,8 @@ or intermittent reproduction explicit; revert a change whose motivating
 hypothesis the evidence refutes, preserving concurrent work.
 
 Use targeted mutation or fault injection when a plausible critical mistake
-could escape the selected checks, especially after guard changes. Before using
-one of these techniques, read its branch below. Mere compile failure or harness
-failure is not evidence that a behavioral oracle detected the intended defect.
+could escape the selected checks, especially after guard changes; read its
+branch below before selecting a fault.
 
 Obtain independent review when the task or repository requires it, or for changes
 to concurrency, authorization, data spanning versions, hard-to-recover effects,
@@ -110,9 +105,9 @@ gate rules. Once a failed run establishes a pre-existing or environmental blocke
 reuse its receipt and keep that gate open. Retry when inputs relevant to the failure
 change, or when the run can distinguish a concrete new diagnostic hypothesis.
 Use a proven focused entry for independent claims; its success does not pass the
-blocked gate. If a finding refutes an evidence claim, rederive claims of the same
-kind in the slice. Test a suspected shared cause before repairing several defects;
-validate each finding against the repair and keep independent defects separate.
+blocked gate. Rederive claims of the same kind when a finding refutes one.
+Test a suspected shared cause before repairing several defects, then validate
+each finding against the repair; keep independent defects separate.
 
 ## Load branch details when needed
 
@@ -133,14 +128,13 @@ validate each finding against the repair and keep independent defects separate.
 
 ## Close the requested outcomes
 
-Check the final diff for scope and unintended changes. Report the requested
-outcome, decisive checks and material gaps in the user's language; prose can
-suffice. Judge behavior, structure and cost separately. Explain structural gains
-in rule ownership, caller knowledge or coordinated edit points; for migration,
-close the removal target or name the remaining stage and exit condition.
+Check the final diff for scope and unintended changes. Report outcomes, decisive
+checks and material gaps in the user's language. Judge behavior, structure and
+cost separately. Explain structural gains in rule ownership, caller knowledge
+or coordinated edit points; name any remaining migration stage and exit condition.
 
-Bind verification and any required completed review to the final material
-revision, with findings dispositioned. Keep failed checks classified as
-introduced, pre-existing or environmental. An essential missing check or review
-leaves the affected acceptance claim open; report implementation and local
-verification separately, and continue work independent of the blocker.
+Bind verification and required review, with findings dispositioned, to the final
+material revision. Classify failed checks as introduced, pre-existing or
+environmental. A missing essential check or required review leaves the affected
+acceptance open; report what is implemented and locally verified, and continue
+independent work.

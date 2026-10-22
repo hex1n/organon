@@ -17,22 +17,16 @@ Establish three things before restructuring:
 - **Removal target:** the obsolete path and temporary structures that should
   disappear, including any external condition that delays their removal.
 
-Establish characterization evidence through the relevant current interface.
-Use requirements to resolve intended changes; preserve characterized behavior
-only within the agreed contract. Each proposed artifact should serve a target
-or a necessary transition.
+Characterize preserved behavior through the current interface; the contract in
+Tekton governs intended changes. Each artifact serves a target or its transition.
 
 ## Separate movement from meaning
 
-Keep behavior-preserving movement distinguishable from changes to ownership or
-caller obligations. Moving or renaming code can be mechanical; changing state
-meaning, errors, ordering, effects, compatibility, or required caller knowledge
-needs its own expectation and evidence. Moving a decision to a new owner also
-needs structural verification even when its observable behavior is conserved.
-
-Prefer separate slices when this makes equivalence easier to establish. When
-movement and semantic change cannot be separated, state both obligations and
-verify both. Avoid labeling a slice mechanical because it mostly moves lines.
+Separate mechanical movement from changes to state meaning, errors, order,
+effects, compatibility or caller obligations when that makes equivalence easier
+to establish. Otherwise state and verify both obligations. A new decision owner
+needs structural evidence even with unchanged behavior; moved lines alone do
+not make a slice mechanical.
 
 ## Choose the transition
 
@@ -54,6 +48,8 @@ For each meaningful stage, establish:
 - what observation demonstrates that the stage succeeded;
 - how to recover if it fails, given the state it may already have written.
 
+Verify behavior, structural obligations and recovery before advancing the stage.
+
 Introduce compatibility before a stage relies on it. Check reachable mixed
 states, including older readers and writers that may still be active. Expand
 before migrating data; contract only after the remaining consumers and recovery
@@ -63,48 +59,32 @@ Shadow or differential execution is useful only when duplicate effects are
 suppressed or isolated. Keep one authoritative result and effect path while
 comparing observable behavior.
 
-Track each temporary surface's purpose, accountable owner, removal condition
-and evidence that removal is safe. Use actual ownership evidence; keep unknown
-owners and exits unresolved, with removal pending while either is unknown.
-Continue reversible preparations and use existing task records.
+Track each temporary surface's purpose, accountable owner, removal condition and
+safety evidence in existing task records. Keep removal pending while the owner
+or exit is unknown; continue independent reversible preparations.
 
-## Migrate and verify
-
-Keep every reachable intermediate state valid. Establish the current contracts
-and introduce required compatibility before moving a consumer or data cohort.
-Verify behavior, structural obligations and recovery before advancing. Remove
-the old path only when the transition's exit evidence permits it, then verify
-through the target interface. An atomic replacement can meet these obligations
-in one change.
+## Migrate and recover
 
 After migration slices, check for duplicated rules and new consumers of the old
 path. Stop advancing the affected migration on an unexplained mismatch. Resolve
 it as a defect, an intended change, or a missing authority decision before moving
 more consumers; continue work independent of that mismatch.
 
-Recovery must match the actual state. Code rollback works only while code, data,
-and already-emitted effects remain compatible. Otherwise establish a tested
-forward repair, restore, or compensation path appropriate to the consequence.
-Prepare and test recovery in the authorized environment; deployment, destructive
-data changes, and live recovery remain subject to the user's authorization.
+Code rollback works only while code, data and emitted effects remain compatible.
+Otherwise establish a tested forward repair, restore or compensation path for
+the actual state. Prepare and test recovery in the authorized environment;
+deployment, destructive data changes and live recovery require authorization.
 
 ## Verify the targets and remove obsolete paths
 
-Check the targets against the final code and evidence:
+Check the targets on final code: intended decision owners and dependency
+direction, reduced caller obligations and complexity hidden by the interface.
+A facade that leaves all caller knowledge in place has not met that target.
+Verify preserved results, errors and effects through the target interface.
 
-- Preserved behavior holds through the target interface, including errors and
-  effects previously guarded by the old implementation.
-- Decisions have the intended owners, dependencies follow the target direction,
-  and callers no longer reproduce hidden rules or coordinate internal steps.
-- The interface hides the intended complexity; a facade that leaves all caller
-  knowledge in place has not achieved that target.
-- Searches and runtime or consumer evidence, as appropriate, establish that old
-  paths can be retired. Retain compatibility required by unresolved external exits.
-- Remove obsolete implementations, expired adapters and flags, generated
-  artifacts, and tests tied solely to retired internals. Preserve behavioral
-  cases at the target interface and rerun the affected checks after removal.
-
-Explain the structural gain with concrete changes in caller knowledge, decision
-ownership, dependencies, or coordinated edit points. A completed migration stage
-can still have an open removal target. Report that stage and its remaining exit
-condition instead of claiming the final refactor is complete.
+Use searches and appropriate runtime or consumer evidence to establish safe
+retirement; unresolved external exits retain their compatibility surface.
+Remove obsolete implementations, expired adapters and flags, generated artifacts
+and tests tied solely to retired internals. Preserve behavioral cases at the
+target interface and rerun affected checks after removal. Report remaining stages
+and exits under Tekton's hand-off rule.

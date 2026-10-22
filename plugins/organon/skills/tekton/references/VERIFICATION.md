@@ -11,12 +11,10 @@ If the check rejects incidental naming, syntax or layout, narrow it to the
 required property. A spelling or representation is fixed only when the contract
 fixes it.
 
-Inspect a test double at the boundary whose behavior the conclusion depends on.
-Preserve the relevant generation, storage and read semantics: identity creation,
-ordering, normalization, the fields a write replaces or keeps, or transaction
-effects. Run that boundary
-for real when the fake cannot reproduce the deciding behavior. Keep unavailable
-semantics explicit rather than treating the substitute's result as proof.
+At a deciding test-double boundary, preserve generation, storage and read
+semantics: identity creation, order, normalization, replaced or retained fields,
+and transaction effects. Use the real boundary when the fake cannot reproduce
+the deciding behavior; keep unavailable semantics explicit.
 
 Pair the contract-preserving change with a plausible contract violation. Passing an
 equivalent change alone does not show that the check detects a defect; a rejected
@@ -43,27 +41,19 @@ Preserve compile-time and runtime settings where they differ; a runtime launcher
 shortcut does not establish that a separate compiler resolves the same dependencies.
 Change only the fault and the source/output locations required by isolation.
 
-For each selected fault:
+Establish a passing unmutated control under the experiment's relevant settings.
+Reuse a still-applicable receipt; a changed build/test entry needs its own control.
 
-1. Establish that the intended checks pass on unmutated code under the experiment's
-   relevant settings. Reuse a still-applicable receipt; a changed build/test entry
-   needs its own unmutated control. Only a passing check can detect a fault.
-2. Introduce one representative fault in an isolated copy or test harness.
-3. Confirm the code under test includes the fault and the intended observation
-   detects its consequence.
-4. Remove or restore only that experimental change. Confirm the actual implementation
-   passes after the experiments; an isolated batch can share this final run while
-   its source, inputs and environment remain applicable.
+For each selected fault, introduce it in an isolated copy or test harness, confirm
+the executed code includes it, observe its consequence, then remove or restore
+only that experimental change. Preserve concurrent edits and keep experiments out
+of shared installations, live data and live services. Confirm the actual
+implementation passes after the experiments; an isolated batch can share this
+final run while its source, inputs and environment remain applicable.
 
-Keep experiments out of shared installations, live data, and live services.
-Preserve concurrent edits when restoring a local experiment. A compile failure,
-unrelated exception, or harness failure does not show that a behavioral check
-detects the intended defect.
-
-Interpret each result by cause. A verdict is differential and per test: the
-test passed on the baseline and fails on the fault, on the assertion for the
-property under test; an exit code only locates a failure. A scripted batch
-records this for every fault.
+Compare each test's passing baseline with its fault result and the affected
+property's assertion. Classify by cause; an exit code alone is insufficient.
+A scripted batch records this for every fault.
 
 - **Detected:** the intended check fails for the affected property.
 - **Missed:** the fault is reachable and behaviorally meaningful, but the checks
@@ -71,9 +61,10 @@ records this for every fault.
 - **Not exercised:** the faulted path was not reached; coverage remains open.
 - **Equivalent or irrelevant:** explain why the fault cannot violate this
   contract under supported inputs. Do not count it as detected.
-- **Invalid or inconclusive:** the fault or execution failed before the intended
-  behavior could be observed, including a harness or test double lacking the
-  input the fault now reaches. Correct the experiment or report the limitation.
+- **Invalid or inconclusive:** compilation, an unrelated exception, the harness
+  or a test double prevents observing the intended behavior, including an
+  unprepared input the fault now reaches. Correct the experiment or report the
+  limitation; this does not count as detection.
 
 Investigate meaningful survivors rather than optimizing a score. A result
 belongs to the exact test and implementation it ran against: editing,
@@ -110,9 +101,8 @@ establish which alternative is better.
   work's share, stating the assumptions. If an independently removed part took
   fraction p (0 <= p < 1) of the original time for a fixed workload and the
   rest is unchanged, time falls by at most p of its original value. Throughput
-  is at most 1 / (1 - p) times its original value. For p = 0.10, those are
-  10% less time and about 11% more throughput. An apparent violation calls for
-  checking timing scope, caching, work counts, and other changed factors.
+  is at most 1 / (1 - p) times its original value. An apparent violation calls
+  for checking timing scope, caching, work counts and other changed factors.
 - **Claim boundary.** Keep a microbenchmark result local until a representative
   user-facing workload establishes its end-to-end effect. Report a sound local
   result when that larger path is unavailable, naming the unverified impact.
