@@ -38,15 +38,22 @@ observable state. For rollback, the operation must change business state before
 the failure; after an idempotent rerun or other no-op, omitted rollback leaves
 the same state, so the check cannot detect it.
 
+Reuse the successful build/test invocation, toolchain and resolved dependencies.
+Preserve compile-time and runtime settings where they differ; a runtime launcher
+shortcut does not establish that a separate compiler resolves the same dependencies.
+Change only the fault and the source/output locations required by isolation.
+
 For each selected fault:
 
-1. Run the baseline on the unmutated code and confirm the intended checks
-   execute and pass. Only a passing check can detect a fault.
+1. Establish that the intended checks pass on unmutated code under the experiment's
+   relevant settings. Reuse a still-applicable receipt; a changed build/test entry
+   needs its own unmutated control. Only a passing check can detect a fault.
 2. Introduce one representative fault in an isolated copy or test harness.
 3. Confirm the code under test includes the fault and the intended observation
    detects its consequence.
-4. Remove or restore only that experimental change, then rerun the check on the
-   actual implementation.
+4. Remove or restore only that experimental change. Confirm the actual implementation
+   passes after the experiments; an isolated batch can share this final run while
+   its source, inputs and environment remain applicable.
 
 Keep experiments out of shared installations, live data, and live services.
 Preserve concurrent edits when restoring a local experiment. A compile failure,

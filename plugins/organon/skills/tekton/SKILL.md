@@ -105,9 +105,13 @@ instructions before dispatch or remediation. No sibling skill is required.
 Unavailable required review leaves acceptance open; other work is self-reviewed.
 
 Reuse evidence only while its relevant source, inputs and environment remain
-applicable. Rerun invalidated checks and required repository gates on the final
-version. If a finding refutes an evidence claim, rederive claims of the same kind
-in the slice. Test a suspected shared cause before repairing several defects;
+applicable. Rerun invalidated checks and follow the repository's final-version
+gate rules. Once a failed run establishes a pre-existing or environmental blocker,
+reuse its receipt and keep that gate open. Retry when inputs relevant to the failure
+change, or when the run can distinguish a concrete new diagnostic hypothesis.
+Use a proven focused entry for independent claims; its success does not pass the
+blocked gate. If a finding refutes an evidence claim, rederive claims of the same
+kind in the slice. Test a suspected shared cause before repairing several defects;
 validate each finding against the repair and keep independent defects separate.
 
 ## Load branch details when needed
