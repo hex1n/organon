@@ -18,8 +18,9 @@ designated as the contract at a particular revision. With no established authori
 retain useful characterization scenarios and mark the intended result
 `NEEDS-DECISION`. Agreement with the implementation does not resolve that decision.
 
-Trace the normal route from entry to completed outcome. Include a producer flow when
-it creates a prerequisite the journey must exercise. For a change, follow affected
+Trace each in-scope business outcome from its legitimate entry to completion. Follow
+the same actor and compatible fixture state through the journey, including a producer
+flow when it creates a prerequisite the journey must exercise. For a change, follow affected
 contracts through shared writers, readers, callers, and subscribers to other business
 outcomes. Inspect alternate entries and asynchronous or recovery paths the change
 can reach; retain unresolved impact as a gap instead of silently narrowing scope.
@@ -34,9 +35,10 @@ and retaining the original coverage obligation.
 
 ## 2. Identify coverage and choose its layer
 
-Account for the requested rules, accepted and rejected input partitions, boundaries,
-state transitions, and affected flows. A short list mapping these to scenarios or
-gaps is sufficient when the mapping is direct.
+Partition inputs and prior state by their observable effects, including accepted
+changes and accepted no-change cases. Account for requested rules, rejected inputs,
+boundaries, transitions, and affected flows. A short mapping to scenarios or gaps
+is sufficient when the obligations are direct.
 
 Read [Coverage Models](REFERENCE.md#coverage-models) when conditions interact,
 rules overlap, retries or concurrency introduce alternative transitions, a shared
@@ -44,6 +46,11 @@ change affects multiple flows, or the user requests a matrix or formal traceabil
 Build only the models that explain those obligations. The reference also defines
 when an explicit test-requirement ledger is useful; a simple plan needs neither
 that ledger nor a table proving that unused models are inapplicable.
+
+Instantiate each chosen criterion before claiming coverage: identify the feasible
+input tuples, competing conditions, or transitions and the assertion each needs.
+Map each instance to a scenario, an inspected lower-layer assertion, or a named gap.
+For precedence, the selected fixture must make the competing rules apply together.
 
 Allocate each obligation to the lowest layer that exposes the fault: unit for local
 calculations and validation; integration for component contracts, persistence, and
@@ -57,31 +64,27 @@ is a plan fact, never an executed-pass claim, and never authorization to write t
 
 ## 3. Write the scenario tree
 
-Keep each scenario's definition under its business branch. Put the shortest complete
-Primary Happy Path first, then attach variants at the step where they diverge. Include
-affected-flow regressions and source-backed failure or recovery branches. When the
-contract is negative-only, put its canonical verification path first and explain why
-there is no positive Happy Path.
+Start with the shortest complete Primary Happy Path: one coherent fixture's ordered
+actions from entry through the final business observation. Attach variants at the
+step where that path diverges, showing the common prefix and changed condition.
+Give independent outcomes their own complete paths, including affected-flow
+regressions. Queries, submission, and asynchronous completion belong to the journey
+they advance; each is a separate outcome only when the requested contract makes it
+one. A negative-only contract starts with its canonical verification path and states
+why no positive Happy Path applies.
 
-Declare `Execution handoff: execution-anchors/v1` in the overview; localize the label,
-preserve the token. Each stable scenario ID has a purpose and these effective facts:
+Keep definitions under those business branches, with stable scenario IDs. Grouping
+nodes hold shared context; executable scenarios identify their complete route and
+terminal assertion. A list of endpoint probes or a later success case using a
+different incompatible fixture does not establish the Primary Happy Path. Missing
+live data can block a path; still define its compatible selection or construction
+conditions and retain the missing capability.
 
-| Fact | Required content |
-|---|---|
-| Preconditions | Concrete starting state and inputs, or deterministic construction/selection rules; predecessor scenario IDs only where genuinely required. |
-| Actions | Ordered business actions through a source-backed entry or adapter, naming the stable operation and its inputs. |
-| Observes | Final contractual observation and completion predicate. Record an approved product time threshold, or `business threshold: none specified`. |
-| State Footprint | Resources read, written, and external effects; `none` for an empty class. Every writable/external target names provenance or ownership and allowed lifecycle: `retain`, `restore`, or `delete`. |
-| Capabilities | What judging this scenario needs beyond the entry under test — the probes its observations read and the access they require; `entry only` when the response settles it. Execution selects against this, so a session lacking one blocks that scenario by name instead of discovering it mid-run. |
-| Expected Results | Concrete values, errors, or invariants that distinguish correct from incorrect behavior. |
-| Oracle / Expected Authority | `specified` for approved expected values, or `derived` for an independent reference/relation; name the governing source, revision, and calculation. |
-| Implementation Evidence | Locators supporting the entry, state, observation, and footprint; these establish mechanics, not business correctness. |
-
-The first five facts are the execution anchors. Resolve business facts here; the
-execution stage resolves live targets, credentials, commands, safety wait bounds, owner
-markers, and cleanup implementations. Keep a known project command when it is the
-stable entry interface. Missing business decisions stay `NEEDS-DECISION`; missing
-source anchors stay `BLOCKED`. Either can be planned, but neither is execution-ready.
+Read [Effective scenario facts](REFERENCE.md#effective-scenario-facts) when writing
+the tree. Declare `Execution handoff: execution-anchors/v1` in the overview;
+localize the label, preserve the token. Every executable scenario needs the eight
+effective facts defined there. Present them through scoped shared context and
+branch-specific detail so the business journey remains readable.
 
 A synchronous query or calculation can finish in its complete response. Establish a
 read-only footprint from the adapter and inspected call path; that alone creates no
@@ -93,9 +96,10 @@ requires it. Execution-safety timeouts are not business failure thresholds.
 
 Co-locate shared facts on the nearest parent. An omitted child field inherits the
 complete parent value; a child replacement restates the whole effective field.
-This atomic rule also governs execution and any derived view. Add priority, step IDs,
-and `Requirements` links when they aid selection or traceability; their absence does
-not invalidate an otherwise complete handoff.
+This atomic rule also governs execution and any derived view. A variant's changed
+condition preserves the entry's other eligibility conditions and the journey's
+shared assertions. Add priority, step IDs, and `Requirements` links when they aid
+selection or traceability; their absence does not invalidate a complete handoff.
 
 ## 4. Close and deliver
 
@@ -103,11 +107,24 @@ Use an overview, the scenario tree, and coverage/gaps as the default shape. Plac
 sources beside the facts they support; add flow diagrams and model tables where
 they explain a decision. Do not reproduce the tree as a second scenario inventory.
 
-Check that every in-scope obligation has a scenario, an inspected lower-layer
-assertion, or an explicit gap; all referenced IDs resolve; inherited anchors and
-expected values are coherent. When using a ledger, reconcile both mapping directions.
+Walk each complete path using its stated fixture and actions: every step must accept
+the state produced by the previous step and reach the asserted business outcome.
+Derive entry-visible values and errors through the full adapter and translation
+path, including transaction and exception wrappers that can change the response.
+Resolve each executable branch's inherited facts under the atomic replacement rule.
+Check the resulting conditions, footprint, capabilities, and assertions together:
+could a fixture satisfy them yet be rejected before the intended branch, or could a
+required invariant be broken while all its assertions pass? Repair the definition
+or expose the missing fact as a gap.
+
+Reconcile the instantiated coverage obligations with the tree, inspected lower-layer
+assertions, and gaps. Check that all referenced IDs resolve; when using a ledger,
+reconcile both mapping directions. Model headings and filled fields alone do not
+establish these properties.
 End with the smallest useful first slice: the Happy Path and highest-risk required
-branches, identified by scenario ID.
+branches, identified by scenario ID. This orders the initial execution; it narrows
+the requested coverage only when the user selected that subset. Keep remaining
+in-scope obligations and their readiness visible.
 
 Use `NEEDS-DECISION` for unresolved authority, `BLOCKED` for unavailable execution
 evidence or capability, and `OUT-OF-SCOPE` for a stated exclusion. `ASSUMED` requires
@@ -115,17 +132,18 @@ an explicitly accepted temporary premise and the accepting owner. Keep unresolve
 items and missing lower-layer tests visible without inflating the E2E tree.
 
 Save Markdown as `.scratch/{feature}/e2e/{date}-{feature}-e2e-test-plan.md` unless the
-user specifies a path, and link it in the reply. Hand its HTML view to a fresh-context
-agent per the hand-off in [../READER-VIEW.md](../READER-VIEW.md), or author it here
-when the runtime has no subagents. Planning ends with the plan; execute tests or
-implement test code only when the task authorizes it.
+user specifies a path, and link it in the reply. Produce its HTML view through
+[../READER-VIEW.md](../READER-VIEW.md). A ready business plan can hand off authorized
+execution while its view is being prepared; presentation work does not gate that
+handoff. Planning alone authorizes neither test execution nor test-code changes.
 
 ## 5. Hand off to execution (run mode only)
 
 Continue to execution only when the selected mode includes it.
-Use the user's scenario selection, otherwise the first slice.
-Those scenarios must carry no `NEEDS-DECISION` or `BLOCKED` item.
-If they do, deliver the plan with its missing decisions or evidence.
+Honor the user's scenario selection; otherwise begin with the first slice and
+continue ready in-scope obligations under the same authorization. Execute only
+scenarios carrying no `NEEDS-DECISION` or `BLOCKED` item. Report the missing decisions
+or evidence for the others while continuing independent ready work.
 
 Use [the execution handoff](../run/HANDOFF.md) for fresh context, the brief,
 parent/executor responsibilities and the no-subagent fallback.

@@ -41,9 +41,11 @@ For run, render, and brief, select the starting artifact in this order:
 
 1. If the ask names a plan (`*-e2e-test-plan.md`) or execution report
    (`*-e2e-test-report.md`), use that artifact. If it does not exist, report it as missing.
-2. Otherwise, resolve the feature from the ask, then from the task already in the
-   conversation. If a feature is known, select the newest artifact under
+2. Otherwise, resolve the feature and requested business outcome from the ask,
+   then from the conversation. Select the newest applicable artifact under
    `.scratch/{feature}/e2e/`: plans are there, and reports are under its `runs/`.
+   Check its expectations and coverage against the current request; a related
+   feature's report is background, not an execution plan for new behavior.
 3. If neither the ask nor the conversation names a feature, select the newest
    artifact across `.scratch/*/e2e/`. State which feature it belongs to.
    If two artifacts are equally recent, ask the user to choose.
@@ -51,11 +53,15 @@ For run, render, and brief, select the starting artifact in this order:
 Harness mode starts from the repository and its existing `docs/verify/`, not from
 a plan or report; run mode reads that harness when it exists.
 
-A report means a continuation. In render mode, never create a substitute plan.
-A scenario described only in the ask is planning input, however complete it
-reads. The planning rules scale a plan down to one scenario.
+A report means a continuation of the outcome it covers. A harness supplies
+execution mechanics, not scenario coverage. For run mode without an applicable
+business plan, follow planning first; establish the scenario tree and gaps before
+selecting an executable slice. In render mode, never create a substitute plan.
+A scenario described only in the ask is planning input; planning can scale to one
+scenario while retaining the requested outcome and affected flows.
 Before reading any stage's rules, state the mode and its starting artifacts.
 
-Deliver with the HTML view first when it exists, then the canonical Markdown, and the
-summary the stage file specifies. A harness has no HTML view: deliver its files and
-the proof run's result.
+Deliver verified business findings and the canonical Markdown when ready; complete
+the default HTML view without holding those results for presentation work. When the
+view is ready, link it first with its source and remaining gaps. A harness has no
+HTML view: deliver its files and the proof run's result.

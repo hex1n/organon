@@ -19,8 +19,10 @@ system. For a continuation or inherited scenario fields, read
 [INTAKE.md](INTAKE.md). A straightforward plan can proceed from this
 entrypoint.
 
-Select explicit user-named scenarios first; otherwise the plan's First Test Slice,
-then all ready scenarios by priority.
+Honor an explicit scenario subset. Otherwise select the plan's obligations at the
+requested execution boundary, begin with its First Test Slice, and continue ready
+scenarios by priority. The first slice sets execution order; it is not the whole request's
+completion boundary. Keep unavailable in-scope obligations visible as gaps.
 Record selected IDs and exclusions before execution. Lower-layer test mappings and
 unimplemented follow-ups are coverage context, not extra E2E scenario nodes. Selecting
 a subset preserves its shared prerequisites and safety gates.
@@ -140,5 +142,7 @@ actual state-management, evidence-size, or handoff purpose.
 
 Completion means every selected ID has an honest terminal status and proof or an
 explicit deficit; any retained data has an allowed lifecycle; evidence, current
-source/build identity, and rerun instructions agree. Link the report, summarize all
-nonzero status counts, and state what remains blocked or retained.
+source/build identity, and rerun instructions agree. State whether the requested
+business outcome is covered and name remaining obligations; a completed slice with
+gaps is a partial result. Deliver that result before HTML preparation finishes,
+then supply the checked view. Summarize all nonzero counts and retained state.

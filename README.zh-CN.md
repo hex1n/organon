@@ -44,6 +44,7 @@ claude plugin install organon@organon
 | [`euthyna`](plugins/organon/skills/euthyna/) | 审查 | 用有证据的反例审查代码与变更，区分缺陷、未验证风险、待决事项和可选改进；只读报告，不代替实施修复。 |
 | [`peira`](plugins/organon/skills/peira/) | 验证 | 规划、执行并呈现端到端测试：可溯源的业务场景树、把缺陷交回调用方另行授权修复的证据化执行报告，明确要求时才做有上限的直至全绿循环，以及 HTML 阅读视图。开头带 `plan`、`run`、`render`、`brief` 或 `harness` 时选定模式：plan 出计划并渲染；run 执行并渲染，无计划时先规划；render 只渲染已有产物；brief 为已完成的报告出一页纸摘要，与报告一起交付；harness 在 `docs/verify/` 下写出项目的验证配方，并以一次端到端实跑证明其可用。 |
 | [`horos`](plugins/organon/skills/horos/) | 落地/验证 | 基于代码契约生成跨 RPC 与 HTTP 协议的后端 API 文档，范围可为单个接口、一个需求的后端 API 或一个分支的 API 变更。 |
+| [`ichnos`](plugins/organon/skills/ichnos/) | 留痕 | 现有记录不足以保留重要选择、转向、阻断或交接依据，或用户明确要求时，记录理由、证据和结果。在任务的 `.scratch/` 文件夹中合并关键检查点，复用工作本身要求的审查。 |
 | [`scholion`](plugins/organon/skills/scholion/) | 导航 | 记录当前代码为什么这样实现，按文件路径或代码片段查找对应的实现理由；记录由个人维护、Git 忽略，支持工作树交接。 |
 
 ## 命名
@@ -61,6 +62,7 @@ claude plugin install organon@organon
 | `scholion`（σχόλιον） | `rationale-records` | 抄本页边针对某一段的批注 | 锚定到代码片段、写在项目文档之外的个人记录 |
 | `horos`（ὅρος） | `generating-api-docs` | 界石；雅典的 horos 公示地块上的负担 | 在边界上写调用方契约，不写实现 |
 | `peira`（πεῖρα） | `e2e-test-workflow` | 试验、尝试；empirical 一词的来源 | 在真实环境中试跑场景 |
+| `ichnos`（ἴχνος） | —（新增） | 足迹、踪迹；猎人循迹找到猎物 | 复核者顺着留痕找回每个决策及其证据 |
 
 `dokimasia` 与 `euthyna` 是雅典官员上任和卸任时各受的一次审查。在这里，它们把审查分成
 实施前的方案评审和实施后的代码审查。
@@ -139,6 +141,12 @@ claude plugin install organon@organon
 - **从代码查理由**：每条记录用文件路径和在文件内唯一匹配的代码片段定位实现，便于修改者找到对应理由。
 - **记录是一次中断**：标题写"改成更自然的写法会破坏什么"——读者是在改代码的当口到达的，适不适用已由锚点回答。
 
+### `ichnos`
+
+- **同步、可归属的记录（ALCOA 数据完整性原则）**：在重要选择发生时记录，每次参与运行标明自己写的行。
+- **只做更正分录、不擦除（簿记）**：写错的行保留，由后面的行取代。
+- **适度审计**：对照证据检查新增的重要记录，并纳入工作本身已经要求的审查。
+
 ## 生命周期定位
 
 ```
@@ -148,6 +156,7 @@ claude plugin install organon@organon
 验证   peira（plan → run → render · brief）· horos
 调研   historia            ← 按需求证
         ↑ 新发现的未知回馈下一轮规划
+按需   ichnos              ← 保留重要决策和交接依据
 ```
 
 这些技能保证「事情做对」。对用户已有方案的拷问（访谈 / grill 类技能）位于

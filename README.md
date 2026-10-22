@@ -49,6 +49,7 @@ for the distribution vocabulary.
 | [`euthyna`](plugins/organon/skills/euthyna/) | review | Review code and changes through evidence-backed counterexamples; separate defects, unverified risks, decision items, and optional improvements without editing the candidate. |
 | [`peira`](plugins/organon/skills/peira/) | verify | Plan, execute, and present end-to-end tests: source-backed scenario trees, evidence-backed execution reports that hand defects back for separately authorized fixes, with a capped iterate-until-green loop on explicit request, and HTML reader views. Typed first, `plan`, `run`, `render`, `brief`, or `harness` selects the mode: plan and render it; run, planning first when no plan exists, and render; render an existing artifact; brief a finished report for readers outside the run, delivered with it; or write the project's verification harness under `docs/verify/`, proved by one end-to-end run. |
 | [`horos`](plugins/organon/skills/horos/) | land/verify | Generate backend API docs across RPC and HTTP protocols from code-backed contracts, for one interface, one requirement's backend API, or a branch's API changes. |
+| [`ichnos`](plugins/organon/skills/ichnos/) | record | Preserve consequential choices, pivots, blockers and handoffs with their reasons, evidence and results when existing records are insufficient, or when a trail is requested. Group material checkpoints in the task's `.scratch/` folder and reuse the work's required review. |
 | [`scholion`](plugins/organon/skills/scholion/) | navigate | Record why current code is implemented this way and find the reason by file path or code snippet; keep records personal and Git-ignored, with worktree handoff. |
 
 ## Naming
@@ -67,6 +68,7 @@ survive only in history and in install links made before the rename; see
 | `scholion` (σχόλιον) | `rationale-records` | marginal note on a manuscript, keyed to one passage | a personal note anchored to one code snippet, outside the project docs |
 | `horos` (ὅρος) | `generating-api-docs` | boundary stone; Athenian horoi publicly declared the obligation on a plot | the caller contract at the boundary, never the implementation |
 | `peira` (πεῖρα) | `e2e-test-workflow` | trial, attempt; the root of *empirical* | scenarios are tried against a real environment |
+| `ichnos` (ἴχνος) | — (new) | track, footprint; the trace a hunter reads back to the animal | a reviewer follows the trail back to each decision and its evidence |
 
 `dokimasia` and `euthyna` were the two scrutinies an Athenian official faced, on
 entering and on leaving office. Here they split review into the plan before
@@ -148,6 +150,12 @@ look when extending it.
 - **Code-to-reason lookup:** each record pairs a file path with a code snippet that matches exactly once in that file, so a maintainer can find the implementation rationale from the code.
 - **A record is an interruption:** its title names what a natural rewrite would break, because the reader arrives mid-edit and the anchor has already answered whether the record applies to them.
 
+### `ichnos`
+
+- **Contemporaneous, attributable records (ALCOA data-integrity principles):** record consequential choices when they arise; each contributing run identifies its rows.
+- **Correcting entries, never erasure (bookkeeping):** a wrong row stays and a later row supersedes it.
+- **Proportionate audit:** check new material rows against their evidence and include them in any review the work already requires.
+
 ## Lifecycle placement
 
 ```
@@ -157,6 +165,7 @@ review-code  euthyna             ← challenge the code and the findings; report
 verify       peira (plan → run → render · brief) · horos
 investigate  historia            ← answer questions from evidence
               ↑ discovered unknowns feed the next plan
+as needed    ichnos              ← preserve consequential decisions and handoffs
 ```
 
 These skills keep the work itself correct. Stress-testing a plan the user

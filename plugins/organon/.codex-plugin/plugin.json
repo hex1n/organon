@@ -1,6 +1,6 @@
 {
   "name": "organon",
-  "version": "0.6.1",
+  "version": "0.7.2",
   "description": "Instruments for coding agents: decide from the root problem, change code without breaking its contracts, and falsify claims before trusting them.",
   "author": {
     "name": "hex1n"
@@ -30,12 +30,13 @@
     "research",
     "api-docs",
     "e2e-testing",
-    "rationale"
+    "rationale",
+    "decision-trail"
   ],
   "interface": {
     "displayName": "Organon",
     "shortDescription": "Decide from the root problem; falsify claims before trusting them.",
-    "longDescription": "Eight skills: first-principles planning, contract-preserving implementation, code review, plan review, deep research, API documentation, E2E acceptance testing, and code rationale records.",
+    "longDescription": "Nine skills: first-principles planning, contract-preserving implementation, code review, plan review, deep research, API documentation, E2E acceptance testing, code rationale records, and decision trails.",
     "developerName": "hex1n",
     "category": "Developer Tools",
     "capabilities": [

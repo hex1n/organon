@@ -1,7 +1,7 @@
 # Planning reference
 
-Read the section selected by the task. The ordinary planning and handoff rules live
-in `PLAN.md`; this file supplies expanded coverage analysis.
+The planning workflow lives in `PLAN.md`. Read Coverage Models for interacting
+coverage obligations and Effective scenario facts when writing the scenario tree.
 
 ## Coverage Models
 
@@ -45,11 +45,13 @@ risk. Start with these defaults:
 | Input space | Base-Choice: a feasible accepted base tuple, then each accepted non-base block with other characteristics held at compatible base values. Cover rejected blocks separately. For source-backed interactions, use All-Combinations for up to three coupled characteristics, Pairwise for larger interaction sets. |
 | Decision logic | Each rule, error code, and independently firing condition, plus precedence where rules overlap. |
 
-Expand the selected criterion into actual obligations: Base-Choice tuples, feasible
-pairs for Pairwise, complete feasible tuples for All-Combinations, or rule/transition
-assertions. Mark infeasible combinations with their constraint. A negative assertion
-cannot close an accepted outcome. Merge obligations one test can satisfy, preserving
-which ones it proves and the independent expected result.
+Represent each instance selected under the criterion with its conditions and
+observable: Base-Choice tuples, feasible pairs for Pairwise, complete feasible tuples
+for All-Combinations, or rule/transition assertions. Give each a coverage reference
+or explicit gap; a criterion name or rule summary is not that mapping. Mark infeasible
+combinations with their constraint. A negative assertion cannot close an accepted
+outcome. Merge obligations one test can satisfy, preserving which ones it proves and
+the independent expected result.
 
 ### Test-requirement ledger
 
@@ -73,3 +75,26 @@ that asserts it; every scenario requirement link resolves back to its row. Keep 
 stable when revising a referenced plan; document retired obligations when existing
 references need them. Consecutive numbering is unnecessary. Old plans without layer
 columns or a ledger remain valid; preserve their established coverage mappings.
+
+## Effective scenario facts
+
+Each executable scenario has a purpose and these effective facts. They describe
+the business case; their headings are not a template to repeat at every tree node.
+
+| Fact | Required content |
+|---|---|
+| Preconditions | Concrete starting state and inputs, or deterministic construction/selection rules; predecessor scenario IDs only where genuinely required. |
+| Actions | Ordered business actions through a source-backed entry or adapter, naming the stable operation and its inputs. |
+| Observes | Final contractual observation and completion predicate. Record an approved product time threshold, or `business threshold: none specified`. |
+| State Footprint | Resources read, written, and external effects; `none` for an empty class. Every writable/external target names provenance or ownership and allowed lifecycle: `retain`, `restore`, or `delete`. |
+| Capabilities | What judging this scenario needs beyond the entry under test — the probes its observations read and the access they require; `entry only` when the response settles it. Execution selects against this, so a session lacking one blocks that scenario by name instead of discovering it mid-run. |
+| Expected Results | Concrete values, errors, or invariants that distinguish correct from incorrect behavior. |
+| Oracle / Expected Authority | `specified` for approved expected values, or `derived` for an independent reference/relation; name the governing source, revision, and calculation. |
+| Implementation Evidence | Locators supporting the entry, state, observation, and footprint; these establish mechanics, not business correctness. |
+
+The first five facts are the execution anchors. Resolve business facts here; the
+execution stage resolves live targets, credentials, commands, safety wait bounds,
+owner markers, and cleanup implementations. Keep a known project command when it
+is the stable entry interface. Missing business decisions stay `NEEDS-DECISION`;
+missing source anchors stay `BLOCKED`. Either can be planned, but neither is
+execution-ready.

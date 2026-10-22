@@ -29,9 +29,11 @@ source revision. Carry forward applicable user overrides and retained-state fact
 
 ### Choose and validate the continuation
 
-Honor the user's explicit scenario selection. Otherwise select previous `failed`,
-`blocked`, and `unverified` scenarios plus dependents that consumed the fixed behavior.
-Explain any affected dependents excluded by the requested scope; do not silently
+Honor the user's explicit scenario selection. Otherwise resume the requested
+outcome's outstanding obligations, including in-scope scenarios never selected or
+executed in the previous slice. For focused fix verification, select previous
+`failed`, `blocked`, and `unverified` scenarios plus dependents that consumed the
+fixed behavior. Explain affected dependents excluded by the requested scope; do not
 claim their regressions were checked. Expand to the entire plan only when impact or
 the user requires it. A subset never waives shared prerequisites or safety gates.
 

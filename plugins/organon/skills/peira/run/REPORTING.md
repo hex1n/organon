@@ -26,7 +26,9 @@ Account for `passed`, `failed`, `blocked`, `unverified`, and `skipped` from the
 selected-scenario records; report/v1 generates their counts in HTML, while other
 formats include them explicitly. An all-pass conclusion requires a
 nonempty selection with every selected scenario passed; zero selected scenarios and
-all-skipped runs are never successful runs.
+all-skipped runs are never successful runs. Scope that conclusion to the selection.
+State which requested business outcomes remain untested or blocked, even when every
+executed case passed; scenario counts do not establish feature coverage.
 
 ### Contents
 
