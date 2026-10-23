@@ -82,6 +82,8 @@ function runRationaleGate(repoRoot) {
     cwd: repoRoot,
     encoding: "utf8",
     windowsHide: true,
+    // The JSON lists every changed path, which outgrows the 1 MiB default in a large worktree.
+    maxBuffer: Infinity,
   });
   const output = [result.error && result.error.message, result.stdout, result.stderr]
     .filter(Boolean).join("\n").trim();

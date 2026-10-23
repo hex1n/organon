@@ -64,9 +64,11 @@ facts. Expose an unsupported assumption or contradiction; distinguish it from a
 confirmed choice that requires the user's decision to change.
 
 Trace supported inputs through decisions, transformations, stored state and
-effects to affected callers and consumers. Check each distinct outcome, including
-unchanged branches receiving new inputs. Correct final values also require valid
-intermediate states, side effects, rejection behavior and recovery.
+effects to affected callers and consumers. For affected write-back paths,
+establish from actual writer and reader semantics whether consumers' required
+contracts still hold. Check each distinct outcome, including unchanged branches
+receiving new inputs. Correct final values also require valid intermediate
+states, side effects, rejection behavior and recovery.
 
 Follow the change's impact into upstream assumptions, downstream readers and
 shared rules. Select boundary and lifecycle cases from those paths: partial
@@ -106,10 +108,13 @@ reasoning can establish a complete path; an unverified material premise stays an
 explicit risk. A structural finding needs a concrete ownership or maintenance
 consequence, even when outputs currently agree.
 
-Run the smallest authorized experiment that distinguishes the competing
-explanations. Execute the real core and derive expected observations independently
-of candidate predicates. Respect fixture provenance and observe effects at the
-boundary the claim concerns. A setup failure establishes no business defect.
+Reuse evidence while its premises remain applicable. Run the smallest authorized
+experiment that distinguishes competing explanations about a remaining material
+uncertainty. End exploratory checks when further runs cannot change the supported
+verdict, carrying unresolved premises into its stated limits. Execute the real
+core and derive expected observations independently of candidate predicates.
+Respect fixture provenance and observe effects at the boundary the claim
+concerns. A setup failure establishes no business defect.
 
 Use ablation when necessity is disputed: remove or simplify the suspect guard,
 branch, state or layer in the validation copy, then compare required behavior and
@@ -124,7 +129,9 @@ After both independent returns, have each reviewer try to falsify the other's
 material conclusions: claims that affect acceptance, business scope or a required
 remedy. Challenge agreement and favorable judgments as well as reported defects.
 Test business authority, reachability, invariant ownership and claimed structural
-cost against the strongest supported alternative explanation.
+cost against the strongest supported alternative explanation. For additional
+challenges of favorable judgments, use existing coverage to prioritize unresolved
+premises whose failure could change the verdict.
 
 For a decisive conclusion based on a shared unchecked premise, or where a wrong
 verdict could cause serious business or system harm, obtain a fresh falsifier on
@@ -154,7 +161,7 @@ material defect or risk; missing business authority limits the affected claim.
 Return concise prose in the user's language and honor requested output formats.
 Review reports findings; repair work needs its own authorization.
 
-On re-review, answer each prior concern on the current code, inspect the repair's
-effects and reuse evidence only while its inputs remain applicable. Close a
-concern with evidence that its mechanism is removed or its premise was false;
-deferral, deletion and repair claims alone do not establish resolution.
+On re-review, answer each prior concern on the current code and inspect the
+repair's effects. Close a concern with evidence that its mechanism is removed or
+its premise was false; deferral, deletion and repair claims alone do not establish
+resolution.

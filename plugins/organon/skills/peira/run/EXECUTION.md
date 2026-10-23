@@ -80,8 +80,7 @@ exceeding only a safety bound is `blocked` as incomplete observation, preserving
 more specific environment/tooling cause.
 
 Finish dependent chains with the contractual cross-store/event/external consistency
-checks. For a rejection that promises unchanged state, retain a before/after or other
-independent invariant probe, including when the error response itself is correct.
+checks.
 
 ## Preserve and clean up
 

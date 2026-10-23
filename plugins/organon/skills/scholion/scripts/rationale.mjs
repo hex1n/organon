@@ -33,7 +33,8 @@ function under(root, candidate) {
 }
 
 function git(cwd, args, { optional = false, encoding = "utf8" } = {}) {
-  const result = spawnSync("git", args, { cwd, encoding, windowsHide: true });
+  // Untracked and ignored listings of a large worktree exceed the 1 MiB default buffer.
+  const result = spawnSync("git", args, { cwd, encoding, windowsHide: true, maxBuffer: Infinity });
   if (result.status !== 0) {
     if (optional) return null;
     const output = [result.error?.message, result.stderr, result.stdout].filter(Boolean).join("\n").trim();

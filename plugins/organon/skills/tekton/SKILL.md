@@ -1,14 +1,15 @@
 ---
 name: tekton
 description: >
-  Use for 实施 / 实现 / 修复 / 改进 / 重构 / 迁移 / 落地 work on code that already
-  has callers, stored data, or tests to keep working: extraction, consolidation,
-  or ownership moves of a rule, constant, or value domain (magic values,
-  divergent copies of one rule); schema, API, protocol, or data migrations;
-  removing, merging, or relaxing a validation or guard; edits that reach more
-  than one module or a published interface; landing a design document or
-  adjudicated plan — even when the user only says 改一下. Delivers the change
-  with evidence that affected contracts hold.
+  Use for 实施 / 实现 / 修复 / 改进 / 重构 / 迁移 / 落地 work on new or existing
+  code without breaking the callers, stored data, or tests it reaches: new
+  features and modules; extraction, consolidation, or ownership moves of a rule,
+  constant, or value domain (magic values, divergent copies of one rule);
+  schema, API, protocol, or data migrations; adding, removing, merging, or
+  relaxing a validation or guard; edits that reach more than one module or a
+  published interface; landing a design document or adjudicated plan — even
+  when the user only says 改一下. Delivers the change with evidence that
+  affected contracts hold.
 ---
 
 # Tekton — Contract-Preserving Implementation
@@ -35,10 +36,31 @@ Preserve observation points whose freshness can change the next decision.
 Preview evidence does not establish the effectful path, and an earlier
 observation does not replace required enforcement at the effect boundary.
 
-For a guard added, removed, narrowed or moved, establish the obligation and its
-owner. Reuse upstream invariants; a new defense needs a reachable failure the
-owning boundary does not already exclude. Investigate technical facts directly;
-ask for missing user intent or authority while continuing independent work.
+Before adding, removing, narrowing or moving a guard (a null/empty, duplicate,
+range or state check, a cross-store equality, a fail-closed branch), establish
+its real entry, owner and oracle:
+
+- **Real entry:** the production path that delivers the illegal shape. A value
+  that could theoretically be absent, or that a sample happens to lack, is not an
+  entry; a model, database or upstream constraint may already exclude it.
+- **Owner:** the database, model or constructor, input boundary or module that
+  owns the invariant. Establish which operations the guard can reject or skip
+  and which obligations remain on either branch. Reuse an invariant upstream
+  already establishes. When a guard only keeps parallel maps, parameters or
+  indexes consistent, merge them
+  into one type so the contradiction cannot be expressed. Keep backfill,
+  migration and repair equalities in SQL, deployment checks or a one-off gate,
+  off the business path.
+- **Oracle:** a production-reachable case whose test fails when the guard is
+  removed or returns the wrong error code. Removing or relaxing a guard needs the
+  inverse: the entry is gone or the owner enforces the rule, and the owning test
+  still passes on the required behavior.
+
+Remove a guard that lacks these answers, or reshape the interface instead.
+Report the answers for each kept guard; one that can be neither justified nor
+removed goes to the user's decision, including a guard the user asked for.
+Investigate technical facts directly; ask for missing user intent or authority
+while continuing independent work.
 
 Put needed scratch files in `.scratch/YYYYMMDD-task-name/` in the user's timezone;
 reuse the folder on resumption and honor an explicit output path.
@@ -70,14 +92,21 @@ as values; names and comments do not establish the requested improvement.
 
 ## Verify the affected properties
 
-Derive checks from the contract. Use the smallest surface that exercises the
-relevant logic and observes its result. Add or strengthen a test for a missing
-case; routine reversible edits need no new test that repeats the implementation.
+Derive checks from the user's outcome and governing contracts; proposed control
+flow is a candidate, not the oracle. When conditions interact, use a combined
+case that distinguishes their scopes and exposes required work skipped by an
+early exit. Use the smallest surface that exercises the relevant logic and
+observes its result. Add or strengthen a test for a missing case; routine
+reversible edits need no new test that repeats the implementation.
 
-Select checks for the actual risks: committed effects and recovery, repeated
-execution, controlled concurrency, or old/new callers and stored data. A local
-result reaches an end-to-end conclusion only if intervening boundaries preserve
-its assumptions; check the first missing connection or leave that claim open.
+Select tests by changed contracts and their callers and dependencies. Run the
+narrowest set covering the affected behavior, integrations and configuration.
+Include committed effects, recovery, repeated execution, concurrency and
+version/data compatibility where affected. Keep that scope for final verification;
+expand only for an explicit repository gate or a concrete coverage or diagnostic
+need. A repository's default full-suite command alone does not establish that need.
+A local result supports an end-to-end claim only across verified boundaries;
+check the missing connection or leave the claim open.
 
 A defect closes where it was reproduced: establish failure before and success
 after through the same entry, inputs and environment, using
@@ -111,6 +140,8 @@ each finding against the repair; keep independent defects separate.
 
 ## Load branch details when needed
 
+- **Writing or changing a test:** read
+  [Writing tests](references/VERIFICATION.md#writing-tests) before writing it.
 - **Structural refactoring:** read [Refactoring](references/REFACTORING.md) before
   choosing the transition. For compatibility/data migration alone, start at
   [Choose the transition](references/REFACTORING.md#choose-the-transition).

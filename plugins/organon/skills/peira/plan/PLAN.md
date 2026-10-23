@@ -96,10 +96,14 @@ requires it. Execution-safety timeouts are not business failure thresholds.
 
 Co-locate shared facts on the nearest parent. An omitted child field inherits the
 complete parent value; a child replacement restates the whole effective field.
-This atomic rule also governs execution and any derived view. A variant's changed
-condition preserves the entry's other eligibility conditions and the journey's
-shared assertions. Add priority, step IDs, and `Requirements` links when they aid
-selection or traceability; their absence does not invalidate a complete handoff.
+This atomic rule also governs execution and any derived view. Name a fixture,
+route, footprint, or assertion set that several scenarios share, with the
+parameters its variants change, and have each variant reference it with its own
+values, as in `F1(sync=off)`, plus any condition it adds. A variant that
+references its base instead of retyping it keeps the entry's other eligibility
+conditions and the journey's shared assertions in effect. Add priority, step IDs,
+and `Requirements` links when they aid selection or traceability; their absence
+does not invalidate a complete handoff.
 
 ## 4. Close and deliver
 
@@ -132,18 +136,30 @@ an explicitly accepted temporary premise and the accepting owner. Keep unresolve
 items and missing lower-layer tests visible without inflating the E2E tree.
 
 Save Markdown as `.scratch/{feature}/e2e/{date}-{feature}-e2e-test-plan.md` unless the
-user specifies a path, and link it in the reply. Produce its HTML view through
-[../READER-VIEW.md](../READER-VIEW.md). A ready business plan can hand off authorized
-execution while its view is being prepared; presentation work does not gate that
-handoff. Planning alone authorizes neither test execution nor test-code changes.
+user specifies a path, and link it in the reply. A plan gets an HTML view only when
+the user asks for one, through [../READER-VIEW.md](../READER-VIEW.md), and that work
+never gates the execution handoff. Planning alone authorizes neither test execution
+nor test-code changes.
+
+Before delivery, have a fresh-context checker try to break the saved plan; a fork of
+the planning context does not qualify. The author's own walk shares the blind spots
+that wrote the plan, and an independent reader with source access is what finds a
+wrong entry-visible error, a dropped inherited condition, or an uninstantiated
+partition. Brief it with the plan path, the request and its authority sources, and
+the pinned source revision; its checklist, for every executable scenario, is §3's
+Primary Happy Path rule plus this section's walk and reconciliation questions. It
+returns each finding with the scenario it breaks and the source location that
+decides it, and names the questions that found nothing. Repair each supported
+finding or record it as a gap, then have the checker confirm the repairs. Without
+subagents, or for a plan with one executable scenario and no inherited facts, run
+the checklist here; the delivery then says the check was not independent.
 
 ## 5. Hand off to execution (run mode only)
 
-Continue to execution only when the selected mode includes it.
-Honor the user's scenario selection; otherwise begin with the first slice and
-continue ready in-scope obligations under the same authorization. Execute only
-scenarios carrying no `NEEDS-DECISION` or `BLOCKED` item. Report the missing decisions
-or evidence for the others while continuing independent ready work.
+Continue to execution only when the selected mode includes it. Pass on the user's
+scenario selection when there is one; otherwise the executor applies RUN.md's
+default selection. Scenarios carrying a `NEEDS-DECISION` or `BLOCKED` item stay out
+of execution; report what each one is missing while independent ready work continues.
 
 Use [the execution handoff](../run/HANDOFF.md) for fresh context, the brief,
 parent/executor responsibilities and the no-subagent fallback.

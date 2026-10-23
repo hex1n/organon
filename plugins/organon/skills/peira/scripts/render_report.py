@@ -14,15 +14,40 @@ import sys
 from urllib.parse import unquote, urlsplit
 
 STATES = ('passed', 'failed', 'blocked', 'unverified', 'skipped')
-LABELS = dict(zip(STATES, ('通过', '失败', '阻塞', '未验证', '跳过')))
 CASE = re.compile(r'^## ([A-Za-z][A-Za-z0-9_-]*) \[(' + '|'.join(STATES) + r')\] (.+)$')
 SHARED = re.compile(r'^## shared:([A-Za-z][A-Za-z0-9_-]*) (.+)$')
 # Dispositions are the closed vocabulary of run/REFERENCE.md#defect-handoffs and
 # stay in their original spelling under the report language policy.
-DISPOSITIONS = ('OPEN', 'CLOSED', 'MITIGATED', 'ACCEPTED', 'CONDITIONAL',
-                'BLOCKED-BY-TOOLING', 'BLOCKED-BY-ENVIRONMENT', 'OUT-OF-SCOPE')
-ISSUE = re.compile(r'^## issue:([A-Za-z][A-Za-z0-9_-]*) \[(' + '|'.join(DISPOSITIONS) + r')\] (.+)$')
-MARKER = '<!-- e2e-reader: report/v1 -->'
+DISPOSITIONS = ('OPEN', 'CLOSED', 'MITIGATED', 'ACCEPTED', 'NEEDS-DECISION', 'BLOCKED', 'OUT-OF-SCOPE')
+# Historical reports keep the tokens they were written with.
+EARLIER_DISPOSITIONS = ('CONDITIONAL', 'BLOCKED-BY-TOOLING', 'BLOCKED-BY-ENVIRONMENT')
+ISSUE = re.compile(r'^## issue:([A-Za-z][A-Za-z0-9_-]*) \[(' + '|'.join(DISPOSITIONS + EARLIER_DISPOSITIONS) + r')\] (.+)$')
+MARKER = re.compile(r'<!-- e2e-reader: report/v1(?: lang=([A-Za-z-]+))? -->')
+# The page's own words; the report body stays in the language it was written in.
+TEXT = {
+    'zh-CN': {
+        'states': ('通过', '失败', '阻塞', '未验证', '跳过'),
+        'brand': '审阅长卷', 'tag': '执行报告', 'overview': '报告总览', 'issues': '问题列表',
+        'cases': '场景用例', 'case_table': '场景总览', 'record': '完整输入、预期、实际与证据',
+        'sources': '资料来源', 'source_link': 'Markdown 事实来源',
+        'issue_head': ('ID', '处置', '问题', '影响场景'),
+        'case_head': ('ID', '场景', '状态', '业务结果与限制'),
+        'issue_total': '共 {count} 项：{spread}。影响场景由各场景的引用得出，与场景计数不同。',
+        'list_sep': '、', 'nav_sep': '　', 'index': '阅读索引', 'case_total': '共 {count} 个场景',
+        'index_notes': ('完整输入与证据收在对应场景内。', '共享资料位于首个场景；各场景正文说明适用范围。'),
+    },
+    'en': {
+        'states': ('Passed', 'Failed', 'Blocked', 'Unverified', 'Skipped'),
+        'brand': 'Reading view', 'tag': 'Execution report', 'overview': 'Overview', 'issues': 'Issues',
+        'cases': 'Cases', 'case_table': 'Case overview', 'record': 'Full inputs, expectations, actual results and evidence',
+        'sources': 'Sources', 'source_link': 'Markdown source of record',
+        'issue_head': ('ID', 'Disposition', 'Issue', 'Affected cases'),
+        'case_head': ('ID', 'Case', 'Status', 'Business result and limits'),
+        'issue_total': "{count} in total: {spread}. Affected cases come from each case's own links and differ from case counts.",
+        'list_sep': ', ', 'nav_sep': ' ', 'index': 'Reading index', 'case_total': '{count} cases',
+        'index_notes': ('Full inputs and evidence sit inside each case.', 'Shared material sits in the first case; each case states where it applies.'),
+    },
+}
 
 
 class InvalidReport(ValueError):
@@ -40,8 +65,12 @@ class Section:
 
 def parse(text):
     lines = text.splitlines()
-    if not lines or lines[0] != MARKER:
+    marker = MARKER.fullmatch(lines[0]) if lines else None
+    if not marker:
         raise InvalidReport('Missing report/v1 marker; only report/v1 Markdown has a view, and a report without it keeps its Markdown as written.')
+    lang = marker[1] or 'zh-CN'
+    if lang not in TEXT:
+        raise InvalidReport('Unsupported marker language ' + lang + '; use ' + ' or '.join(TEXT) + '.')
     if len(lines) < 3 or not lines[1].startswith('# '):
         raise InvalidReport('Expected a single # report title immediately after marker.')
     title = lines[1][2:].strip()
@@ -81,7 +110,7 @@ def parse(text):
     for issue in issues:
         if not issue.text.strip() or issue.text.lstrip().startswith(('#', '|', '-', '```')):
             raise InvalidReport(issue.id + ': start with a business-impact paragraph.')
-    return overview, cases, [s for s in sections[1:] if not s.status and not s.disposition], issues
+    return lang, overview, cases, [s for s in sections[1:] if not s.status and not s.disposition], issues
 
 
 class Markdown:
@@ -245,7 +274,9 @@ def issue_file(target, run_dir):
 
 
 def render(source, text):
-    overview, cases, shared, issues = parse(text)
+    lang, overview, cases, shared, issues = parse(text)
+    words = TEXT[lang]
+    labels = dict(zip(STATES, words['states']))
     md = Markdown(source)
     counts = Counter(c.status for c in cases)
     asset = Path(__file__).resolve().parent.parent / 'references' / 'report.css'
@@ -259,12 +290,12 @@ def render(source, text):
         content = md.blocks(case.text)
         # Which issues a case is affected by is read off the case's own links.
         cited[case.id] = {unquote(t[1:]) for t in md.links[mark:] if t.startswith('#')}
-        rows.append(f'<tr><td><a href="#{case.id}">{case.id}</a></td><td>{html.escape(case.title)}</td><td class="status {case.status}">{LABELS[case.status]}</td><td>{summary}</td></tr>')
+        rows.append(f'<tr><td><a href="#{case.id}">{case.id}</a></td><td>{html.escape(case.title)}</td><td class="status {case.status}">{labels[case.status]}</td><td>{summary}</td></tr>')
         inherited = ''
         if index == 0:
             inherited = ''.join(f'<details class="nested" id="{s.id}"><summary>{html.escape(s.title)}</summary>{md.blocks(s.text)}</details>' for s in shared)
         opened = ' open' if case.status in ('failed', 'blocked') else ''
-        bodies.append(f'<details class="case {case.status}" id="{case.id}"{opened}><summary><span class="summary-line"><span>{case.id} · {html.escape(case.title)}</span><span class="status {case.status}">{LABELS[case.status]}</span></span></summary><div class="case-content">{summary}<details class="nested" id="{case.id}-record"><summary>完整输入、预期、实际与证据</summary>{content}</details>{inherited}<details class="nested"><summary>资料来源</summary><a href="{source.as_uri()}">Markdown 事实来源</a></details></div></details>')
+        bodies.append(f'<details class="case {case.status}" id="{case.id}"{opened}><summary><span class="summary-line"><span>{case.id} · {html.escape(case.title)}</span><span class="status {case.status}">{labels[case.status]}</span></span></summary><div class="case-content">{summary}<details class="nested" id="{case.id}-record"><summary>{words["record"]}</summary>{content}</details>{inherited}<details class="nested"><summary>{words["sources"]}</summary><a href="{source.as_uri()}">{words["source_link"]}</a></details></div></details>')
     issue_rows, issue_bodies, covered = [], [], set()
     for issue in issues:
         mark = len(md.links)
@@ -272,7 +303,7 @@ def render(source, text):
         covered.update(f for t in md.links[mark:] if (f := issue_file(t, source.parent)))
         ident = issue.id[len('issue-'):]
         affected = [c.id for c in cases if issue.id in cited[c.id]]
-        links = '、'.join(f'<a href="#{c}">{c}</a>' for c in affected) or '—'
+        links = words['list_sep'].join(f'<a href="#{c}">{c}</a>' for c in affected) or '—'
         issue_rows.append(f'<tr><td><a href="#{issue.id}">{ident}</a></td><td class="disposition" data-disposition="{issue.disposition}">{issue.disposition}</td><td>{html.escape(issue.title)}</td><td>{links}</td></tr>')
         opened = ' open' if issue.disposition == 'OPEN' else ''
         issue_bodies.append(f'<details class="issue-card" data-disposition="{issue.disposition}" id="{issue.id}"{opened}><summary><span class="summary-line"><span>{ident} · {html.escape(issue.title)}</span><span class="disposition">{issue.disposition}</span></span></summary><div class="case-content">{body}</div></details>')
@@ -286,17 +317,19 @@ def render(source, text):
     issue_link, issues_section = '', ''
     if issues:
         tally = Counter(i.disposition for i in issues)
-        spread = ' · '.join(f'{d} {tally[d]}' for d in DISPOSITIONS if tally[d])
-        issue_link = '<a href="#issues">问题列表</a>'
-        issues_section = (f'<section class="section" id="issues"><h2>问题列表</h2>'
-                          f'<p class="small">共 {len(issues)} 项：{spread}。影响场景由各场景的引用得出，与场景计数不同。</p>'
-                          '<div class="table-wrap"><table class="overview-table"><thead><tr><th>ID</th><th>处置</th><th>问题</th><th>影响场景</th></tr></thead><tbody>'
+        spread = ' · '.join(f'{d} {tally[d]}' for d in DISPOSITIONS + EARLIER_DISPOSITIONS if tally[d])
+        issue_link = f'<a href="#issues">{words["issues"]}</a>'
+        issues_section = (f'<section class="section" id="issues"><h2>{words["issues"]}</h2>'
+                          f'<p class="small">{words["issue_total"].format(count=len(issues), spread=spread)}</p>'
+                          '<div class="table-wrap"><table class="overview-table"><thead><tr>' + ''.join(f'<th>{h}</th>' for h in words['issue_head']) + '</tr></thead><tbody>'
                           + ''.join(issue_rows) + '</tbody></table></div>' + ''.join(issue_bodies) + '</section>')
-    nav = ''.join(f'<a href="#{c.id}">{c.id}　{html.escape(c.title)}</a>' for c in cases)
-    counters = ''.join(f'<div>{LABELS[s]} <b>{counts[s]}</b></div>' for s in STATES)
+    nav = ''.join(f'<a href="#{c.id}">{c.id}{words["nav_sep"]}{html.escape(c.title)}</a>' for c in cases)
+    counters = ''.join(f'<div>{labels[s]} <b>{counts[s]}</b></div>' for s in STATES)
     state = 'attention' if any(c.status != 'passed' for c in cases) else 'clear'
     script = '''function go(scroll){const id=decodeURIComponent(location.hash.slice(1)||'overview');const t=document.getElementById(id);if(!t)return;for(let n=t;n;n=n.parentElement)if(n.tagName==='DETAILS')n.open=true;document.querySelectorAll('nav a').forEach(a=>{if(a.hash==='#'+id)a.setAttribute('aria-current','location');else a.removeAttribute('aria-current')});if(scroll)t.scrollIntoView()}addEventListener('hashchange',()=>go(true));document.addEventListener('click',e=>{const a=e.target.closest('a[href^="#"]');if(a&&a.hash===location.hash){e.preventDefault();go(true)}});go(!!location.hash);'''
-    document = f'''<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>{html.escape(overview.title)}</title><style>{css}</style></head><body><div class="shell"><aside class="sidebar"><p class="brand">审阅长卷</p><p class="tag">执行报告</p><nav class="side-nav"><a href="#overview">报告总览</a>{issue_link}<a href="#cases">场景用例</a></nav><nav class="case-links">{nav}</nav></aside><main class="main"><h1>{html.escape(overview.title)}</h1><section class="overview {state}" id="overview">{main_overview}<div class="counts">{counters}</div></section>{issues_section}<section class="section"><h2>场景总览</h2><div class="table-wrap"><table class="overview-table"><thead><tr><th>ID</th><th>场景</th><th>状态</th><th>业务结果与限制</th></tr></thead><tbody>{''.join(rows)}</tbody></table></div></section><section class="section" id="cases"><h2>场景用例</h2>{''.join(bodies)}</section></main><aside class="right"><h2>阅读索引</h2><p>共 {len(cases)} 个场景</p><p>完整输入与证据收在对应场景内。</p><p>共享资料位于首个场景；各场景正文说明适用范围。</p></aside></div><script>{script}</script></body></html>'''
+    case_head = ''.join(f'<th>{h}</th>' for h in words['case_head'])
+    notes = ''.join(f'<p>{n}</p>' for n in words['index_notes'])
+    document = f'''<!doctype html><html lang="{lang}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>{html.escape(overview.title)}</title><style>{css}</style></head><body><div class="shell"><aside class="sidebar"><p class="brand">{words["brand"]}</p><p class="tag">{words["tag"]}</p><nav class="side-nav"><a href="#overview">{words["overview"]}</a>{issue_link}<a href="#cases">{words["cases"]}</a></nav><nav class="case-links">{nav}</nav></aside><main class="main"><h1>{html.escape(overview.title)}</h1><section class="overview {state}" id="overview">{main_overview}<div class="counts">{counters}</div></section>{issues_section}<section class="section"><h2>{words["case_table"]}</h2><div class="table-wrap"><table class="overview-table"><thead><tr>{case_head}</tr></thead><tbody>{''.join(rows)}</tbody></table></div></section><section class="section" id="cases"><h2>{words["cases"]}</h2>{''.join(bodies)}</section></main><aside class="right"><h2>{words["index"]}</h2><p>{words["case_total"].format(count=len(cases))}</p>{notes}</aside></div><script>{script}</script></body></html>'''
     structure = Structure(); structure.feed(document)
     if len(set(structure.ids)) != len(structure.ids):
         raise InvalidReport('Duplicate or reserved section ID.')

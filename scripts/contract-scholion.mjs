@@ -23,6 +23,7 @@ function run(args, cwd, stateRoot, extraEnv = {}) {
     cwd,
     encoding: "utf8",
     windowsHide: true,
+    maxBuffer: Infinity,
     env: { ...process.env, ASDF_AGENT_STATE_ROOT: stateRoot, ...extraEnv },
   });
 }
@@ -163,6 +164,16 @@ try {
   const stateFile = listFiles(stateRoot).find((file) => file.endsWith(".json"));
   assert.ok(stateFile, "incremental check must create user-local state");
   stage("incremental state");
+
+  // A worktree whose untracked listing exceeds spawnSync's 1 MiB default buffer.
+  const bulk = path.join(repo, "bulk");
+  fs.mkdirSync(bulk);
+  for (let index = 0; index < 10000; index++) {
+    fs.writeFileSync(path.join(bulk, `${"u".repeat(100)}-${String(index).padStart(5, "0")}.txt`), "");
+  }
+  expect(run(["check", "--incremental", "--json"], repo, stateRoot), 0, "incremental check with a large untracked listing");
+  fs.rmSync(bulk, { recursive: true, force: true });
+  stage("large untracked listing");
 
   const lookup = expect(run(["find", "W-001", "--full"], repo, stateRoot), 0, "record lookup");
   assert.match(lookup, /实现理由 第一行先建立状态/);

@@ -212,8 +212,12 @@ scope, the rule it owns, the result it establishes, and the outcome or downstrea
 operation that uses that result. Where code exists, trace how supported entries
 and state transitions produce those inputs. Check what existing consumers assume
 about the result, including assumptions a proposed scope or prerequisite change
-would alter. Derive dependencies from these inputs and results; identify which
-conditions permit an effect and which require it.
+would alter. For each condition, identify the operation it constrains, whether
+failure rejects the request or skips that operation, and which validation,
+results and effects remain required on that path. Derive dependencies and
+observable ordering from these obligations; check interacting conditions where
+an early exit could change the outcome. Distinguish conditions that permit an
+effect from those that require it.
 Identify the business subject of each operation and where its governing rules
 belong. Use these to choose the entry point and express the required dependencies.
 Carry confirmed structural choices and user corrections into the implementation

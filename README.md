@@ -45,8 +45,8 @@ for the distribution vocabulary.
 | [`arche`](plugins/organon/skills/arche/) | plan | Plan or decide from the root problem: separate constraints from assumptions, compare mechanisms, and return the current-best path with its failure condition and next check; also answers whether to build at all and challenges to a recommendation just given. |
 | [`dokimasia`](plugins/organon/skills/dokimasia/) | review | Independently falsify one completed design or plan revision: review-only ends after one complete round with GO, NO_GO, or SUSPENDED; on request, review-and-revise iterates on the exact final revision until every required reviewer returns GO or the review suspends. Depth follows the candidate's risk and decides reviewer strength. |
 | [`historia`](plugins/organon/skills/historia/) | investigate | Evidence-backed investigation whose deliverable is written findings, not a fix: what is true, why behavior occurs, which option the evidence supports. |
-| [`tekton`](plugins/organon/skills/tekton/) | implement | Implement, fix, refactor, or migrate code that already has callers, stored data, or tests to keep working, or land an adjudicated plan; delivers the change with evidence that affected contracts hold, structural improvement when requested, and verification matched to risk. |
-| [`euthyna`](plugins/organon/skills/euthyna/) | review | Review code and changes through evidence-backed counterexamples; separate defects, unverified risks, decision items, and optional improvements without editing the candidate. |
+| [`tekton`](plugins/organon/skills/tekton/) | implement | Implement, fix, refactor, or migrate code, new or existing, or land a design document or adjudicated plan, without breaking the callers, stored data, or tests the change reaches. Traces the affected contracts first, changes code in verifiable slices, closes a defect only where it was reproduced, keeps a guard only with a real entry, an owner and a test that fails without it, and delivers evidence on the final version that the contracts hold. |
+| [`euthyna`](plugins/organon/skills/euthyna/) | review | Establish what correct means, then independently review business and system behavior alongside implementation and structure; investigate defects, unnecessary complexity and material risks, and synthesize the evidence without editing the candidate. |
 | [`peira`](plugins/organon/skills/peira/) | verify | Plan, execute, and present end-to-end tests: source-backed scenario trees, evidence-backed execution reports that hand defects back for separately authorized fixes, with a capped iterate-until-green loop on explicit request, and HTML reader views. Typed first, `plan`, `run`, `render`, `brief`, or `harness` selects the mode: plan and render it; run, planning first when no plan exists, and render; render an existing artifact; brief a finished report for readers outside the run, delivered with it; or write the project's verification harness under `docs/verify/`, proved by one end-to-end run. |
 | [`horos`](plugins/organon/skills/horos/) | land/verify | Generate backend API docs across RPC and HTTP protocols from code-backed contracts, for one interface, one requirement's backend API, or a branch's API changes. |
 | [`ichnos`](plugins/organon/skills/ichnos/) | record | Preserve consequential choices, pivots, blockers and handoffs with their reasons, evidence and results when existing records are insufficient, or when a trail is requested. Group material checkpoints in the task's `.scratch/` folder and reuse the work's required review. |
@@ -62,7 +62,7 @@ survive only in history and in install links made before the rename; see
 | --- | --- | --- | --- |
 | `arche` (ἀρχή) | `first-principles-planner` | origin; first principle | plans from the root problem |
 | `dokimasia` (δοκιμασία) | `assayer` | Athenian scrutiny of an official before taking office; its verb also named the testing of coin | a plan is falsified before it is built |
-| `tekton` (τέκτων) | `arborist` | builder, carpenter; the root of *architect* | builds on code that already has callers, stored data, and tests |
+| `tekton` (τέκτων) | `arborist` | builder, carpenter; the root of *architect* | builds to contract: new code that holds up, existing code whose callers, data, and tests stay intact |
 | `euthyna` (εὔθυνα) | `scrutineer` | Athenian accounting of an official at the end of a term; its examiners dismissed a charge or referred it to a court | code is examined after it is built, and findings go back without repairs |
 | `historia` (ἱστορία) | `deep-research` | inquiry; Herodotus called his work the display of his inquiry | investigation delivered as written findings |
 | `scholion` (σχόλιον) | `rationale-records` | marginal note on a manuscript, keyed to one passage | a personal note anchored to one code snippet, outside the project docs |
@@ -111,16 +111,17 @@ look when extending it.
 - **DRY in its original sense (Hunt & Thomas):** one authoritative owner per rule; callers use the decision without reproducing its conditions.
 - **Evolutionary refactoring patterns (Fowler's catalog):** parallel change, branch by abstraction, strangler, expand-migrate-contract, each exiting on obsolete-path removal.
 - **Incremental delivery:** load-bearing assumptions are checked before each slice, every slice is verifiable, and intermediate states stay valid for callers and data.
+- **Make illegal states unrepresentable (Minsky):** a guard stays only with a production entry that delivers the illegal shape, the invariant's owner, and a test that fails without it; parallel structures merge into one type instead of being guarded.
+- **Tests as oracles:** run the real core behind faked data boundaries, start fixtures from real samples with provenance, and assert values, error codes and final store state at the owning boundary.
 - **Verification matched to risk:** mutation analysis (DeMillo) and focused independent review when warranted.
 
 ### `euthyna`
 
-- **Popperian falsification, in both directions:** challenge the implementation with counterexamples, then seek evidence that refutes each candidate finding.
-- **Contract-based review:** the object under challenge is a threatened requirement or compatibility contract, never historical behavior alone.
-- **Consequence-based severity:** kept separate from evidence strength.
-- **Findings and remedies validated separately:** a confirmed defect does not show that a fix preserves the contracts.
-- **Revision-bound evidence:** every finding is reproducible at the reviewed revision.
-- **Independent reads over one deeper read:** a review that gates acceptance runs two or three fresh reads with different entries and merges them without dropping or voting; each finding stands on its own evidence.
+- **Independent expectations:** derive correctness from the business objective and supported contracts, distinguishing the goal, chosen approach and implementation.
+- **Complementary perspectives:** one reviewer traces business and system outcomes; another examines rule ownership, implementation structure and concrete maintenance cost.
+- **Causal evidence:** establish reachable consequences and challenge the premises of a finding; unresolved material premises remain risks.
+- **Ablation and test oracles:** investigate disputed complexity and defenses with focused experiments, while checking what their observations can establish.
+- **Independent falsification:** challenge material conclusions, including agreement and favorable judgments; resolve them by evidence and retain deciding gaps, distinct affected outcomes and coverage limits.
 
 ### `peira`
 

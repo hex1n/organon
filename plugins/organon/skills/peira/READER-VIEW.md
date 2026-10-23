@@ -2,8 +2,8 @@
 
 Create a desktop reading view of the finalized Markdown plan or report. Markdown
 stays canonical: the page adds no plan facts or test results. Trace every value to
-that artifact, the consumed plan, or linked evidence. Skip HTML when the user asks
-for Markdown only.
+that artifact, the consumed plan, or linked evidence. A report gets this view unless
+the user asks for Markdown only; a plan gets one when the user asks for it.
 
 Save the same-stem `.html` beside the artifact. Regenerate the view when its source
 changes; preserve historical runs. For a redesign of a historical artifact, create
@@ -13,7 +13,7 @@ in OS temp, or in the run's attachments when they are evidence.
 
 ## Routine execution reports
 
-For a Chinese report using the accepted layout, follow
+For a Chinese or English report using the accepted layout, follow
 [report/v1](references/REPORT-FORMAT.md) and run
 [render_report.py](scripts/render_report.py). It uses the bundled
 [report.css](references/report.css), preserves the Markdown body and computes
@@ -37,6 +37,6 @@ produce one, and a brief never stands in for the report.
 
 ## Other views
 
-Plans, other interface languages, and an explicitly requested new layout use
-the [design hand-off](references/READER-DESIGN.md). A rendering error follows report/v1's failure path;
+A requested plan view, other interface languages, and an explicitly requested new
+layout use the [design hand-off](references/READER-DESIGN.md). A rendering error follows report/v1's failure path;
 it does not automatically start a new model-author loop.

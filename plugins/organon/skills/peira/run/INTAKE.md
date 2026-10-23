@@ -8,7 +8,9 @@ run-directory rules live in `RUN.md`.
 
 For `execution-anchors/v1`, resolve shared fields from root to leaf: an omitted child
 field inherits the nearest complete parent value; a defined child field replaces the
-whole value. Partial append/delete inside an inherited field is invalid. Preserve
+whole value. Partial append/delete inside an inherited field is invalid. A reference
+to a named fixture, route, footprint, or assertion set with parameter values is a
+complete value: resolve it from that definition with those values. Preserve
 all five anchors and the approved verdict facts. Priority, business-step IDs,
 requirement links, layer-allocation tables, and a formal ledger are optional unless
 an existing consumer explicitly requires them. Missing such annotations alone is

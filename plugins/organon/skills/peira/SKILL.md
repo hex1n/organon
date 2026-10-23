@@ -31,7 +31,7 @@ from the whole ask:
 
 | Mode | Stages | Selected by |
 |---|---|---|
-| plan | [Plan → render](plan/PLAN.md); no execution handoff | Planning scenarios or coverage without an ask to run |
+| plan | [Plan](plan/PLAN.md); HTML view on request; no execution handoff | Planning scenarios or coverage without an ask to run |
 | run | [Execute → render](run/RUN.md); without a plan, plan first and follow its execution handoff | Run or continue scenarios |
 | render | [Render](READER-VIEW.md) an existing artifact only; no substitute plan | HTML view of a plan/report |
 | brief | [Brief](READER-VIEW.md) a finished report; with only a plan, say so and offer run mode | Summary or one-page report |
@@ -61,7 +61,7 @@ A scenario described only in the ask is planning input; planning can scale to on
 scenario while retaining the requested outcome and affected flows.
 Before reading any stage's rules, state the mode and its starting artifacts.
 
-Deliver verified business findings and the canonical Markdown when ready; complete
-the default HTML view without holding those results for presentation work. When the
-view is ready, link it first with its source and remaining gaps. A harness has no
-HTML view: deliver its files and the proof run's result.
+Deliver verified business findings and the canonical Markdown when ready. A report's
+HTML view follows by default without holding those results; a plan gets one only on
+request. When a view is ready, link it first with its source and remaining gaps. A
+harness has no HTML view: deliver its files and the proof run's result.

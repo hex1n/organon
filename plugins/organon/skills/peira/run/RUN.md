@@ -51,11 +51,8 @@ Unknown authority permits characterization, not a business-correctness pass.
 
 Pin the upstream artifact by content hash. Retain the consumed expectations in
 this run. Create a fresh run directory under the user's output path, or use
-`.scratch/{feature}/e2e/runs/{yyyymmdd-hhmm}/` by default.
-Resolve each existing parent inside the authorized output/workspace boundary.
-Reject traversal or symlink escape before creating missing parents.
-If the run directory exists, choose the next free `-2`, `-3` suffix.
-Verify the resulting child. Keep historical runs immutable.
+`.scratch/{feature}/e2e/runs/{yyyymmdd-hhmm}/` by default; if it exists, choose the
+next free `-2`, `-3` suffix. Keep historical runs immutable.
 
 Record these facts as work proceeds in
 `{date}-{feature}-e2e-test-report.md` inside the run directory.
@@ -89,7 +86,8 @@ in its full response. Compare it with an independently computed approved expecta
 the response cannot supply its own expected value. For persistent writes, read the
 required committed state before cleanup; for async effects, observe the completion
 predicate. Acceptance alone cannot prove those outcomes. A rejection promising
-unchanged state also requires that invariant checked. An absence claim — no write, no
+unchanged state also requires that invariant checked by a before/after or other
+independent probe, even when the error response is correct. An absence claim — no write, no
 log line, no event — is proven by the probe that would have found it and that probe's
 empty result, retained like any other observation. A path established as read-only
 needs no invented datastore or zero-write probe unless requested or a write risk exists.

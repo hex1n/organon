@@ -59,9 +59,11 @@ their semantics decide the behavior.
 **Test oracles:** derive expected values from business rules or supported data,
 then trace assertions into the real production branch. Distinguish exact values
 from formatted output, final state from call counts, and failure behavior from
-setup errors. Confirm that a fake preserves the boundary semantics the claim
-needs and rejects unprepared reads. Where provenance rules permit constructed
-cases, name their derivation and limits.
+setup errors. Limit test conclusions to the decisive behavior actually exercised.
+If a fake omits boundary semantics the claim needs, resolve that gap with other
+applicable evidence or leave the claim unverified. Fakes must reject unprepared
+reads. Where provenance rules permit constructed cases, name their derivation and
+limits.
 
 **Ablation and mutation:** state the disputed necessity or plausible mistake
 before changing the validation copy. Preserve required observations and vary the

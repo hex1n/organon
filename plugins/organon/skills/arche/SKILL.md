@@ -49,8 +49,8 @@ Read only the relevant reference sections:
   [Value Gate](REFERENCE.md#value-gate-and-decision-envelope). Unsupported
   economics stay unknown. Inherit an explicit build decision; reopen it only
   when new evidence materially breaks its assumptions.
-- **Mechanism or architecture design:** derive the business subjects, rule owners
-  and required dependencies with [Business Operation Model](REFERENCE.md#business-operation-model)
+- **Mechanism or architecture design:** derive the business subjects, rule owners,
+  condition scopes and required dependencies with [Business Operation Model](REFERENCE.md#business-operation-model)
   and compare [Option Categories](REFERENCE.md#option-categories).
   For close or coupled tradeoffs, use [Bestness Check](REFERENCE.md#bestness-check).
 - **Costly reversal and consequential uncertainty that a short comparison cannot

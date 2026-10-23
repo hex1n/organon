@@ -5,7 +5,7 @@ mirroring the plan's name; it is the default home for the run's facts.
 Apply the language policy in [RUN.md](RUN.md); only identifiers, closed status
 vocabularies, commands, and quoted evidence retain their original spelling.
 
-For the standard Chinese reader layout, write new reports in
+For the standard reader layout in Chinese or English, write new reports in
 [report/v1](../references/REPORT-FORMAT.md). Its case headings own the selected
 IDs and verdicts; the renderer derives the counts and comparison table. Keep the
 business conclusion and full evidence in this Markdown, without a second data model.

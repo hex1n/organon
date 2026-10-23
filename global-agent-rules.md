@@ -116,77 +116,11 @@ substitute for evidence that the required behavior and structure hold.
 
 Report a blocked part on its own and finish everything else.
 
-## Defensive code admission
+## Guards and tests
 
-Before adding a runtime guard (null/empty check, duplicate key, range or state
-check, cross-table equality, fail-closed branch), answer three questions; a
-guard that cannot answer them is deleted, or the interface is reshaped instead:
-
-- **Real entry:** which production path delivers the illegal shape here.
-  "Could theoretically be null" and "the current sample lacks it" are not
-  evidence; a model constraint, database constraint, or upstream code path may
-  prove the invariant already holds.
-- **Single owner:** whether the database, the model or constructor, the input
-  boundary, or this module owns the invariant. Use an invariant the upstream
-  already establishes. When a guard only keeps parallel maps, parallel
-  parameters, or mutually contradicting indexes consistent, merge them into
-  one type so the illegal combination cannot be expressed. Backfill,
-  migration, and data-repair equalities belong in SQL, deployment checks, or a
-  one-off gate, off the business hot path.
-- **Killable oracle:** a kept guard has a production-reachable fixture whose
-  test goes red when the guard is removed or returns the wrong error code.
-
-At delivery, list the three answers per guard; a guard that can neither be
-explained nor removed is listed for the user's decision.
-
-## Tests
-
-Every test is an oracle: it goes red for the real reason.
-
-- **Run the real core.** Tests of the logic under test execute it for real;
-  fakes sit only at data boundaries (external data access, clocks and
-  calendars, configuration), and each fake is backed by a captured real fact.
-- **Assert real values.** Amounts, counts, and ordering assert expected
-  values; non-null checks and call counts are not coverage.
-- **Assert the error `code`;** message text may change.
-- **Diff final state per table or store** with a stable sort and non-business
-  timestamps removed; a failure scenario asserts zero diff on every business
-  store.
-- **Design assertions from how the code goes wrong:** after writing one,
-  substitute the most plausible wrong implementation and confirm the test goes
-  red.
-- **Assert behavior, not implementation:** a test that a behavior-preserving
-  refactor would break is rewritten at the owning boundary before it lands.
-  A detail is asserted when it is itself the contract: call order a caller
-  observes, or a user-facing key, byte, or path a source check guards most
-  cheaply. An existing test that resembles implementation stays until the
-  contract it fails to guard is named.
-- **One contract, one owning test** at the strongest boundary; another layer
-  earns a test only for a risk the owner cannot reach, such as transport or
-  lifecycle. Extend the owner's table case or shared fixture instead of adding
-  a near-duplicate, and merge the setup the change duplicates.
-- **Test through the production boundary:** a test the change adds or edits
-  that needs an export, flag, wrapper, or hook no production caller uses moves
-  to the boundary production calls; an existing test on such a seam stays
-  until a change touches it. A self-test entry or export that a tool documents
-  as its contract surface is itself a production boundary. Production code the
-  change leaves with only test callers is deleted with those tests.
-- **Fixtures start from a real sample** when the project has a real data
-  source: before deriving expected values, survey that source for the target
-  shape (existence, count, distribution), pick one real sample, and take its
-  whole record set plus the prior state it reads. Keep real values unmodified
-  and uncombined across samples; when a mutation-test fault cannot be told
-  apart on real data, report it as indistinguishable rather than inventing
-  data to kill it. Make data-reading fakes fail on unprepared input; an empty
-  default return fakes a kill.
-- **Fixture values carry provenance:** each comes from a named real record or
-  a stated derivation.
-- **Dependency-direction refactors are accepted by re-exporting the
-  module-level reference graph,** not by type names.
-
-Method-level docs in tests carry only three things: how the shape is built,
-where each expected value comes from, and why a real sample cannot produce the
-shape. Design argument and review history stay out of tests.
+Before adding, removing, or relaxing a runtime guard, or writing or changing a
+test, apply the organon `tekton` skill's guard rules and its Writing tests
+reference, even in a small edit.
 
 ## Code conventions
 
@@ -230,12 +164,14 @@ has one of the listed semantic reasons.
 
 ## Verification and delivery
 
-Change first, then gather evidence; write process documents only when asked.
-When the repository keeps a verification registry, select its gates by
-behavior and every consumer chain, not by file name or test count. A focused
-run shortens feedback; only the gate's handoff run closes delivery. A change
-matching no gate still gets focused tests plus one handoff run covering its
-domain, and the delivery says what ran and what stays unproven.
+Change first, then gather evidence. Apart from the decision trail below, write
+process documents only when asked. Select verification by changed behavior and
+its consumer/dependency chains, using the repository's verification registry
+when present. Run the narrowest test set covering those contracts on the final
+version. Broaden only for an explicit repository gate or a concrete coverage or
+diagnostic need; a default full-suite command alone does not establish that need.
+A focused result does not close a distinct required gate. Report the selected
+checks and what stays unproven.
 
 When two fixes that share one premise fail the same check, write that premise
 as one sentence. Before the next fix, make an observation that comes out

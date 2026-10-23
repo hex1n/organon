@@ -1,6 +1,7 @@
 # Reader design branch
 
-Read for plans, other interface languages, or a user-requested layout change.
+Read for a requested plan view, other interface languages, or a user-requested
+layout change.
 Routine report/v1 rendering uses [READER-VIEW.md](../READER-VIEW.md).
 
 ## Hand-off

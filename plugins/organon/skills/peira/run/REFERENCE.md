@@ -109,11 +109,13 @@ does not invent findings absent from its source.
 | `CLOSED` | Verified complete or no longer applicable. |
 | `MITIGATED` | A workaround exists; residual risk remains explicit. |
 | `ACCEPTED` | Deliberately accepted by the named owner. |
-| `CONDITIONAL` | Requires a named precondition or owner's decision. |
-| `BLOCKED-BY-TOOLING` | A specific execution/observation capability is missing. |
-| `BLOCKED-BY-ENVIRONMENT` | A required dependency, sample, or fixture is unavailable. |
+| `NEEDS-DECISION` | Waits on a named owner's decision or missing expected-result authority. |
+| `BLOCKED` | Waits on a named missing capability, dependency, sample, or fixture. |
 | `OUT-OF-SCOPE` | Excluded by the current task boundary or user override. |
 
+The last three carry their plan meanings, so a planner's item keeps its token when it
+becomes an issue. The cause stays in the issue's category: a `BLOCKED` issue names
+`tooling` or `environment` there.
 Preserve inherited planner dispositions until this run changes the item's state.
 Only `OPEN` findings become immediate executable next actions; other findings retain
 their missing precondition, decision, capability, or scope reason. Superseded plan

@@ -132,12 +132,9 @@ which is exactly how skills and tools are installed. A script that only ever
 runs top-level stays `.mjs`.
 
 A skill's record schema is declarative and lives at the skill root, next to
-`SKILL.md`, because a reference file hands the same field list to the agent
-that must emit the record. Where that file shows the fields as a ```json
-template, `scripts/assert-schema-templates.cjs` pins the template to the
-schema; a new template joins the list at the top of that script. Where more
-than one skill needs the schema interpreter, each carries its own copy — an
-import reaching outside the skill directory resolves in this checkout and
+`SKILL.md`. A reference that supplies a record template must agree with its
+schema. Where more than one skill needs the schema interpreter, each carries
+its own copy — an import reaching outside the skill directory resolves in this checkout and
 nowhere else — delimited by the `shared-validator-helpers` markers that
 `scripts/assert-validator-helpers.mjs` pins byte-identical.
 

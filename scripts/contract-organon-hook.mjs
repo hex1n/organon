@@ -86,6 +86,21 @@ function runRationale(temporaryDir, stateRoot) {
   fs.mkdirSync(path.join(repo, "docs", "rationale"), { recursive: true });
   assert.deepEqual(stop(repo, stateRoot), {}, "an empty record set passes");
 
+  // With an active record the incremental JSON lists every changed path; here it
+  // exceeds spawnSync's 1 MiB default.
+  write(path.join(repo, "a.txt"), "first();\n");
+  write(path.join(repo, "docs", "rationale", "demo", "01-demo.md"),
+    "# demo\n> TL;DR：演示记录。\n\n## W-001 · 改名会破坏调用顺序\n\n"
+    + "- **文件路径** `a.txt`\n- **代码片段** `first();`\n- **实现理由** 演示。\n");
+  assert.deepEqual(stop(repo, stateRoot), {}, "a valid record passes and seeds incremental state");
+  const bulk = path.join(repo, "bulk");
+  fs.mkdirSync(bulk);
+  for (let index = 0; index < 10000; index++) {
+    fs.writeFileSync(path.join(bulk, `${"u".repeat(100)}-${String(index).padStart(5, "0")}.txt`), "");
+  }
+  assert.deepEqual(stop(repo, stateRoot), {}, "a large untracked listing passes");
+  fs.rmSync(bulk, { recursive: true, force: true });
+
   // Schema-valid record whose snippet is absent from its file: the checker
   // reports W-001 and also emits selectedPaths, which the reason must omit.
   write(path.join(repo, "a.txt"), "first();\n");

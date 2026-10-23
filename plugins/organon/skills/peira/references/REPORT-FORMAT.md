@@ -1,13 +1,16 @@
 # Deterministic execution-report view
 
-Use this format for new Chinese execution reports that use the accepted reader
-layout. The renderer consumes the canonical Markdown directly; it neither invokes
-a model nor decides business outcomes. Plan views, other interface languages and
-requested redesigns use the design branch in [READER-VIEW.md](../READER-VIEW.md).
+Use this format for new Chinese or English execution reports that use the accepted
+reader layout. The renderer consumes the canonical Markdown directly; it neither
+invokes a model nor decides business outcomes. Plan views, other interface languages
+and requested redesigns use the design branch in [READER-VIEW.md](../READER-VIEW.md).
 
 ## Write once
 
-The first two lines are the marker and report title. The introduction states the
+The first two lines are the marker and report title. The marker sets the page's
+interface language: `<!-- e2e-reader: report/v1 -->` renders Chinese labels, and
+`<!-- e2e-reader: report/v1 lang=en -->` renders English ones; write the report's
+prose in the same language. The introduction states the
 business outcome, significant issues and next action. Each selected scenario has
 one level-two heading: stable ID, terminal status, and meaningful name. Its first
 paragraph is the business result shown in the comparison table; the rest holds
@@ -47,7 +50,9 @@ computed from these headings.
 
 Each referenced issue record gets one `## issue:ID [DISPOSITION] title` section.
 Its heading owns the ID and one disposition from
-[Defect Handoffs](../run/REFERENCE.md#defect-handoffs); its body carries the business
+[Defect Handoffs](../run/REFERENCE.md#defect-handoffs). Historical reports keep the
+dispositions they were written with, so the renderer also accepts the earlier
+`CONDITIONAL`, `BLOCKED-BY-TOOLING` and `BLOCKED-BY-ENVIRONMENT`. Its body carries the business
 impact and the link to the record. The renderer builds the issue list from these
 headings and fills each row's affected scenarios from the `#issue-ID` links the cases
 already make, so a case states its own exposure once. A report that links a file under
