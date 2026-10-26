@@ -1,0 +1,50 @@
+node:internal/modules/esm/resolve:271
+    throw new ERR_MODULE_NOT_FOUND(
+          ^
+
+Error [ERR_MODULE_NOT_FOUND]: Cannot find module '/Users/hex1n/Workspace/organon/skills/assayer/scripts/check-gate-state.mjs' imported from /Users/hex1n/Workspace/organon/tests/assayer-gap-closure.test.mjs
+    at finalizeResolution (node:internal/modules/esm/resolve:271:11)
+    at moduleResolve (node:internal/modules/esm/resolve:861:10)
+    at defaultResolve (node:internal/modules/esm/resolve:988:11)
+    at #cachedDefaultResolve (node:internal/modules/esm/loader:700:20)
+    at #resolveAndMaybeBlockOnLoaderThread (node:internal/modules/esm/loader:717:38)
+    at ModuleLoader.resolveSync (node:internal/modules/esm/loader:749:52)
+    at #resolve (node:internal/modules/esm/loader:682:17)
+    at ModuleLoader.getOrCreateModuleJob (node:internal/modules/esm/loader:602:35)
+    at ModuleJob.syncLink (node:internal/modules/esm/module_job:162:33)
+    at ModuleJob.link (node:internal/modules/esm/module_job:252:17) {
+  code: 'ERR_MODULE_NOT_FOUND',
+  url: 'file:///Users/hex1n/Workspace/organon/skills/assayer/scripts/check-gate-state.mjs'
+}
+
+Node.js v26.0.0
+✖ /Users/hex1n/Workspace/organon/tests/assayer-gap-closure.test.mjs (67.443458ms)
+ℹ tests 1
+ℹ suites 0
+ℹ pass 0
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 72.037375
+
+✖ failing tests:
+
+test at tests/assayer-gap-closure.test.mjs:1:1
+✖ /Users/hex1n/Workspace/organon/tests/assayer-gap-closure.test.mjs (67.443458ms)
+  'test failed'
+FAIL: test suites (1 files)
+local override: USER-AGENT-RULES.md @ .codex — content the installer did not write; not checked
+PASS: 2 current, 0 drifted, 0 not installed, 1 local override(s) not checked
+PASS: installed copies
+PASS: organon 0.7.7, 9 skills, manifests and marketplaces agree
+PASS: plugin manifests
+PASS: 2 identical shared reader style blocks (145 lines, 8371 bytes)
+PASS: report styles
+PASS: 6 identical shared derived-view blocks (plugins/organon/skills/arche/REFERENCE.md, plugins/organon/skills/dokimasia/REFERENCE.md, plugins/organon/skills/historia/REFERENCE.md, plugins/organon/skills/horos/DERIVED-VIEWS.md, plugins/organon/skills/peira/references/READER-DESIGN.md, plugins/organon/skills/tekton/references/DERIVED-VIEWS.md)
+PASS: shared views
+PASS: 120 in-skill anchors across 9 skills (0 broken, 4 out-of-scope links skipped)
+PASS: skill links
+PASS: 1 identical shared validator helper blocks (plugins/organon/skills/dokimasia/scripts/validate-review-ledger.cjs)
+PASS: validator helpers
+note: not in this gate (external toolchain) — run directly: node scripts/contract-java-formatter.mjs, node scripts/contract-organon-hook.mjs, node scripts/contract-scholion.mjs

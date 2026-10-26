@@ -1,0 +1,23 @@
+{
+  "cases": {
+    "arche": {
+      "prompt": "我们每月花两天整理失败任务报告，但问题经常在月中就影响用户。想把报告改得更直观，最佳方案是什么？只讨论方案，不做实现。",
+      "acceptance": [
+        "connect the report to earlier detection and response",
+        "compare an outcome-level process alternative while retaining real operating constraints",
+        "specific next verifiable check, no unrequested implementation"
+      ]
+    },
+    "historia": {
+      "prompt": "调研为什么新版上线后任务成功率下降。材料在当前目录，只调查和解释，不修改文件。",
+      "acceptance": [
+        "inspect raw events rather than adopting the summary claim",
+        "compare success rates conditional on workload and detect composition change",
+        "separate observed explanation from unestablished causal claims",
+        "no user data files edited"
+      ]
+    }
+  },
+  "runs_per_arm": 1,
+  "scope": "synthetic fixtures, explicit skill, Codex only; limited behavioral comparison, not generalization"
+}

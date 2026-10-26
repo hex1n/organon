@@ -1,0 +1,24 @@
+{
+  "harness": "native Codex subagent, fresh context; fallback after sequential CLI 429",
+  "task": "arche_final_acceptance",
+  "source": "plugins/organon/skills/arche/SKILL.md at organon 0.7.7",
+  "result": "completed",
+  "observed": {
+    "outcome": "Earlier discovery of user-impacting failures and assignment of recovery work, with monthly retrospective retained.",
+    "constraints_used": [
+      "Existing hourly queries",
+      "Existing team queue",
+      "No additional staff or around-the-clock coverage"
+    ],
+    "comparison": "Existing hourly queries and queue compared with daily manual summary; separate real-time dashboard lacked justification.",
+    "failure_condition": "Logs may not distinguish failed tasks from user-impacting work requiring manual recovery; noisy routing can overwhelm the queue.",
+    "next_check": "Replay recent logs against known user incidents and assess actionable volume and team capacity.",
+    "scope": "Planning only; no implementation requested or performed."
+  },
+  "acceptance": "Observed output satisfies source-aware planning criteria; not a before/after efficacy claim.",
+  "limits": [
+    "Native runtime differs from paired CLI trials",
+    "One fallback run",
+    "Original rate-limited CLI receipts retained"
+  ]
+}

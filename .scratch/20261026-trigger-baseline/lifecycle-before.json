@@ -1,0 +1,134 @@
+{
+  "target": "organon",
+  "match_mode": "exact",
+  "active_only": false,
+  "scan_complete": false,
+  "roots": [
+    {
+      "path": "/Users/hex1n/.agents/skills",
+      "canonical_path": "/Users/hex1n/.agents/skills",
+      "kind": "loadable",
+      "runtime": "universal",
+      "exists": true,
+      "is_symlink": false,
+      "symlink_target": "",
+      "status": "present"
+    },
+    {
+      "path": "/Users/hex1n/.claude/plugins",
+      "canonical_path": "/Users/hex1n/.claude/plugins",
+      "kind": "plugin-store",
+      "runtime": "claude",
+      "exists": true,
+      "is_symlink": false,
+      "symlink_target": "",
+      "status": "present"
+    },
+    {
+      "path": "/Users/hex1n/.claude/skills",
+      "canonical_path": "/Users/hex1n/.agents/skills",
+      "kind": "loadable",
+      "runtime": "claude",
+      "exists": true,
+      "is_symlink": true,
+      "symlink_target": "../.agents/skills",
+      "status": "present"
+    },
+    {
+      "path": "/Users/hex1n/.codex/.tmp/plugins",
+      "canonical_path": "/Users/hex1n/.codex/.tmp/plugins",
+      "kind": "unpacked-cache",
+      "runtime": "codex",
+      "exists": true,
+      "is_symlink": false,
+      "symlink_target": "",
+      "status": "present"
+    },
+    {
+      "path": "/Users/hex1n/.codex/plugins",
+      "canonical_path": "/Users/hex1n/.codex/plugins",
+      "kind": "plugin-store",
+      "runtime": "codex",
+      "exists": true,
+      "is_symlink": false,
+      "symlink_target": "",
+      "status": "present"
+    },
+    {
+      "path": "/Users/hex1n/.codex/skills",
+      "canonical_path": "/Users/hex1n/.agents/skills",
+      "kind": "loadable",
+      "runtime": "codex",
+      "exists": true,
+      "is_symlink": true,
+      "symlink_target": "../.agents/skills",
+      "status": "present"
+    },
+    {
+      "path": "/Users/hex1n/Workspace/organon/.agents/skills",
+      "canonical_path": "/Users/hex1n/Workspace/organon/.agents/skills",
+      "kind": "loadable",
+      "runtime": "project",
+      "exists": false,
+      "is_symlink": false,
+      "symlink_target": "",
+      "status": "missing"
+    },
+    {
+      "path": "/Users/hex1n/Workspace/organon/.claude/skills",
+      "canonical_path": "/Users/hex1n/Workspace/organon/.claude/skills",
+      "kind": "loadable",
+      "runtime": "claude-project",
+      "exists": false,
+      "is_symlink": false,
+      "symlink_target": "",
+      "status": "missing"
+    },
+    {
+      "path": "/Users/hex1n/Workspace/organon/.codex/skills",
+      "canonical_path": "/Users/hex1n/Workspace/organon/.codex/skills",
+      "kind": "loadable",
+      "runtime": "codex-project",
+      "exists": false,
+      "is_symlink": false,
+      "symlink_target": "",
+      "status": "missing"
+    }
+  ],
+  "aliases": [
+    {
+      "path": "/Users/hex1n/.claude/skills",
+      "canonical_path": "/Users/hex1n/.agents/skills",
+      "kind": "loadable",
+      "runtime": "claude",
+      "exists": true,
+      "is_symlink": true,
+      "symlink_target": "../.agents/skills",
+      "status": "present",
+      "shares_with": [
+        "/Users/hex1n/.agents/skills",
+        "/Users/hex1n/.codex/skills"
+      ]
+    },
+    {
+      "path": "/Users/hex1n/.codex/skills",
+      "canonical_path": "/Users/hex1n/.agents/skills",
+      "kind": "loadable",
+      "runtime": "codex",
+      "exists": true,
+      "is_symlink": true,
+      "symlink_target": "../.agents/skills",
+      "status": "present",
+      "shares_with": [
+        "/Users/hex1n/.agents/skills",
+        "/Users/hex1n/.claude/skills"
+      ]
+    }
+  ],
+  "hits": [],
+  "warnings": [
+    "scan depth 8 pruned descendants below /Users/hex1n/.codex/plugins/cache/openai-curated-remote/data-analytics/1.0.11/templates/data-app/starters/dashboard",
+    "scan depth 8 pruned descendants below /Users/hex1n/.codex/plugins/cache/openai-curated-remote/data-analytics/1.0.11/templates/data-app/starters/report",
+    "scan depth 8 pruned descendants below /Users/hex1n/.codex/plugins/cache/openai-curated-remote/data-analytics/1.0.11/templates/data-app/base/src"
+  ]
+}

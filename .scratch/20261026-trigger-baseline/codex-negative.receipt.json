@@ -1,0 +1,19 @@
+{
+  "runtime": "codex",
+  "case": "negative",
+  "status": "exited",
+  "exit_code": 0,
+  "seconds": 39.3,
+  "cwd": "/var/folders/8x/2zb93d5x3qx2fml_5zbv2hnr0000gn/T/organon-trigger-u6266btb/codex-negative",
+  "command": [
+    "codex",
+    "exec",
+    "--json",
+    "--ephemeral",
+    "-s",
+    "workspace-write",
+    "-C",
+    "/var/folders/8x/2zb93d5x3qx2fml_5zbv2hnr0000gn/T/organon-trigger-u6266btb/codex-negative",
+    "解释一下这个项目的保存和查询流程，不要修改文件。"
+  ]
+}

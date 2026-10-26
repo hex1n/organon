@@ -1,0 +1,18 @@
+{
+  "name": "runtime-1",
+  "status": "exited",
+  "exit_code": 0,
+  "seconds": 87.9,
+  "command": [
+    "codex",
+    "exec",
+    "--json",
+    "--ephemeral",
+    "-s",
+    "workspace-write",
+    "-C",
+    "/var/folders/8x/2zb93d5x3qx2fml_5zbv2hnr0000gn/T/organon-consumer-akep2udo/runtime-1",
+    "把这个开发工具升级到 v2，让当前会话用上新版。"
+  ],
+  "cwd": "/var/folders/8x/2zb93d5x3qx2fml_5zbv2hnr0000gn/T/organon-consumer-akep2udo/runtime-1"
+}

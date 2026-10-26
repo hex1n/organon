@@ -1,0 +1,5 @@
+{
+  "prompt": "背景和约束见 README.md。我们每月花两天整理失败任务报告，但问题经常在月中就影响用户。想把报告改得更直观，最佳方案是什么？只讨论方案，不做实现。",
+  "reason": "Both initial planning arms omitted the available background; source entry made explicit in a separate paired trial.",
+  "classification": "setup clarification; separate from initial first-attempt outcomes"
+}

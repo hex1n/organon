@@ -1,0 +1,20 @@
+{
+  "after-historia": {
+    "summary.md": "f3b0b5f0ed16e265c86bf9c169097b7404da3d64a7a0e6008da7af84d8bfd13a",
+    "events.jsonl": "a8267364d75785b03cc2b8a2192732fc0c3d49c49767303add58730f530630b5",
+    "AGENTS.md": "c216bd48f26bbdb2bb746fee0738d72b0128b484dfca14fba5eb5981303a1a0e"
+  },
+  "after-arche": {
+    "README.md": "1e35ad506716b255c3b5cd66f36fe310cdd9a7cb654f56731c4447e14510e5df",
+    "AGENTS.md": "c216bd48f26bbdb2bb746fee0738d72b0128b484dfca14fba5eb5981303a1a0e"
+  },
+  "before-historia": {
+    "summary.md": "f3b0b5f0ed16e265c86bf9c169097b7404da3d64a7a0e6008da7af84d8bfd13a",
+    "events.jsonl": "a8267364d75785b03cc2b8a2192732fc0c3d49c49767303add58730f530630b5",
+    "AGENTS.md": "c216bd48f26bbdb2bb746fee0738d72b0128b484dfca14fba5eb5981303a1a0e"
+  },
+  "before-arche": {
+    "README.md": "1e35ad506716b255c3b5cd66f36fe310cdd9a7cb654f56731c4447e14510e5df",
+    "AGENTS.md": "c216bd48f26bbdb2bb746fee0738d72b0128b484dfca14fba5eb5981303a1a0e"
+  }
+}

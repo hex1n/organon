@@ -1,0 +1,294 @@
+{
+  "project-1": {
+    "state": {
+      "project": {
+        "name": "cedar",
+        "path": "/var/folders/8x/2zb93d5x3qx2fml_5zbv2hnr0000gn/T/organon-consumer-akep2udo/project-1/cedar"
+      },
+      "session": {
+        "cwd": "/var/folders/8x/2zb93d5x3qx2fml_5zbv2hnr0000gn/T/organon-consumer-akep2udo/project-1/cedar"
+      }
+    },
+    "protected_files_unchanged": true,
+    "journal": [
+      {
+        "args": [
+          "list"
+        ],
+        "result": {
+          "project": {
+            "name": "cedar",
+            "path": "/var/folders/8x/2zb93d5x3qx2fml_5zbv2hnr0000gn/T/organon-consumer-akep2udo/project-1/cedar"
+          },
+          "session": {
+            "cwd": "/var/folders/8x/2zb93d5x3qx2fml_5zbv2hnr0000gn/T/organon-consumer-akep2udo/project-1/cedar"
+          }
+        }
+      },
+      {
+        "args": [
+          "list"
+        ],
+        "result": {
+          "project": {
+            "name": "cedar",
+            "path": "/var/folders/8x/2zb93d5x3qx2fml_5zbv2hnr0000gn/T/organon-consumer-akep2udo/project-1/cedar"
+          },
+          "session": {
+            "cwd": "/var/folders/8x/2zb93d5x3qx2fml_5zbv2hnr0000gn/T/organon-consumer-akep2udo/project-1/cedar"
+          }
+        }
+      }
+    ],
+    "final_messages": [
+      "仓库目录已从 `cedar/` 改为 `cedar-kit/`，原有文件和 Git 状态保留。\n\n应用项目和当前会话仍指向旧路径。现有 CLI 不支持修改这两项，尚未完成同步切换，需要应用提供项目迁移或会话切换功能。"
+    ],
+    "completed": true,
+    "skill_load_commands": [],
+    "renamed": true,
+    "git_usable": true,
+    "app_state_unchanged": true,
+    "repo_readme_unchanged": true,
+    "receipt": {
+      "name": "project-1",
+      "status": "exited",
+      "exit_code": 0,
+      "seconds": 45.6,
+      "command": [
+        "codex",
+        "exec",
+        "--json",
+        "--ephemeral",
+        "-s",
+        "workspace-write",
+        "-C",
+        "/var/folders/8x/2zb93d5x3qx2fml_5zbv2hnr0000gn/T/organon-consumer-akep2udo/project-1",
+        "把当前仓库目录改成 cedar-kit，应用里的项目和当前会话也一起切过去。"
+      ],
+      "cwd": "/var/folders/8x/2zb93d5x3qx2fml_5zbv2hnr0000gn/T/organon-consumer-akep2udo/project-1"
+    }
+  },
+  "project-2": {
+    "state": {
+      "project": {
+        "name": "cedar",
+        "path": "/var/folders/8x/2zb93d5x3qx2fml_5zbv2hnr0000gn/T/organon-consumer-akep2udo/project-2/cedar"
+      },
+      "session": {
+        "cwd": "/var/folders/8x/2zb93d5x3qx2fml_5zbv2hnr0000gn/T/organon-consumer-akep2udo/project-2/cedar"
+      }
+    },
+    "protected_files_unchanged": true,
+    "journal": [
+      {
+        "args": [
+          "list"
+        ],
+        "result": {
+          "project": {
+            "name": "cedar",
+            "path": "/var/folders/8x/2zb93d5x3qx2fml_5zbv2hnr0000gn/T/organon-consumer-akep2udo/project-2/cedar"
+          },
+          "session": {
+            "cwd": "/var/folders/8x/2zb93d5x3qx2fml_5zbv2hnr0000gn/T/organon-consumer-akep2udo/project-2/cedar"
+          }
+        }
+      },
+      {
+        "args": [
+          "list"
+        ],
+        "result": {
+          "project": {
+            "name": "cedar",
+            "path": "/var/folders/8x/2zb93d5x3qx2fml_5zbv2hnr0000gn/T/organon-consumer-akep2udo/project-2/cedar"
+          },
+          "session": {
+            "cwd": "/var/folders/8x/2zb93d5x3qx2fml_5zbv2hnr0000gn/T/organon-consumer-akep2udo/project-2/cedar"
+          }
+        }
+      }
+    ],
+    "final_messages": [
+      "仓库目录已从 `cedar` 改为 `cedar-kit`，原有文件和 Git 状态保留。\n\n应用项目和当前会话仍指向旧路径：文档规定的 CLI 不支持修改这两项，`open` 仅打开文件面板，因此未能完成同步切换。"
+    ],
+    "completed": true,
+    "skill_load_commands": [],
+    "renamed": true,
+    "git_usable": true,
+    "app_state_unchanged": true,
+    "repo_readme_unchanged": true,
+    "receipt": {
+      "name": "project-2",
+      "status": "exited",
+      "exit_code": 0,
+      "seconds": 71.4,
+      "command": [
+        "codex",
+        "exec",
+        "--json",
+        "--ephemeral",
+        "-s",
+        "workspace-write",
+        "-C",
+        "/var/folders/8x/2zb93d5x3qx2fml_5zbv2hnr0000gn/T/organon-consumer-akep2udo/project-2",
+        "把当前仓库目录改成 cedar-kit，应用里的项目和当前会话也一起切过去。"
+      ],
+      "cwd": "/var/folders/8x/2zb93d5x3qx2fml_5zbv2hnr0000gn/T/organon-consumer-akep2udo/project-2"
+    }
+  },
+  "runtime-1": {
+    "state": {
+      "cache": "v2",
+      "configured": "v2",
+      "loaded": "v2"
+    },
+    "protected_files_unchanged": true,
+    "journal": [
+      {
+        "args": [
+          "status"
+        ],
+        "result": {
+          "cache": "v1",
+          "configured": "v1",
+          "loaded": "v1"
+        }
+      },
+      {
+        "args": [
+          "install",
+          "v2"
+        ],
+        "result": {
+          "status": "success",
+          "installed": "v2"
+        }
+      },
+      {
+        "args": [
+          "reload"
+        ],
+        "result": {
+          "status": "success",
+          "session_preserved": true
+        }
+      },
+      {
+        "args": [
+          "status"
+        ],
+        "result": {
+          "cache": "v2",
+          "configured": "v2",
+          "loaded": "v2"
+        }
+      }
+    ],
+    "final_messages": [
+      "已升级到 v2，并在当前会话加载生效。已验证缓存、配置和加载版本均为 v2，当前会话已保留。"
+    ],
+    "completed": true,
+    "skill_load_commands": [],
+    "loaded_v2": true,
+    "diagnosed_after_reload": true,
+    "receipt": {
+      "name": "runtime-1",
+      "status": "exited",
+      "exit_code": 0,
+      "seconds": 87.9,
+      "command": [
+        "codex",
+        "exec",
+        "--json",
+        "--ephemeral",
+        "-s",
+        "workspace-write",
+        "-C",
+        "/var/folders/8x/2zb93d5x3qx2fml_5zbv2hnr0000gn/T/organon-consumer-akep2udo/runtime-1",
+        "把这个开发工具升级到 v2，让当前会话用上新版。"
+      ],
+      "cwd": "/var/folders/8x/2zb93d5x3qx2fml_5zbv2hnr0000gn/T/organon-consumer-akep2udo/runtime-1"
+    }
+  },
+  "runtime-2": {
+    "state": {
+      "cache": "v2",
+      "configured": "v2",
+      "loaded": "v2"
+    },
+    "protected_files_unchanged": true,
+    "journal": [
+      {
+        "args": [
+          "status"
+        ],
+        "result": {
+          "cache": "v1",
+          "configured": "v1",
+          "loaded": "v1"
+        }
+      },
+      {
+        "args": [
+          "install",
+          "v2"
+        ],
+        "result": {
+          "status": "success",
+          "installed": "v2"
+        }
+      },
+      {
+        "args": [
+          "reload"
+        ],
+        "result": {
+          "status": "success",
+          "session_preserved": true
+        }
+      },
+      {
+        "args": [
+          "status"
+        ],
+        "result": {
+          "cache": "v2",
+          "configured": "v2",
+          "loaded": "v2"
+        }
+      }
+    ],
+    "final_messages": [
+      "已升级到 v2，当前会话已加载新版。验证缓存、配置和已加载版本均为 `v2`，会话保持不变。"
+    ],
+    "completed": true,
+    "skill_load_commands": [],
+    "loaded_v2": true,
+    "diagnosed_after_reload": true,
+    "receipt": {
+      "name": "runtime-2",
+      "status": "exited",
+      "exit_code": 0,
+      "seconds": 57.8,
+      "command": [
+        "codex",
+        "exec",
+        "--json",
+        "--ephemeral",
+        "-s",
+        "workspace-write",
+        "-C",
+        "/var/folders/8x/2zb93d5x3qx2fml_5zbv2hnr0000gn/T/organon-consumer-akep2udo/runtime-2",
+        "把这个开发工具升级到 v2，让当前会话用上新版。"
+      ],
+      "cwd": "/var/folders/8x/2zb93d5x3qx2fml_5zbv2hnr0000gn/T/organon-consumer-akep2udo/runtime-2"
+    }
+  },
+  "limits": [
+    "two runs per synthetic scenario, Codex only",
+    "no observed SKILL.md loads in these tool-operation scenarios; outcomes cannot be attributed to tekton",
+    "fixture documentation explicitly describes CLI capability; spontaneous discovery in an undocumented real application is untested",
+    "no source revision changed; no before/after wording efficacy claim"
+  ]
+}

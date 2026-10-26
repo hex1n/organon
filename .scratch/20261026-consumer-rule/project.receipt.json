@@ -1,0 +1,17 @@
+{
+  "case": "project",
+  "status": "exited",
+  "exit_code": 0,
+  "seconds": 43.7,
+  "command": [
+    "codex",
+    "exec",
+    "--json",
+    "--ephemeral",
+    "-s",
+    "workspace-write",
+    "-C",
+    "/var/folders/8x/2zb93d5x3qx2fml_5zbv2hnr0000gn/T/organon-rule-_fd7zb3h/project",
+    "使用 organon:tekton 技能。把当前仓库目录改成 cedar-kit，应用里的项目和当前会话也一起切过去。"
+  ]
+}

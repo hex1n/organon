@@ -32,8 +32,8 @@ for that branch. If no candidate exists, obtain one before review.
 
 Before dispatch, freeze:
 
-- candidate and content hash; versions or recoverable snapshots of material
-  authority sources;
+- candidate and content hash; original request, intended outcome, confirmed
+  choices, and versions or recoverable snapshots of material authority sources;
 - mode, scope, constraints, any applicable upstream decision, and rubric;
 - author identity, depth and its basis, required reviewers and their independence
   classes; at full depth, the reviewer assigned the operator-on-call walk;
@@ -52,7 +52,7 @@ positive threshold and basis. Calibrate depth, expected rounds and default budge
 from irreversibility, blast radius and value; check that the budget can cover the
 candidate. Missing budget never means unbounded.
 
-The rubric covers coherence, feasibility, compatibility, migration/rollback,
+The rubric covers outcome fit, coherence, feasibility, compatibility, migration/rollback,
 verification and scope. Add dimensions for claims these do not reach, such as
 source fidelity or inventory completeness. Existing-system claims need authority
 evidence or become verification gaps. At full depth, one reviewer first walks
@@ -77,8 +77,9 @@ Post-GO translations or reformats are `derived-unreviewed` unless byte-identical
 
 ### Review
 
-Give each first-pass reviewer the candidate, constraints, rubric and evidence
-scope, without the author's reasoning. The reviewer returns in-band and writes
+Give each first-pass reviewer the frozen request, outcome authority, candidate,
+constraints, rubric and evidence scope, without the author's reasoning.
+The reviewer returns in-band and writes
 neither the candidate nor review records. Self-rereading cannot satisfy the gate.
 Use [the compact packet](REFERENCE.md#compact-review-packet) for long or remote
 transfer and [invocation handling](REFERENCE.md#runtime-and-invocation) for
@@ -90,6 +91,12 @@ optional [blocker sweep](REVISION.md#blocker-sweep) before that complete review.
 Return [the reviewer payload](REFERENCE.md#reviewer-return) with stable finding IDs
 and explicit coverage; the parent preserves these fields without inferring or
 upgrading them.
+
+Derive expectations from the original request and governing sources, then check
+whether the proposed mechanism can produce that outcome under the actual
+constraints. Internal consistency and agreement with the candidate's own tests
+establish no independent expectation. Preserve confirmed product and scope
+choices; missing outcome authority is a verification gap.
 
 Trace guarantees through the assumptions each boundary must preserve. A local
 check proves only its own premises; missing connections are verification gaps.

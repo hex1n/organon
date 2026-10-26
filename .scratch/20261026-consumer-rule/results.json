@@ -1,0 +1,145 @@
+{
+  "runtime": {
+    "receipt": {
+      "case": "runtime",
+      "status": "exited",
+      "exit_code": 0,
+      "seconds": 71.0,
+      "command": [
+        "codex",
+        "exec",
+        "--json",
+        "--ephemeral",
+        "-s",
+        "workspace-write",
+        "-C",
+        "/var/folders/8x/2zb93d5x3qx2fml_5zbv2hnr0000gn/T/organon-rule-_fd7zb3h/runtime",
+        "使用 organon:tekton 技能。把这个开发工具升级到 v2，让当前会话用上新版。"
+      ]
+    },
+    "loaded_076_tekton": true,
+    "final": [
+      "已升级到 v2，并重新加载到当前会话，会话保持不变。\n\n验证结果：缓存、配置、当前加载版本均为 `v2`。"
+    ],
+    "state": {
+      "cache": "v2",
+      "configured": "v2",
+      "loaded": "v2"
+    },
+    "journal": [
+      {
+        "args": [
+          "status"
+        ],
+        "result": {
+          "cache": "v1",
+          "configured": "v1",
+          "loaded": "v1"
+        }
+      },
+      {
+        "args": [
+          "install",
+          "v2"
+        ],
+        "result": {
+          "status": "success",
+          "installed": "v2"
+        }
+      },
+      {
+        "args": [
+          "reload"
+        ],
+        "result": {
+          "status": "success",
+          "session_preserved": true
+        }
+      },
+      {
+        "args": [
+          "status"
+        ],
+        "result": {
+          "cache": "v2",
+          "configured": "v2",
+          "loaded": "v2"
+        }
+      }
+    ],
+    "control_script_unchanged": true,
+    "accepted": true
+  },
+  "project": {
+    "receipt": {
+      "case": "project",
+      "status": "exited",
+      "exit_code": 0,
+      "seconds": 43.7,
+      "command": [
+        "codex",
+        "exec",
+        "--json",
+        "--ephemeral",
+        "-s",
+        "workspace-write",
+        "-C",
+        "/var/folders/8x/2zb93d5x3qx2fml_5zbv2hnr0000gn/T/organon-rule-_fd7zb3h/project",
+        "使用 organon:tekton 技能。把当前仓库目录改成 cedar-kit，应用里的项目和当前会话也一起切过去。"
+      ]
+    },
+    "loaded_076_tekton": true,
+    "final": [
+      "已将仓库目录 `cedar` 改为 `cedar-kit`，并确认 Git 状态保持一致。\n\n应用项目和当前会话尚未切换，仍指向旧路径。现有 CLI 不支持修改这两项；需要在应用中手动更新项目路径，并切换或新建会话。"
+    ],
+    "state": {
+      "project": {
+        "name": "cedar",
+        "path": "/var/folders/8x/2zb93d5x3qx2fml_5zbv2hnr0000gn/T/organon-rule-_fd7zb3h/project/cedar"
+      },
+      "session": {
+        "cwd": "/var/folders/8x/2zb93d5x3qx2fml_5zbv2hnr0000gn/T/organon-rule-_fd7zb3h/project/cedar"
+      }
+    },
+    "journal": [
+      {
+        "args": [
+          "list"
+        ],
+        "result": {
+          "project": {
+            "name": "cedar",
+            "path": "/var/folders/8x/2zb93d5x3qx2fml_5zbv2hnr0000gn/T/organon-rule-_fd7zb3h/project/cedar"
+          },
+          "session": {
+            "cwd": "/var/folders/8x/2zb93d5x3qx2fml_5zbv2hnr0000gn/T/organon-rule-_fd7zb3h/project/cedar"
+          }
+        }
+      },
+      {
+        "args": [
+          "list"
+        ],
+        "result": {
+          "project": {
+            "name": "cedar",
+            "path": "/var/folders/8x/2zb93d5x3qx2fml_5zbv2hnr0000gn/T/organon-rule-_fd7zb3h/project/cedar"
+          },
+          "session": {
+            "cwd": "/var/folders/8x/2zb93d5x3qx2fml_5zbv2hnr0000gn/T/organon-rule-_fd7zb3h/project/cedar"
+          }
+        }
+      }
+    ],
+    "control_script_unchanged": true,
+    "directory_renamed": true,
+    "git_usable": true,
+    "app_still_old": true,
+    "report_accepted_by_manual_read": true
+  },
+  "limits": [
+    "Codex only by user instruction; one explicit-load run per case",
+    "synthetic fixtures with documented capabilities; not proof of real-application integration",
+    "prior implicit trials differ in invocation; no measured improvement claim"
+  ]
+}

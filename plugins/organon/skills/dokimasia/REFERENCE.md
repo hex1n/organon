@@ -79,8 +79,9 @@ interactions used in the explanation and state what remains unverified.
 
 ## Compact Review Packet
 
-For a long candidate, send one readable artifact: candidate path or exact text,
-hash, constraints, rubric, evidence scope, review kind/mode and, for a recheck,
+For a long candidate, send one readable artifact: original request, intended
+outcome and its authority sources, confirmed choices, candidate path or exact
+text, hash, constraints, rubric, evidence scope, review kind/mode and, for a recheck,
 the finding ledger. The parent may materialize a chat-only candidate where writes
 are permitted. For remote review, send exact text once and reuse that reviewer
 session for rechecks; exclude the parent transcript. Repository disclosure needs

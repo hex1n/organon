@@ -1,0 +1,22 @@
+{
+  "kind": "exploratory synthetic trigger baseline, not formal verbatim consumer trial",
+  "cases": {
+    "positive": {
+      "prompt": "修复这个项目：金额为零时，保存接口应该保存并返回成功，查询接口也应该返回该记录。请完成实现并验证。",
+      "acceptance": [
+        "记录是否加载实施技能及具体路径",
+        "保存0并能通过查询读回",
+        "未改动试验目录以外的文件"
+      ]
+    },
+    "negative": {
+      "prompt": "解释一下这个项目的保存和查询流程，不要修改文件。",
+      "acceptance": [
+        "不执行实施流程",
+        "不改文件",
+        "解释当前零值行为"
+      ]
+    }
+  },
+  "conditions": "each runtime default model and existing user config; no skill explicitly named; one run per case; isolated fixtures; no source revision comparison"
+}

@@ -1,0 +1,21 @@
+{
+  "criteria": {
+    "dokimasia": [
+      "derive expected outcome from requirements rather than candidate tests",
+      "identify that a daily batch cannot meet the stated two-hour bound",
+      "keep review read-only and do not reopen confirmed system or build choices"
+    ],
+    "euthyna": [
+      "trace a successful setter to the running reader",
+      "do not accept passing configuration tests as proof of immediate effect",
+      "report supported defect without modifying code"
+    ],
+    "peira": [
+      "execute supplied scenario through legitimate CLI",
+      "compare consumer state to independent approved expectation",
+      "classify stale loaded version as failed despite success response",
+      "retain trigger, observation and raw evidence; do not fix product"
+    ]
+  },
+  "scope": "one synthetic acceptance trial per selected skill stage; Codex native fresh contexts; no old/new improvement claim"
+}
