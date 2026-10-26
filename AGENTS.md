@@ -54,17 +54,19 @@ repository's source, distribution, and verification constraints. Use the
 current runtime's official guidance for invocation settings and metadata.
 
 **Portable text:** skills here are installed into many repositories, so rules
-and examples under `plugins/organon/skills/` state the general class and use invented
-placeholders, never an identifier, code, table, or domain term from a real
-project. Before committing, search the diff for names and domain terms from the
-repositories the session read.
+and examples under `plugins/organon/skills/` state the general class and use
+invented placeholders for business-project-specific identifiers, code, tables
+and domain terms. Public API, protocol and tool names may be used when needed.
+Before committing, search the diff for business-project-specific names and terms
+from repositories the session read.
 
 **Descriptions:** a model-invoked description states, in positive terms, the
 requests the skill serves. It carries no exemption clause and names no sibling
 skill; scope words such as "while options are still open" mark a boundary. Check
-a description change with trigger trials: verbatim user prompts from both sides
-of each boundary, run in the repository where each was typed, on both runtimes,
-before and after.
+changes to skill selection or invocation boundaries with
+[trigger trials](MAINTENANCE.md#trigger-trials) on both runtimes, before and after.
+Purely mechanical wording changes that preserve those boundaries need no trigger
+trials.
 
 **Wording and structure:** use `writing-for-agents` when writing or editing
 skills and shared agent instructions. Apply its wording, information hierarchy,
@@ -106,39 +108,22 @@ This method adds no document, approval, or evaluation format.
 **Evaluate behavior:** define the intended change and acceptance evidence before
 the trial; inspect actual work products against that criterion. Format checks
 and passing tests do not establish an untested property such as structural fit.
-When comparing revisions, keep inputs and conditions fixed where possible and
-disclose differences that limit attribution. Run trials under the instructions
-the skill meets in use: the global rules at the revision under test, and a
-consuming repository's instructions instead of this one's. A Codex agent reads
-the installed rules copy as it stands at launch. Count prompted repairs
-separately from first-attempt success. Report each arm's run count and spread,
-and rule out other readings of a gap (runs that skipped the task, unequal
-conditions, noise) before crediting it to the revision. For generalization
-claims, probe contrasting task shapes and limit conclusions to what ran. When
-revisions repeatedly fail the same criterion, revisit the diagnosis and
-evaluation setup.
+For comparisons or generalization claims, use
+[behavioral trials](MAINTENANCE.md#behavioral-trials) for representative conditions,
+attribution and reporting. When revisions repeatedly fail the same criterion,
+revisit the diagnosis and evaluation setup.
 
 ## Scripts
 
-A script's prefix decides what runs it, and `scripts/gate.mjs` discovers both
-prefixes rather than listing them. Name a repository gate `assert-*` and the
-gate runs it — that is the whole registration step. Name an external-toolchain
-check (JDK, Maven, git fixtures) `contract-*` and the gate names it on exit
-instead of running it, so it stays runnable anywhere Node is. A script that
-must stay out of the gate says so by taking neither prefix.
+`scripts/gate.mjs` discovers scripts by prefix: it runs `assert-*` repository
+gates and lists `contract-*` external-toolchain checks for direct execution.
+Use neither prefix for a script that must stay outside that discovery.
 `validate-<record>` ships inside a skill and checks an agent-authored record
 against its sibling `<record>-schema.json`.
 
-The gate is `gate.mjs`, not `check-all`, because it deliberately leaves
-`contract-*` out: a name promising "all" licenses a completeness claim its run
-does not support.
-
-A script that is both importable and runnable as a CLI is `.cjs`, so
-`require.main === module` decides whether it executes. The ESM alternative
-compares `import.meta.url` against `process.argv[1]`, which silently exits 0
-without running when the script is reached through a symlink or junction —
-which is exactly how skills and tools are installed. A script that only ever
-runs top-level stays `.mjs`.
+A script that is both importable and runnable as a CLI uses `.cjs` with
+`require.main === module`; top-level-only scripts use `.mjs`. See
+[script conventions](MAINTENANCE.md#script-conventions) for the rationale.
 
 A skill's record schema is declarative and lives at the skill root, next to
 `SKILL.md`. A reference that supplies a record template must agree with its
@@ -151,7 +136,7 @@ nowhere else — delimited by the `shared-validator-helpers` markers that
 
 When changing these targets:
 
-- `tools/java-formatter/` or its installer: read
+- `tools/java-formatter/` or its installation behavior: read
   [tools/java-formatter/README.md](tools/java-formatter/README.md) and run
   `node scripts/contract-java-formatter.mjs`.
 - `plugins/organon/hooks/`: run `node scripts/contract-organon-hook.mjs`, then
@@ -161,8 +146,7 @@ When changing these targets:
   [its README](plugins/organon/skills/scholion/README.md) and run
   `node scripts/contract-scholion.mjs`.
 - `user-agent-rules.md`: run `node scripts/install-agent-tools.cjs --apply` so a
-  Codex copy made where a file symlink was unavailable follows the source, then
-  `node scripts/gate.mjs`, whose installed-copies check reports a stale copy.
+  Codex copy made where a file symlink was unavailable follows the source.
 
 ## Verification And Completion
 
@@ -172,8 +156,9 @@ checks. It discovers local `.test.mjs` and `.test.cjs` suites and runs every
 `assert-*` gate. It does not replace the `contract-*` checks it names on exit,
 or behavioral validation selected by the official `skill-creator`.
 
-For tool or installer changes, run the affected tool's documented contract
-checks and relevant maintenance tests.
+For tool or installer changes, run relevant maintenance tests and the documented
+contract checks for affected behavior. Select shared-installer checks by affected
+assets and shared installation paths.
 
 A new mechanical gate or refusal is exercised once on a real artifact before it
 ships. Its synthetic cases are written by whoever wrote the rule and inherit that
