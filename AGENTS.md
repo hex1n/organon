@@ -69,10 +69,17 @@ before and after.
 **Wording and structure:** use `writing-for-agents` when writing or editing
 skills and shared agent instructions. Apply its wording, information hierarchy,
 context-pointer, and pruning guidance while preserving the intended behavior.
-Apply the [instruction design constitution](global-agent-rules.md#instruction-design-constitution)
-to the complete skill and its instruction references. Choose writing, diagrams,
-interactive HTML, or video where it improves understanding. Keep clear text
-and exact schema, command, and interface contracts intact.
+Write for a capable model: keep outcomes, non-obvious context, decision criteria
+and required constraints. Use clear, direct prose with consistent terms; keep
+conditions and exceptions with their actions. Keep essential conditions visible
+and load branch-specific detail when needed. Preserve exact schema, command and
+interface contracts.
+
+Choose writing, diagrams or interactive HTML by the understanding gained and
+creation and maintenance cost; a short answer can be enough. Honor the requested
+form, scope and authorization. Before producing a diagram or interactive view,
+read [Instruction views](INSTRUCTION-VIEWS.md) for source fidelity, layout
+and visual acceptance.
 
 ### Improvement Method
 
@@ -89,9 +96,11 @@ adaptation. Preserve confirmed requirements and governing contracts; keep
 proposals and replaceable technical choices open.
 
 **Revise and prune:** prefer replacing, merging, or removing guidance over
-appending rules. Apply the instruction design constitution to the complete
-path. Check which behavior each retained or removed instruction changes;
-preserve required contracts and keep evidence proportional to the change.
+appending rules. Review the complete instruction path, including references.
+Remove generic tutorials, repetition and obsolete rules; use fixed steps only
+for a real dependency or demonstrated risk. Check which behavior each retained
+or removed instruction changes; preserve required contracts and keep evidence
+proportional to the change. Brevity alone is not evidence of improvement.
 This method adds no document, approval, or evaluation format.
 
 **Evaluate behavior:** define the intended change and acceptance evidence before
@@ -151,7 +160,7 @@ When changing these targets:
 - `plugins/organon/skills/scholion/`: read
   [its README](plugins/organon/skills/scholion/README.md) and run
   `node scripts/contract-scholion.mjs`.
-- `global-agent-rules.md`: run `node scripts/install-agent-tools.cjs --apply` so a
+- `user-agent-rules.md`: run `node scripts/install-agent-tools.cjs --apply` so a
   Codex copy made where a file symlink was unavailable follows the source, then
   `node scripts/gate.mjs`, whose installed-copies check reports a stale copy.
 

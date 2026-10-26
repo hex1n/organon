@@ -198,7 +198,7 @@ tests/                 # 门禁运行的测试套件（仅本机，Git 忽略）
 AGENTS.md              # 跨运行时共用仓库约定
 CONTEXT.md             # 技能分发的领域术语
 CLAUDE.md              # Claude Code 入口：一行 @AGENTS.md 导入
-global-agent-rules.md  # 适用于任意仓库的用户级通用规则
+user-agent-rules.md    # 适用于任意仓库的用户级通用规则
 ```
 
 每个技能目录包含面向任务的 `SKILL.md`（含 `name` / `description` 路由 frontmatter）、
@@ -223,7 +223,7 @@ organon 插件自带一个 Stop Hook：[`hooks/stop.mjs`](plugins/organon/hooks/
 安装器把 formatter 链接到 `~/.agents/tools`，并清理早先安装为这个 Hook 留下的东西：各运行时
 配置里的全局 Stop Hook 和 `~/.agents/tools/scholion` 链接，其他 Hook 和设置保持不变。
 
-它还会安装 [`global-agent-rules.md`](global-agent-rules.md)，即适用于任意仓库的用户级规则：
+它还会安装 [`user-agent-rules.md`](user-agent-rules.md)，即适用于任意仓库的用户级规则：
 `~/.codex/AGENTS.md` 建成指向它的文件符号链接，建不了链接的环境（没有开发者模式的 Windows）退回逐字节相同的副本；
 `~/.claude/CLAUDE.md` 加一行指向它的 `@import`。安装器保留 Claude 文件中的其他内容，并刷新它管理的 Codex 副本。
 不是安装器写的 Codex 文件只报告、不替换。

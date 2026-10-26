@@ -13,7 +13,8 @@ const ROOT = path.join(__dirname, "..");
 // without Developer Mode) — the installed-copies gate then re-checks the copy.
 // Claude Code reads ~/.claude/CLAUDE.md and expands `@path` imports, so one
 // import line there needs no link and no copy on any platform.
-const RULES_SOURCE_NAME = "global-agent-rules.md";
+const RULES_SOURCE_NAME = "user-agent-rules.md";
+const LEGACY_RULES_SOURCE_NAME = "global-agent-rules.md";
 const ASSET_SPECS = [
   { name: "java-formatter", source: ["tools", "java-formatter"], install: [".agents", "tools", "java-formatter"] },
 ];
@@ -102,6 +103,8 @@ function classifyRulesCopy(target, source, io = fs) {
   }
   if (stat.isSymbolicLink()) {
     try {
+      const linkedSource = path.resolve(path.dirname(target), io.readlinkSync(target));
+      if (linkedSource === path.join(path.dirname(source), LEGACY_RULES_SOURCE_NAME)) return "stale";
       return io.realpathSync(target) === io.realpathSync(source) ? "linked" : "foreign";
     } catch {
       return "foreign";
@@ -158,17 +161,30 @@ function classifyRulesImport(target, source, line, io = fs) {
   }
   const content = io.readFileSync(target, "utf8");
   if (content.trim() === "") return "absent";
-  return content.split(/\r?\n/u).some((candidate) => candidate.trim() === line) ? "present" : "append";
+  const lines = content.split(/\r?\n/u);
+  const previousLine = importLine(path.join(path.dirname(source), LEGACY_RULES_SOURCE_NAME));
+  if (lines.some((candidate) => candidate.trim() === previousLine)) return "stale";
+  return lines.some((candidate) => candidate.trim() === line) ? "present" : "append";
 }
 
-// The user's own CLAUDE.md keeps everything it has; the import line is added
-// below it, beside the user's own content.
-function installRulesImport(target, line, io = fs) {
+// Preserve the user's CLAUDE.md content; replace our retired import or append ours.
+function installRulesImport(target, line, io = fs, previousLine) {
   io.mkdirSync(path.dirname(target), { recursive: true });
   let existing = "";
   try {
     existing = io.readFileSync(target, "utf8");
   } catch {}
+  if (previousLine && existing.split(/\r?\n/u).some((candidate) => candidate.trim() === previousLine)) {
+    let inserted = existing.split(/\r?\n/u).some((candidate) => candidate.trim() === line);
+    const updated = existing.split(/(?<=\n)/u).map((row) => {
+      if (row.trim() !== previousLine) return row;
+      if (inserted) return "";
+      inserted = true;
+      return row.replace(previousLine, line);
+    }).join("");
+    io.writeFileSync(target, updated, "utf8");
+    return;
+  }
   const separator = existing === "" || existing.endsWith("\n") ? "" : "\n";
   io.appendFileSync(target, separator + line + "\n", "utf8");
 }
@@ -183,7 +199,8 @@ function planRules(home, sourceRoot, io = fs) {
   if (io.existsSync(path.join(home, ".claude"))) {
     const target = path.join(home, ".claude", "CLAUDE.md");
     const line = importLine(source);
-    rules.push({ runtime: "claude", mode: "import", source, target, line, state: classifyRulesImport(target, source, line, io) });
+    const previousLine = importLine(path.join(sourceRoot, LEGACY_RULES_SOURCE_NAME));
+    rules.push({ runtime: "claude", mode: "import", source, target, line, previousLine, state: classifyRulesImport(target, source, line, io) });
   }
   return rules;
 }
@@ -195,8 +212,8 @@ function applyRules(rules, io = fs) {
     if (rule.mode === "file") {
       if (rule.state === "absent" || rule.state === "stale") outcome = installRulesCopy(rule.target, rule.source, io);
       else if (rule.state === "copy") outcome = installRulesCopy(rule.target, rule.source, io, { linkOnly: true });
-    } else if (rule.state === "absent" || rule.state === "append") {
-      installRulesImport(rule.target, rule.line, io);
+    } else if (rule.state === "absent" || rule.state === "append" || rule.state === "stale") {
+      installRulesImport(rule.target, rule.line, io, rule.previousLine);
       outcome = "present";
     }
     outcomes.push({ ...rule, outcome });
@@ -219,6 +236,7 @@ function describeRule(rule, apply) {
   switch (rule.state) {
     case "absent": return prefix + "create rules import " + rule.line + ": " + rule.target;
     case "append": return prefix + "append rules import " + rule.line + " to: " + rule.target;
+    case "stale": return prefix + "replace retired rules import with " + rule.line + ": " + rule.target;
     case "linked": return prefix + "keep rules link: " + rule.target;
     default: return prefix + "keep rules import: " + rule.target;
   }
