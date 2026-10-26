@@ -215,7 +215,7 @@ tests/                 # test suites run by the gate (local-only, Git-ignored)
 AGENTS.md              # shared repository contract
 CONTEXT.md             # canonical domain terms for skill distribution
 CLAUDE.md              # Claude Code entry: one @AGENTS.md import
-user-agent-rules.md    # portable user-level rules for any repository
+USER-AGENT-RULES.md    # portable user-level rules for any repository
 ```
 
 Each skill directory contains a task-facing `SKILL.md` (with `name` / `description`
@@ -246,7 +246,7 @@ The installer links the formatter into `~/.agents/tools`. It also removes what
 earlier installs placed for the hook: the global Stop handler in each runtime's
 settings and the `~/.agents/tools/scholion` link, keeping unrelated hooks and settings.
 
-It also installs [`user-agent-rules.md`](user-agent-rules.md), the user-level
+It also installs [`USER-AGENT-RULES.md`](USER-AGENT-RULES.md), the user-level
 rules for every repository: `~/.codex/AGENTS.md` becomes a file symlink to it, or
 a byte-identical copy where a file symlink needs elevation (Windows without
 Developer Mode), and `~/.claude/CLAUDE.md` gets one `@import` line pointing at it.

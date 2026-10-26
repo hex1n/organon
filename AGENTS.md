@@ -145,7 +145,7 @@ When changing these targets:
 - `plugins/organon/skills/scholion/`: read
   [its README](plugins/organon/skills/scholion/README.md) and run
   `node scripts/contract-scholion.mjs`.
-- `user-agent-rules.md`: run `node scripts/install-agent-tools.cjs --apply` so a
+- `USER-AGENT-RULES.md`: run `node scripts/install-agent-tools.cjs --apply` so a
   Codex copy made where a file symlink was unavailable follows the source.
 
 ## Verification And Completion
