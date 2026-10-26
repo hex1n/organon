@@ -64,6 +64,9 @@ For Standard/Deep:
    external claims locally. For Deep External or Mixed investigations with
    parallelizable reading, use a
    [background evidence lane](REFERENCE.md#background-evidence-lane).
+   When summaries or a single discipline leave a deciding uncertainty unresolved,
+   choose raw materials, methods and validation using
+   [method selection](REFERENCE.md#method-selection).
    For exploratory or strategic questions, consider a
    [perspective scan](REFERENCE.md#perspective-scan) after the source inventory.
 3. Build a source inventory. Before deep evidence gathering, share the smallest

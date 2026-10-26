@@ -77,10 +77,26 @@ For unresolved contradictions in Chinese requests:
 - 状态: 已通过 ... 解决 | 仍开放，因为 ...
 ```
 
+## Method Selection
+
+Choose methods by the uncertainty they can resolve. Identify the raw material
+behind a consequential summary and the smallest analysis that distinguishes the
+live explanations. Use methods and tools from another field when they expose a
+missing variable, mechanism or falsifiable prediction; name the concrete check
+they enable. Expert vocabulary or a role label alone establishes no method.
+
+Match validation to the claim: a reproducible query, a replay, an independent
+measurement or held-out data may test different properties. Trace models and
+simulations back to observations, and keep their untested assumptions visible.
+Prefer an existing query or focused analysis when it settles the uncertainty;
+more elaborate tooling earns its cost through a deciding check it makes possible.
+
 ## Perspective Scan
 
-For Deep exploratory External or Mixed questions, choose domain roles whose
-incentives or evidence could expose material disagreement. Skip this branch
+For Deep exploratory External or Mixed questions, choose perspectives whose
+methods, incentives or evidence could expose a missing explanation or material
+disagreement. Use [method selection](#method-selection) to turn a perspective
+into a concrete investigation. Skip this branch
 when one factual answer or Standard-depth evidence settles the question.
 Run roles in the main context by default; use fresh scanners when the
 contradiction map drives a durable decision or an earlier scan manufactured

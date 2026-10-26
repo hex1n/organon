@@ -105,8 +105,11 @@ Include committed effects, recovery, repeated execution, concurrency and
 version/data compatibility where affected. Keep that scope for final verification;
 expand only for an explicit repository gate or a concrete coverage or diagnostic
 need. A repository's default full-suite command alone does not establish that need.
-A local result supports an end-to-end claim only across verified boundaries;
-check the missing connection or leave the claim open.
+For work spanning boundaries, verify the requested outcome at its final consumer
+after the change. A successful intermediate command or acknowledgement establishes
+only that step. Continue the remaining authorized work; when a needed capability,
+access or user decision is unavailable, report completed and open parts separately,
+with the missing connection and next action.
 
 A defect closes where it was reproduced: establish failure before and success
 after through the same entry, inputs and environment, using

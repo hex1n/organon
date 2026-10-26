@@ -14,9 +14,12 @@ Treat a proposed solution as a candidate; preserve choices the user has confirme
 
 ## Make the decision
 
-Establish the outcome and the load-bearing constraints, conventions and
-unverified assumptions. Check an unknown before relying on it when it could
-rule out the approach. Connect local capabilities to the outcome across the
+Connect a requested action or deliverable to the decision or behavior it should
+change and an observable measure of success. Preserve confirmed form and scope;
+where the mechanism remains open, compare improving the deliverable with changing
+the process that serves that outcome. Establish the load-bearing constraints,
+conventions and unverified assumptions. Check an unknown before relying on it
+when it could rule out the approach. Connect local capabilities to the outcome across the
 relevant boundaries; check the first missing connection that could change
 the recommendation. Missing user intent can leave a conditional recommendation
 with its deciding fact visible.
