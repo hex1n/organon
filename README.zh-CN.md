@@ -25,10 +25,17 @@ claude plugin install organon@organon
 ```
 
 从 GitHub 安装时，把 `./` 换成 `hex1n/organon`。安装后的 skill 带命名空间，Claude Code
-中为 `organon:tekton`。在本仓库中，`node scripts/install-skills.cjs --apply` 会完成两边的
+中为 `organon:tekton`。在本仓库中，`node scripts/install-plugin.cjs --apply` 会完成两边的
 安装，并删除早先链接安装留下的逐个 skill 链接。Claude Code 直接读取本地目录 marketplace，
 改动源文件后在下一个会话或 `/reload-plugins` 后生效。Codex 运行的是缓存副本：改完 skill
-要重新运行安装器，门禁的 installed-copies 检查会报告过期副本。
+要重新运行安装器，门禁的 installation-state 检查会报告过期副本。
+
+普通门禁仅核对 Claude 的安装登记，不启动其 CLI。运行
+`node scripts/contract-installation-state.mjs` 可核对 Claude 报告的实际加载目录和版本，
+并比较缓存插件的内容。
+运行 `node scripts/contract-installation-state.mjs --self-test`，可在不安装 agent 的情况下，
+用隔离场景验证安装检查和安装预览。CI 矩阵配置为在 Windows、Linux、macOS 上使用 Node.js 24
+执行门禁和这些场景，覆盖空格与 Unicode 路径及目录别名；本机结果只证明实际执行的平台。
 
 ## Skills
 
@@ -176,7 +183,7 @@ agent 能力，second-model reviewer 使用 runtime 提供的只读第二模型�
 
 这八个 skill 由 `first-principles-planner`、`assayer`、`arborist`、`scrutineer`、
 `deep-research`、`rationale-records`、`generating-api-docs`、`e2e-test-workflow`
-改名而来（见[命名](#命名)）。`node scripts/install-skills.cjs --apply` 会删除所有
+改名而来（见[命名](#命名)）。`node scripts/install-plugin.cjs --apply` 会删除所有
 指向本仓库的逐个 skill 链接（包括改名留下的），并安装插件。真实目录和指向别处的链接都会保留。`scholion` 的状态仍放在
 `~/.agents/state/rationale-records` 下，已有索引和未消费的工作树交接记录照常可用。
 
@@ -227,7 +234,7 @@ organon 插件自带一个 Stop Hook：[`hooks/stop.mjs`](plugins/organon/hooks/
 `~/.codex/AGENTS.md` 建成指向它的文件符号链接，建不了链接的环境（没有开发者模式的 Windows）退回逐字节相同的副本；
 `~/.claude/CLAUDE.md` 加一行指向它的 `@import`。安装器保留 Claude 文件中的其他内容，并刷新它管理的 Codex 副本。
 不是安装器写的 Codex 文件只报告、不替换。
-`node scripts/assert-installed-copies.cjs` 会复查副本，所以改完规则文件后重跑一次安装器。
+`node scripts/assert-installation-state.cjs` 会复查副本，所以改完规则文件后重跑一次安装器。
 
 ## 测试
 

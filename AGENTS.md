@@ -25,7 +25,7 @@ or remain byte-identical with, their source. Personal divergence belongs in a
 separate override skill.
 
 Install managed skills as the `organon` plugin with
-`node scripts/install-skills.cjs`. The default invocation previews changes;
+`node scripts/install-plugin.cjs`. The default invocation previews changes;
 `--apply` performs them. Claude Code reads this checkout in place; Codex runs a
 cached copy that the installer refreshes. A release that changes the plugin
 raises `version` in both plugin manifests together.
@@ -130,7 +130,7 @@ A skill's record schema is declarative and lives at the skill root, next to
 schema. Where more than one skill needs the schema interpreter, each carries
 its own copy — an import reaching outside the skill directory resolves in this checkout and
 nowhere else — delimited by the `shared-validator-helpers` markers that
-`scripts/assert-validator-helpers.mjs` pins byte-identical.
+`scripts/assert-shared-validator-code.mjs` pins byte-identical.
 
 ## Target-Specific Requirements
 
@@ -140,7 +140,7 @@ When changing these targets:
   [tools/java-formatter/README.md](tools/java-formatter/README.md) and run
   `node scripts/contract-java-formatter.mjs`.
 - `plugins/organon/hooks/`: run `node scripts/contract-organon-hook.mjs`, then
-  refresh the Codex copy with `node scripts/install-skills.cjs --apply` and
+  refresh the Codex copy with `node scripts/install-plugin.cjs --apply` and
   re-trust the changed hook in Codex.
 - `plugins/organon/skills/scholion/`: read
   [its README](plugins/organon/skills/scholion/README.md) and run

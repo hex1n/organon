@@ -28,11 +28,20 @@ claude plugin install organon@organon
 
 From GitHub, replace `./` with `hex1n/organon`. Installed skills are
 namespaced: `organon:tekton` in Claude Code. In this checkout,
-`node scripts/install-skills.cjs --apply` does both installs and removes the
+`node scripts/install-plugin.cjs --apply` does both installs and removes the
 per-skill links an earlier link install left. Claude Code reads a local
 directory marketplace in place, so source edits apply at the next session or
 `/reload-plugins`. Codex runs a cached copy: re-run the installer after editing
-a skill, and the gate's installed-copies check reports a stale copy.
+a skill, and the gate's installation-state check reports a stale copy.
+
+The default gate checks Claude's installation registration without starting its
+CLI. Run `node scripts/contract-installation-state.mjs` to check the actual load
+directory and version reported by Claude, including cached plugin contents.
+Use `node scripts/contract-installation-state.mjs --self-test` to exercise the
+installation checks and installer previews with isolated fixtures, without
+installed agents. The CI matrix runs the gate and these fixtures on Windows,
+Linux, and macOS with Node.js 24, including paths with spaces and Unicode and
+directory aliases. Local results establish only the platform actually executed.
 
 ## Skills
 
@@ -190,7 +199,7 @@ offers, and availability is resolved and recorded once at freeze time.
 The eight skills were renamed from `first-principles-planner`, `assayer`,
 `arborist`, `scrutineer`, `deep-research`, `rationale-records`,
 `generating-api-docs`, and `e2e-test-workflow` (see [Naming](#naming)).
-`node scripts/install-skills.cjs --apply` removes every per-skill link into
+`node scripts/install-plugin.cjs --apply` removes every per-skill link into
 this repository, including those a renamed skill left behind, and installs the
 plugin. Real directories and links elsewhere stay. `scholion` keeps its state
 under `~/.agents/state/rationale-records`, so existing indexes and pending
@@ -252,7 +261,7 @@ a byte-identical copy where a file symlink needs elevation (Windows without
 Developer Mode), and `~/.claude/CLAUDE.md` gets one `@import` line pointing at it.
 The installer preserves unrelated Claude content and refreshes its own managed
 Codex copy. A Codex file the installer did not write is reported, never replaced.
-`node scripts/assert-installed-copies.cjs` re-checks the copy, so re-run the
+`node scripts/assert-installation-state.cjs` re-checks the copy, so re-run the
 installer after editing the rules file.
 
 ## Testing
