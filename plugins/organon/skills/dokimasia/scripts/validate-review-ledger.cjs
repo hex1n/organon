@@ -57,11 +57,10 @@ function duplicates(values) {
 // Schema interpreter
 //
 // Keep this block byte-identical with the copy in every other skill that
-// validates an agent-authored record: `node scripts/assert-validator-helpers.mjs`
+// validates an agent-authored record: `node scripts/assert-shared-validator-code.mjs`
 // fails when they drift. It is duplicated rather than imported because
-// AGENTS.md requires each skill to stay independently distributable, and
-// install-skills.cjs links the skill directory alone — an import reaching
-// outside it resolves in this checkout and nowhere else.
+// AGENTS.md requires each skill to stay independently distributable: an import
+// reaching outside it resolves in this checkout and nowhere else.
 // ---------------------------------------------------------------------------
 
 // >>> shared-validator-helpers
@@ -647,9 +646,9 @@ function main() {
 }
 
 // require.main is a module identity, not a path comparison, so it stays
-// correct when the skill is reached through the symlink or junction that
-// install-skills.cjs creates — and on Windows, where drive-letter casing and
-// MSYS path translation make any argv-versus-module-URL comparison unreliable.
+// correct when the skill is reached through a symlink or junction — and on
+// Windows, where drive-letter casing and MSYS path translation make any
+// argv-versus-module-URL comparison unreliable.
 // Getting that wrong exits 0 having checked nothing, the worst failure a gate
 // has available.
 if (require.main === module) main();

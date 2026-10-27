@@ -4,13 +4,13 @@ const fs = require("node:fs");
 const os = require("node:os");
 const path = require("node:path");
 
-const { classify, linkSkill } = require("./install-skills.cjs");
+const { classify, linkSkill } = require("./install-plugin.cjs");
 
 const ROOT = path.join(__dirname, "..");
 // The user-level rules file is one source with two runtime entry points:
 // Codex reads ~/.codex/AGENTS.md itself, so that path becomes a file symlink,
 // or a byte-identical copy where a file symlink needs elevation (Windows
-// without Developer Mode) — the installed-copies gate then re-checks the copy.
+// without Developer Mode) — the installation-state gate then re-checks the copy.
 // Claude Code reads ~/.claude/CLAUDE.md and expands `@path` imports, so one
 // import line there needs no link and no copy on any platform.
 const RULES_SOURCE_NAME = "USER-AGENT-RULES.md";

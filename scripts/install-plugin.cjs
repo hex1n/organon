@@ -291,4 +291,4 @@ function main(argv) {
 // worst failure available.
 if (require.main === module) main(process.argv.slice(2));
 
-module.exports = { PLUGIN, classify, linkSkill, findLinkedSkills, compareTree, claudeState, codexState, planActions };
+module.exports = { PLUGIN, samePath, classify, linkSkill, findLinkedSkills, compareTree, claudeState, codexState, planActions };

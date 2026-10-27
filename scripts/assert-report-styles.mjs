@@ -11,7 +11,7 @@
 //
 // Neither file may import the other: a rendered page must stand alone with no
 // external style resource. So the shared part is delimited in both files and
-// this gate compares it byte for byte, the same way assert-validator-helpers
+// this gate compares it byte for byte, the same way assert-shared-validator-code
 // pins the duplicated schema interpreter.
 
 import fs from 'node:fs';

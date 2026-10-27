@@ -2,9 +2,9 @@
 
 // Pin the schema-interpreter block that several skills each carry a copy of.
 //
-// A skill must stay independently distributable: install-skills.cjs links the
-// skill directory alone, so a helper imported from a shared path in this repo
-// resolves here and nowhere else. The interpreter is therefore duplicated —
+// A skill must stay independently distributable: a helper imported
+// from a shared path outside the skill directory resolves in this checkout
+// and nowhere else. The interpreter is therefore duplicated —
 // deliberately — and duplication without a pin is drift waiting to happen. One
 // skill gains a keyword, another silently keeps ignoring it, and two records
 // that should be checked the same way are not.
