@@ -1,8 +1,0 @@
-{
-  "trial": "after-arche-context",
-  "observation": "429 Too Many Requests before any model response; runtime scheduled a long retry",
-  "disposition": "Stopped own isolated trial; no retry. Behavioral acceptance for source-aware planning remains open.",
-  "stopped_process_groups": [
-    41539
-  ]
-}

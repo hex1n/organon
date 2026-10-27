@@ -1,7 +1,0 @@
-{
-  "original_path": "/Users/hex1n/Workspace/organon/tests/assayer-gap-closure.test.mjs",
-  "archive_path": "/Users/hex1n/Workspace/organon/.scratch/20261026-ambition-skills/retired-local-tests/assayer-gap-closure.test.mjs",
-  "sha256": "e93d355226385f2a291d566d2b5a3703e37bf5b6991ed9a8910524861b8965ed",
-  "reason": "Git-ignored local-only suite imports retired skills/assayer/scripts/check-gate-state.mjs; no corresponding executable exists in current source. Original file preserved unchanged.",
-  "restore": "Move archive_path back to original_path."
-}
