@@ -13,6 +13,7 @@ const fs = require("node:fs");
 const os = require("node:os");
 const path = require("node:path");
 const { spawnSync } = require("node:child_process");
+const { compareTree, inSync, refreshCodexCache } = require("./plugin-cache.cjs");
 
 const ROOT = path.join(__dirname, "..");
 const PLUGIN = "organon";
@@ -144,44 +145,6 @@ function findLinkedSkills(home = os.homedir(), roots = LINKED_SKILL_ROOTS) {
   return links.sort((a, b) => a.runtime.localeCompare(b.runtime) || a.skill.localeCompare(b.skill));
 }
 
-function listFilesRecursive(root) {
-  const out = [];
-  if (!fs.existsSync(root)) return out;
-  const walk = (dir) => {
-    for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
-      const full = path.join(dir, entry.name);
-      if (entry.isDirectory()) walk(full);
-      else if (entry.isFile()) out.push(path.relative(root, full).split(path.sep).join("/"));
-    }
-  };
-  walk(root);
-  return out.sort();
-}
-
-function sameBytes(a, b) {
-  try {
-    return fs.readFileSync(a).equals(fs.readFileSync(b));
-  } catch {
-    return false;
-  }
-}
-
-function compareTree(sourceDir, installedDir) {
-  if (!fs.existsSync(installedDir)) return { installed: false, drift: [], missing: [], extra: [] };
-  const sourceFiles = listFilesRecursive(sourceDir);
-  const installedFiles = listFilesRecursive(installedDir);
-  const installedSet = new Set(installedFiles);
-  const drift = [];
-  const missing = [];
-  for (const rel of sourceFiles) {
-    if (!installedSet.has(rel)) missing.push(rel);
-    else if (!sameBytes(path.join(sourceDir, rel), path.join(installedDir, rel))) drift.push(rel);
-  }
-  const sourceSet = new Set(sourceFiles);
-  const extra = installedFiles.filter((rel) => !sourceSet.has(rel));
-  return { installed: true, drift, missing, extra };
-}
-
 function readJson(file) {
   try {
     return JSON.parse(fs.readFileSync(file, "utf8"));
@@ -223,13 +186,19 @@ function codexState(home = os.homedir(), root = ROOT, pluginRoot = path.join(roo
     registeredPath,
     marketplace: marketplaceState(registeredPath, root),
     cacheDir,
+    registered: enabled,
     ...tree,
     installed: enabled && tree.installed,
   };
 }
 
-function inSync(state) {
-  return state.installed && !state.drift.length && !state.missing.length && !state.extra.length;
+function singleVersionCache(home, state) {
+  const base = path.join(home, ".codex", "plugins", "cache", PLUGIN, PLUGIN);
+  if (path.dirname(state.cacheDir) !== base) return false;
+  if (!fs.existsSync(base)) return false;
+  const entries = fs.readdirSync(base, { withFileTypes: true });
+  return entries.length === 0 || (entries.length === 1 && entries[0].isDirectory()
+    && entries[0].name === path.basename(state.cacheDir));
 }
 
 function planActions(home = os.homedir(), root = ROOT) {
@@ -244,7 +213,11 @@ function planActions(home = os.homedir(), root = ROOT) {
       cli(command, ["plugin", "install", PLUGIN_ID]);
     }
     if (command === "codex" && (state.marketplace !== "current" || !inSync(state))) {
-      cli(command, ["plugin", "add", PLUGIN_ID]);
+      if (state.marketplace === "current" && state.registered && singleVersionCache(home, state)) {
+        actions.push({ kind: "refresh-cache", sourceDir: path.join(root, "plugins", PLUGIN), cacheDir: state.cacheDir });
+      } else {
+        cli(command, ["plugin", "add", PLUGIN_ID]);
+      }
     }
   }
   return actions;
@@ -252,6 +225,7 @@ function planActions(home = os.homedir(), root = ROOT) {
 
 function describe(action) {
   if (action.kind === "unlink") return `remove linked skill: ${action.skill} @ ${action.runtime}`;
+  if (action.kind === "refresh-cache") return `refresh Codex cache: ${action.cacheDir}`;
   return `run: ${action.runtime} ${action.args.join(" ")}`;
 }
 
@@ -273,6 +247,7 @@ function main(argv) {
     process.stdout.write(`${apply ? "DO" : "would"} ${describe(action)}\n`);
     if (!apply) continue;
     if (action.kind === "unlink") fs.unlinkSync(action.installPath);
+    else if (action.kind === "refresh-cache") refreshCodexCache(action.sourceDir, action.cacheDir, PLUGIN);
     else runCli(action);
   }
   const runtimes = [claudeState(), codexState()].filter(Boolean).map((state) => state.runtime);

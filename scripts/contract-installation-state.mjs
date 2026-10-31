@@ -3,6 +3,7 @@
 // The default check requires the installed Claude CLI; the default gate checks
 // registrations without starting an external runtime. --self-test exercises the
 // CLI contract with isolated platform-native fixtures, without installed agents.
+// --codex-refresh <codex.exe> exercises Windows cache refresh with real handles.
 import assert from "node:assert/strict";
 import fs from "node:fs";
 import path from "node:path";
@@ -229,7 +230,125 @@ async function selfTest() {
 
 }
 
-if (process.argv.includes("--self-test")) {
+async function codexRefreshContract(executable, scratch) {
+  if (process.platform !== "win32") {
+    process.stdout.write("SKIP: Codex cache handle contract requires Windows\n");
+    return;
+  }
+  assert(executable && fs.statSync(executable).isFile(), "pass an installed codex.exe after --codex-refresh");
+  fs.mkdirSync(scratch, { recursive: true });
+  const temporary = fs.mkdtempSync(path.join(scratch, "cache-refresh-"));
+  process.stdout.write(`Codex cache refresh receipts: ${temporary}\n`);
+  const home = path.join(temporary, "home space-中文");
+  const source = path.join(ROOT, "plugins/organon");
+  const version = JSON.parse(fs.readFileSync(path.join(source, ".codex-plugin/plugin.json"), "utf8")).version;
+  const cache = path.join(home, ".codex/plugins/cache/organon/organon", version);
+  const config = path.join(home, ".codex/config.toml");
+  const installer = path.join(ROOT, "scripts/install-plugin.cjs");
+  const { compareTree } = await import("./install-plugin.cjs");
+  fs.cpSync(source, cache, { recursive: true });
+  fs.writeFileSync(config, `[marketplaces.organon]\nsource_type = "local"\nsource = '${ROOT}'\n\n[plugins."organon@organon"]\nenabled = true\n`);
+  const configBefore = fs.readFileSync(config);
+  const payload = path.join(cache, "skills/scholion/README.md");
+  const planFile = path.join(temporary, "plan.json");
+  const helper = path.join(temporary, "handles.ps1");
+  fs.writeFileSync(helper, String.raw`
+param([string]$PlanFile)
+$ErrorActionPreference = 'Stop'
+[Console]::OutputEncoding = [Text.UTF8Encoding]::new($false)
+$plan = Get-Content -Raw -Encoding UTF8 -LiteralPath $PlanFile | ConvertFrom-Json
+Add-Type -TypeDefinition @'
+using System;
+using System.Runtime.InteropServices;
+using Microsoft.Win32.SafeHandles;
+public static class CacheReadHandle {
+  [DllImport("kernel32.dll", CharSet=CharSet.Unicode, SetLastError=true)]
+  static extern SafeFileHandle CreateFile(string path, uint access, uint share, IntPtr security, uint creation, uint flags, IntPtr template);
+  public static SafeFileHandle Open(string path, bool directory) {
+    SafeFileHandle handle = CreateFile(path, 0x80000000u, 3, IntPtr.Zero, 3, directory ? 0x02000000u : 0u, IntPtr.Zero);
+    if (handle.IsInvalid) throw new System.ComponentModel.Win32Exception();
+    return handle;
+  }
+}
+'@
+function Invoke-Child([string]$executable, [string[]]$commandArguments) {
+  $child = [Diagnostics.Process]::new()
+  $child.StartInfo.FileName = $executable
+  $child.StartInfo.Arguments = ($commandArguments | ForEach-Object { '"' + $_ + '"' }) -join ' '
+  $child.StartInfo.UseShellExecute = $false
+  $child.StartInfo.CreateNoWindow = $true
+  $child.StartInfo.RedirectStandardOutput = $true
+  $child.StartInfo.RedirectStandardError = $true
+  $child.StartInfo.StandardOutputEncoding = [Text.Encoding]::UTF8
+  $child.StartInfo.StandardErrorEncoding = [Text.Encoding]::UTF8
+  $child.StartInfo.EnvironmentVariables['HOME'] = $plan.home
+  $child.StartInfo.EnvironmentVariables['USERPROFILE'] = $plan.home
+  $child.StartInfo.EnvironmentVariables['CODEX_HOME'] = $plan.codexHome
+  $null = $child.Start()
+  $output = $child.StandardOutput.ReadToEndAsync()
+  $errors = $child.StandardError.ReadToEndAsync()
+  if (-not $child.WaitForExit(120000)) { $child.Kill(); throw 'Isolated process timed out' }
+  $result = [pscustomobject]@{status=$child.ExitCode; stdout=$output.Result; stderr=$errors.Result}
+  $child.Dispose()
+  return $result
+}
+$held = [CacheReadHandle]::Open($plan.heldPath, $plan.directory)
+try {
+  $original = $null
+  if ($plan.mode -ne 'version') {
+    $original = Invoke-Child $plan.codex @('plugin','add','organon@organon','--json')
+    if ($plan.mode -eq 'config') { [IO.File]::AppendAllText($plan.payload, "stale after native install") }
+  }
+  $updated = Invoke-Child $plan.node @($plan.installer,'--apply')
+} finally { $held.Dispose() }
+[pscustomobject]@{original=$original; updated=$updated} | ConvertTo-Json -Depth 5 -Compress
+`);
+  const receipts = [];
+  for (const mode of ["base", "config", "version"]) {
+    fs.appendFileSync(payload, "\nstale cache\n");
+    const previous = path.join(temporary, `${mode}-before`);
+    fs.cpSync(cache, previous, { recursive: true });
+    fs.writeFileSync(planFile, JSON.stringify({
+      mode, home, codexHome: path.join(home, ".codex"), codex: executable,
+      node: process.execPath, installer, payload,
+      heldPath: mode === "base" ? path.dirname(cache) : mode === "config" ? config : cache,
+      directory: mode !== "config",
+    }));
+    const result = spawnSync("powershell.exe", ["-NoProfile", "-NonInteractive", "-File", helper, planFile], {
+      encoding: "utf8", windowsHide: true, timeout: 240000, maxBuffer: Infinity,
+    });
+    assert.equal(result.status, 0, result.stdout + result.stderr);
+    const receipt = { mode, ...JSON.parse(result.stdout.replace(/^\uFEFF/u, "").trim()) };
+    receipts.push(receipt);
+    fs.writeFileSync(path.join(temporary, `${mode}.json`), JSON.stringify(receipt, null, 2));
+    if (mode === "version") {
+      assert.equal(receipt.updated.status, 1, JSON.stringify(receipt));
+      assert.deepEqual(compareTree(previous, cache), { installed: true, drift: [], missing: [], extra: [] });
+      const retry = spawnSync(process.execPath, [installer, "--apply"], {
+        encoding: "utf8", windowsHide: true,
+        env: { ...process.env, HOME: home, USERPROFILE: home, CODEX_HOME: path.join(home, ".codex") },
+      });
+      assert.equal(retry.status, 0, retry.stdout + retry.stderr);
+    } else {
+      assert.equal(receipt.original.status, 1, JSON.stringify(receipt));
+      assert.match(receipt.original.stderr, mode === "base" ? /os error 32/u : /os error 5/u);
+      if (mode === "base") assert.match(receipt.original.stderr, /failed to back up plugin cache entry/u);
+      assert.equal(receipt.updated.status, 0, JSON.stringify(receipt));
+    }
+    assert.deepEqual(compareTree(source, cache), { installed: true, drift: [], missing: [], extra: [] });
+    assert.deepEqual(fs.readFileSync(config), configBefore);
+    process.stdout.write(`PASS: ${mode} handle, cache contents and unchanged registration\n`);
+  }
+  fs.writeFileSync(path.join(temporary, "results.json"), JSON.stringify(receipts, null, 2));
+  process.stdout.write(`Codex cache refresh contract OK; receipts: ${temporary}\n`);
+}
+
+const refreshIndex = process.argv.indexOf("--codex-refresh");
+const scratchIndex = process.argv.indexOf("--scratch");
+if (refreshIndex >= 0) {
+  await codexRefreshContract(process.argv[refreshIndex + 1], scratchIndex >= 0
+    ? path.resolve(process.argv[scratchIndex + 1]) : path.join(ROOT, ".scratch"));
+} else if (process.argv.includes("--self-test")) {
   await selfTest();
 } else {
   const result = spawnSync(process.execPath, [CHECK, "--runtime", ...process.argv.slice(2)], { stdio: "inherit", windowsHide: true });
