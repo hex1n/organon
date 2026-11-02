@@ -227,6 +227,9 @@ organon 插件自带一个 Stop Hook：[`hooks/stop.mjs`](plugins/organon/hooks/
     node scripts/contract-organon-hook.mjs
     node scripts/contract-scholion.mjs
 
+[个人 Git 钩子](tools/git-hooks/) 同样作为用户级工具链接到 `~/.agents/tools`。
+每个仓库通过自己的测试路径配置单独接入；工具安装器不修改全局 Git 钩子或 Agent Stop Hook。
+
 安装器把 formatter 链接到 `~/.agents/tools`，并清理早先安装为这个 Hook 留下的东西：各运行时
 配置里的全局 Stop Hook 和 `~/.agents/tools/scholion` 链接，其他 Hook 和设置保持不变。
 

@@ -120,8 +120,11 @@ node "<skill-dir>/scripts/rationale.mjs" find path/to/File.ext:120 --full
 
 Use `--records`, repeated `--ext`, or `--src-filter /` for a non-default layout.
 
-`check --full` validates the entire active corpus. `check --incremental` is the
-normal Stop-hook route: on the main checkout it selects changed records plus
+`check --full` validates the entire active corpus. The Stop hook invokes
+`check --incremental` only when `docs/rationale/` exists; skill applicability and
+first initialization are decided by the agent as described in
+[Applicability and first use](SKILL.md#applicability-and-first-use).
+On the main checkout, the incremental check selects changed records plus
 records pointing at source paths changed since the last successful HEAD; in a
 linked worktree it reports `SKIP linked-worktree`. Missing, corrupt, incompatible,
 or non-ancestor state causes a full rebuild. Every schema or anchor problem is a

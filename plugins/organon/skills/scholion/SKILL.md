@@ -2,11 +2,12 @@
 name: scholion
 description: >
   Maintain personal docs/rationale records that explain why code is implemented
-  this way. Use before editing code in a repository that keeps docs/rationale/,
-  when a change leaves a constraint a natural-looking rewrite would break, when
-  answering a question took reconstructing a rule from source that no record
-  states, when the user asks to record or query such a reason, or during
-  worktree handoff of rationale notes.
+  this way. Use when implementation, migration or source investigation reveals
+  a constraint a natural rewrite could break, such as compatibility, ordering or
+  resource lifetime, including first use before docs/rationale/ exists; before editing
+  code in a repository that keeps docs/rationale/; when answering a question took
+  reconstructing a rule from source that no record states; when the user asks to
+  record or query such a reason; or during worktree handoff of rationale notes.
 ---
 
 # Scholion — 代码实现理由记录
@@ -17,9 +18,22 @@ snippet (代码片段), and implementation rationale (实现理由).
 It is not project documentation, requirement history,
 evidence, or a second test plan.
 
-Create a record when a natural rewrite of current code could break real behavior.
-This includes unchanged code whose rationale the task reconstructs. Search first
-so the invariant has one current record.
+## Applicability and first use
+
+Reassess applicability as implementation or investigation uncovers constraints.
+Create a record when a natural rewrite of current code could break real behavior,
+including unchanged code whose rationale the task reconstructs. Search existing
+records first so the invariant has one current explanation.
+
+Directory existence enables the automatic Stop check; it is not a prerequisite
+for using this skill. Initialize `docs/rationale/` only for a qualifying record.
+An ordinary edit with no such constraint needs neither a record nor an empty
+directory.
+
+A task decision trail or migration summary preserves choices and evidence.
+It does not complete a current code rationale record: carry the still-current
+mechanism and rewrite consequence into the path/snippet/rationale schema below,
+leaving task history and verification evidence in their original home.
 
 ## Main-checkout workflow
 
@@ -27,8 +41,10 @@ so the invariant has one current record.
 2. Before editing, find rationale for every affected file and concept using
    source paths, domain terms or known W-IDs. Member lookup is proximity
    navigation; read the matched code and explanations. Repeat for new files.
-3. Add or update an active entry under `docs/rationale/<stable-domain>/`. Name
-   files `<NN>-<topic>.md` so their reading order is visible. Start every file
+3. For the first qualifying record, keep `docs/rationale/` Git-ignored using a
+   repository-local exclude such as `.git/info/exclude` unless it is already
+   ignored. Add or update an active entry under `docs/rationale/<stable-domain>/`.
+   Name files `<NN>-<topic>.md` so their reading order is visible. Start every file
    with a topic and one-line `TL;DR` saying what it records. Split large domains
    by stable subdomain or code ownership, never by requirement.
 4. Name the record after what it anchors and title it with what a natural rewrite
@@ -57,7 +73,9 @@ active records.
 The checker proves only mechanics: ordered files, exact schema, unique W-IDs,
 existing source paths, and file-unique token snippets. Snippet matching ignores
 whitespace, indentation, and line breaks but preserves strings, comments, and
-token boundaries. It cannot decide what prose means. Before handoff, reread
+token boundaries. It cannot decide what prose means or infer from a source diff
+whether a record is needed. A successful Stop check does not establish that all
+qualifying constraints were recorded. Before handoff, reread
 every changed explanation against current code and the reference's content rules;
 keyword filtering cannot establish semantic correctness.
 

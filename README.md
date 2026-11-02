@@ -205,6 +205,16 @@ plugin. Real directories and links elsewhere stay. `scholion` keeps its state
 under `~/.agents/state/rationale-records`, so existing indexes and pending
 worktree handoffs carry over.
 
+For an already registered Codex install with one cached version, same-version
+source edits refresh that version directory transactionally and preserve the
+user configuration. Initial installation, version upgrades and marketplace moves
+use the runtime CLI. If the version directory is in use, refresh leaves the old
+cache intact; retry after its reader releases it. Rerunning after an interrupted
+version switch rebuilds the registered cache from source.
+
+On Windows, exercise the cache and configuration handle cases with
+`node scripts/contract-installation-state.mjs --codex-refresh <absolute-path-to-codex.exe>`.
+
 `euthyna` can run directly or in a fresh-context reviewer delegated by an
 implementation workflow. It owns code review, `tekton` owns implementation,
 and `dokimasia` owns design/plan review; none requires the others to be installed.
@@ -250,6 +260,10 @@ repository dispatchers call:
     node scripts/contract-java-formatter.mjs
     node scripts/contract-organon-hook.mjs
     node scripts/contract-scholion.mjs
+
+The [personal Git hooks](tools/git-hooks/) are another user-level tool linked
+under `~/.agents/tools`. Repositories opt in with their own test-path settings;
+the tool installer does not change global Git hooks or Agent Stop hooks.
 
 The installer links the formatter into `~/.agents/tools`. It also removes what
 earlier installs placed for the hook: the global Stop handler in each runtime's

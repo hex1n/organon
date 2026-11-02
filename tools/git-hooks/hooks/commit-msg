@@ -1,0 +1,17 @@
+#!/bin/sh
+
+message_file="$1"
+
+if grep -Eiq '^(Co-Authored-By:.*(Claude|Anthropic|OpenAI|GPT|Copilot|Cursor|Codeium)|Claude-Session:|OpenAI-Session:)' "$message_file"; then
+  echo "提交信息禁止包含 AI attribution（Co-Authored-By/Session）。" >&2
+  exit 1
+fi
+
+subject=$(sed -n '1p' "$message_file")
+if printf '%s\n' "$subject" | grep -Eq '^Merge |^Revert ' ; then
+  exit 0
+fi
+if ! printf '%s\n' "$subject" | grep -Eq '^(feat|fix|refactor|perf|test|docs|chore|build|ci|style|revert)(\([[:alnum:]_.-]+\))?: .+'; then
+  echo "提交主题须使用 Conventional Commits 格式：type(scope): subject。" >&2
+  exit 1
+fi
