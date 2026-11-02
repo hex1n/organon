@@ -43,8 +43,9 @@ Repeat the `文件路径`/`代码片段` pair when one invariant depends on more
 declaration or call. Use repository-relative paths. A snippet must occur exactly
 once in its file. Whitespace, indentation, and line breaks are ignored when
 matching; strings, comments, and token boundaries are preserved. Anchor
-behavior-bearing code; comments, imports and navigation-only fragments do not
-qualify.
+behavior-bearing production or tool code within the
+[applicability scope](SKILL.md#applicability-and-first-use); comments, imports and
+navigation-only fragments do not qualify.
 
 Anchor the statement, expression, type or ordering whose natural rewrite would
 cause the title's consequence. A forwarding call qualifies when its target,

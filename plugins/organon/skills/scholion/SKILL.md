@@ -1,11 +1,12 @@
 ---
 name: scholion
 description: >
-  Maintain personal docs/rationale records that explain why code is implemented
-  this way. Use when implementation, migration or source investigation reveals
-  a constraint a natural rewrite could break, such as compatibility, ordering or
-  resource lifetime, including first use before docs/rationale/ exists; before editing
-  code in a repository that keeps docs/rationale/; when answering a question took
+  Maintain personal docs/rationale records that explain why production and tool
+  code is implemented this way. Use when implementation, migration or source
+  investigation reveals a constraint a natural rewrite could break, such as
+  compatibility, ordering or resource lifetime, including first use before
+  docs/rationale/ exists; before editing code in a repository that keeps
+  docs/rationale/; when answering a question took
   reconstructing a rule from source that no record states; when the user asks to
   record or query such a reason; or during worktree handoff of rationale notes.
 ---
@@ -20,10 +21,17 @@ evidence, or a second test plan.
 
 ## Applicability and first use
 
+Record reasons in the implementation that provides an application's or tool's
+actual behavior. Tests, fixtures, test doubles and helpers used only for
+verification are not record targets. A test may reveal an implementation
+constraint; anchor it in the implementation that owns it, not the test's setup,
+assertions or result projection. Keep test-specific explanations with the test
+or verification documentation. Classify by the code's role, not its filename.
+
 Reassess applicability as implementation or investigation uncovers constraints.
-Create a record when a natural rewrite of current code could break real behavior,
-including unchanged code whose rationale the task reconstructs. Search existing
-records first so the invariant has one current explanation.
+Create a record when a natural rewrite of that implementation could break real
+behavior, including unchanged code whose rationale the task reconstructs. Search
+existing records first so the invariant has one current explanation.
 
 Directory existence enables the automatic Stop check; it is not a prerequisite
 for using this skill. Initialize `docs/rationale/` only for a qualifying record.
