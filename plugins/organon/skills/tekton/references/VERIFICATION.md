@@ -53,10 +53,12 @@ required property. A spelling or representation is fixed only when the contract
 fixes it. Accept a dependency-direction change by the module-level reference
 graph, re-exported after the change, not by type names.
 
-At a deciding test-double boundary, preserve generation, storage and read
-semantics: identity creation, order, normalization, replaced or retained fields,
-and transaction effects. Use the real boundary when the fake cannot reproduce
-the deciding behavior; keep unavailable semantics explicit.
+At a deciding test-double or reduced-context boundary, preserve the conditions
+that select behavior as well as its data semantics: competing implementations,
+lifecycle and interception, identity creation, order, normalization, replaced or
+retained fields, and transaction effects. Check what the substitution removes from
+the production path. Use the real boundary when the reduced one cannot preserve
+the condition under test; keep unavailable semantics explicit.
 
 Pair the contract-preserving change with a plausible contract violation. Passing an
 equivalent change alone does not show that the check detects a defect; a rejected

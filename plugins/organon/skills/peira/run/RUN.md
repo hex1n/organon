@@ -42,6 +42,17 @@ authority or a contradictory marked anchor is a plan gap; missing live commands,
 or fixtures is an execution blocker. Derive mechanics from available sources before
 asking for facts; keep unresolved facts explicit.
 
+An entry named in a plan is proposed mechanics, not proof of the caller's route.
+For a user journey, establish how that actor and starting state reach the selected
+entry from caller or dispatch evidence. When several entries reach shared business
+logic, compare the prerequisites they enforce before that common path; tracing only
+downstream effects cannot establish their equivalence. An unresolved caller mapping
+leaves the journey unverified; a scoped lower-layer run can still establish its own
+results. Choose an oracle that proves the requested property: matching stored values
+does not establish the caller's response contract. For migration equivalence, compare
+old and new observations at that boundary, or use an independently specified contract;
+normalize only approved differences.
+
 **Preserve expected-result authority.** Pin approved expectations and completion
 predicates to their source/revision. Code changes can refresh stale locators and
 commands, never approve their own changed behavior. Change an expectation only from

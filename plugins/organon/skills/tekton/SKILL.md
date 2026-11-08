@@ -25,6 +25,11 @@ distinguish a plausible wrong implementation. Characterization supports
 preservation; a bug fix needs an expectation independent of the defect. Use a
 justified invariant, comparison or replay when exact values are unavailable.
 
+Before a choice or interpretation materially changes scope, observable behavior
+or operating responsibilities, explain its basis and practical consequence to the
+user. Distinguish confirmed decisions from inferred defaults; surface what could
+change the user's acceptance or next action. Continue within existing authorization.
+
 Trace the affected entry points through decisions, state changes and effects
 to their consumers. Inspect the boundaries that establish identity, order,
 precision and scope. Include retained guards and fallbacks whose inputs change.
@@ -95,9 +100,10 @@ as values; names and comments do not establish the requested improvement.
 Derive checks from the user's outcome and governing contracts; proposed control
 flow is a candidate, not the oracle. When conditions interact, use a combined
 case that distinguishes their scopes and exposes required work skipped by an
-early exit. Use the smallest surface that exercises the relevant logic and
-observes its result. Add or strengthen a test for a missing case; routine
-reversible edits need no new test that repeats the implementation.
+early exit. Use the smallest surface that preserves the conditions deciding the
+outcome, exercises the relevant logic and observes its result. Add or strengthen
+a test for a missing case; routine reversible edits need no new test that repeats
+the implementation.
 
 Select tests by changed contracts and their callers and dependencies. Run the
 narrowest set covering the affected behavior, integrations and configuration.
@@ -148,7 +154,7 @@ each finding against the repair; keep independent defects separate.
 - **Structural refactoring:** read [Refactoring](references/REFACTORING.md) before
   choosing the transition. For compatibility/data migration alone, start at
   [Choose the transition](references/REFACTORING.md#choose-the-transition).
-- **Structural assertions or deciding test doubles:** read
+- **Structural assertions, deciding test doubles or reduced contexts:** read
   [Checking the oracle](references/VERIFICATION.md#checking-the-oracle).
 - **Mutation or fault injection:** read
   [Targeted mutation](references/VERIFICATION.md#targeted-mutation-and-fault-injection)
@@ -162,10 +168,18 @@ each finding against the repair; keep independent defects separate.
 
 ## Close the requested outcomes
 
-Check the final diff for scope and unintended changes. Report outcomes, decisive
-checks and material gaps in the user's language. Judge behavior, structure and
-cost separately. Explain structural gains in rule ownership, caller knowledge
-or coordinated edit points; name any remaining migration stage and exit condition.
+Check the final diff for scope and unintended changes. Lead with the user-visible
+outcome, its verification boundary and material gaps in the user's language.
+Carry still-material choices and scope interpretations into delivery, distinguishing
+user decisions from implementation assumptions. A progress record establishes what
+was done, not who accepted its scope; keep an interpretation provisional when its
+authority is unresolved. Give the reason, practical effect
+and the concrete change to a deciding assumption or dependency that would warrant
+revisiting them. Keep the facts needed for that judgment in the reply and link
+supporting detail. Scale this explanation to the task: routine changes need no
+invented tradeoff or reconsideration condition. Judge behavior, structure and cost
+separately. Explain structural gains in rule ownership, caller knowledge or
+coordinated edit points; name any remaining migration stage and exit condition.
 
 Bind verification and required review, with findings dispositioned, to the final
 material revision. Classify failed checks as introduced, pre-existing or
