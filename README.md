@@ -205,6 +205,12 @@ plugin. Real directories and links elsewhere stay. `scholion` keeps its state
 under `~/.agents/state/rationale-records`, so existing indexes and pending
 worktree handoffs carry over.
 
+Managed plugin caches are replaceable copies of this repository. Applying a
+planned cache refresh with `--apply` replaces cache-local edits, restores missing
+files and removes extra cached files to match current source. Both source updates
+and cache edits can trigger synchronization. Keep personal customisations in a
+separate override skill outside the managed plugin cache.
+
 For an already registered Codex install with one cached version, same-version
 source edits refresh that version directory transactionally and preserve the
 user configuration. Initial installation, version upgrades and marketplace moves

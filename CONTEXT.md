@@ -32,12 +32,8 @@ _Avoid_: Codex-only consumer
 A separate user-owned skill used for personal customisation instead of editing a managed installed skill in place.
 _Avoid_: patching the installed cache
 
-**Provenance Record**:
-Metadata that identifies the source and last-synced content of a managed installed skill.
-_Avoid_: install note, sync log
-
 **Cache Drift**:
-A mismatch between an installed skill cache and its last recorded synced content.
+A mismatch between an installed skill cache and its current source skill. It indicates a cache that needs synchronization, not whether the source or the cache changed.
 _Avoid_: local update, manual fix
 
 ### Relationships
@@ -46,18 +42,18 @@ _Avoid_: local update, manual fix
 - A **Managed Installed Skill** lives in an **Installed Skill Cache**.
 - An **Installed Skill Cache** may be shared by multiple **Agent Runtimes**.
 - A **Local Override Skill** is separate from a **Managed Installed Skill**.
-- A **Provenance Record** belongs to exactly one **Managed Installed Skill**.
-- **Cache Drift** blocks automatic replacement unless the user explicitly forces it.
+- Refreshing an **Installed Skill Cache** restores its **Source Skill** content.
+- Changes inside a managed cache are replaceable; personal customisations belong in a separate **Local Override Skill**.
 
 ### Example dialogue
 
 > **Dev:** "Can I change the installed `historia` skill directly?"
 > **Domain expert:** "No. That is a **Managed Installed Skill** in the shared **Installed Skill Cache** used by **Agent Runtimes** such as Codex and Claude Code; make a **Local Override Skill** if you need personal behaviour."
 > **Dev:** "What if the remote source has a newer version?"
-> **Domain expert:** "Update it only after checking the **Provenance Record** and confirming there is no **Cache Drift**."
+> **Domain expert:** "Refresh the managed cache from its Source Skill. Keep personal customisations in a separate Local Override Skill."
 
 ### Flagged ambiguities
 
 - "local skill" can mean either a **Managed Installed Skill** or a **Local Override Skill**. Resolved: repository-managed installs are **Managed Installed Skills** and are treated as read-only cache entries.
-- "update" must not mean blind overwrite. Resolved: updates are safe replacements from a source skill after provenance and drift checks.
+- "update" means restoring a managed cache from its authoritative source, including replacing cache-local edits. Personal customisations remain separate override skills.
 - "agent runtime" must not mean Codex only. Resolved: Codex and Claude Code are both **Agent Runtimes** that may share the same **Installed Skill Cache**.

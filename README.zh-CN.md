@@ -187,6 +187,10 @@ agent 能力，second-model reviewer 使用 runtime 提供的只读第二模型�
 指向本仓库的逐个 skill 链接（包括改名留下的），并安装插件。真实目录和指向别处的链接都会保留。`scholion` 的状态仍放在
 `~/.agents/state/rationale-records` 下，已有索引和未消费的工作树交接记录照常可用。
 
+受管插件缓存是本仓库源码的可重建副本。执行 `--apply` 计划中的缓存刷新时，会以
+当前源码为准，覆盖缓存中的改动、补齐缺失文件并移除多余文件。源码更新和缓存手改
+都会触发同步；个性化修改放在受管插件缓存之外的独立 override skill 中。
+
 `euthyna` 可独立调用，也可交给实现流程中的 fresh-context reviewer 使用。
 它负责代码审查，`tekton` 负责实施，`dokimasia` 负责方案/计划评审；三者均无强制依赖。
 
