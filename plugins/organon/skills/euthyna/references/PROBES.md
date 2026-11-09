@@ -13,10 +13,15 @@ ordering and aggregation grain through transformations. For alignment work,
 compare equivalent inputs/state and preserve the target's semantic distinctions;
 include affected outputs and retained branches, even after the first mismatch.
 
-**State and effects:** identify the operation's commit boundary and observable
-order. Follow partial writes, messages, external calls and cleanup through
-failure, retry and cancellation. Establish which effects survive a reported
-failure and which repetitions can repeat them. In concurrent paths, find the
+**State and effects:** where prior events change permitted actions, reconstruct
+the implicit state machine across its guards, writers and readers. Keep independent
+dimensions separate: local processing completion need not mean external success.
+Trace reachable transitions from their trigger and guard through writes, effects,
+commit and observation. Follow partial writes, messages, external calls and cleanup
+through failure, retry, cancellation and restart; establish what survives, which
+repetitions can duplicate effects, and which entry can recover it. Judge missing or
+forbidden transitions against the owning
+contract, including deliberate terminal states. In concurrent paths, find the
 actual enforcement point and test an allowed interleaving that could break it.
 
 **Access and shared scope:** carry actor, object and tenant identity to the

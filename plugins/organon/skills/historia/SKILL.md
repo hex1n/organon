@@ -67,6 +67,8 @@ For Standard/Deep:
    When summaries or a single discipline leave a deciding uncertainty unresolved,
    choose raw materials, methods and validation using
    [method selection](REFERENCE.md#method-selection).
+   For lifecycle questions or implicit state-machine discovery, use
+   [state-machine reconstruction](REFERENCE.md#implicit-state-machines).
    For exploratory or strategic questions, consider a
    [perspective scan](REFERENCE.md#perspective-scan) after the source inventory.
 3. Build a source inventory. Before deep evidence gathering, share the smallest

@@ -91,6 +91,41 @@ simulations back to observations, and keep their untested assumptions visible.
 Prefer an existing query or focused analysis when it settles the uncertainty;
 more elaborate tooling earns its cost through a deciding check it makes possible.
 
+## Implicit State Machines
+
+Use this method when prior events change which actions are allowed or what they
+do, even when the state is spread across flags, records, resource existence or
+derived predicates. Start from guarded actions and state writers, then trace their
+callers and readers; status names alone identify candidates, not transitions.
+
+For an inventory, establish the source and verification entry points inspected
+and the search exclusions used. Before declaring material absent, check whether
+filters hid it; ignored tests or generated sources may still belong to the scope.
+Account for candidates there: reconstructed machines, ordinary classifications,
+and unresolved candidates with the missing evidence. Include initialization, callbacks, scheduled work and manual
+recovery where they write the same state. Report uninspected areas separately;
+search matches do not establish that every machine in the application was found.
+
+For each reconstructed machine, identify the entity or correlation key, what
+represents its state, and who can change it. Keep independent state dimensions
+separate and identify the guards or invariants that couple them. Distinguish
+process-local bookkeeping, durable processing records and external outcomes.
+Tie explanatory state names to source predicates rather than inventing stored
+values. Trace consequential transitions through trigger, guard, writes and effects,
+commit boundary, and what readers observe, citing their owners.
+
+Follow reachable failures, retries, duplicate or out-of-order events and restarts
+through the affected transitions. Establish what survives interruption and which
+entry can resume, compensate or deliberately end the work. A missing recovery
+transition is a defect only when a supported obligation requires one; an unusual
+combination of independent states is not by itself an invalid state.
+
+Separate source reconstruction from exercised transitions and unsupported
+assumptions; identify what existing tests actually cover. Use a compact transition
+table or prose where sufficient. Recommend a representation change only for a
+demonstrated behavior or maintenance problem; discovery does not require replacing
+the implementation with a state-machine framework.
+
 ## Perspective Scan
 
 For Deep exploratory External or Mixed questions, choose perspectives whose
