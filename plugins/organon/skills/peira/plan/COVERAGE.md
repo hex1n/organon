@@ -1,7 +1,8 @@
-# Planning reference
+# Coverage reference
 
 The planning workflow lives in `PLAN.md`. Read Coverage Models for interacting
-coverage obligations and Effective scenario facts when writing the scenario tree.
+coverage obligations and Operation coverage map when the scope is a set of
+operations.
 
 ## Coverage Models
 
@@ -76,25 +77,27 @@ stable when revising a referenced plan; document retired obligations when existi
 references need them. Consecutive numbering is unnecessary. Old plans without layer
 columns or a ledger remain valid; preserve their established coverage mappings.
 
-## Effective scenario facts
+### Operation coverage map
 
-Each executable scenario has a purpose and these effective facts. They describe
-the business case; their headings are not a template to repeat at every tree node.
+Use when the requested scope is a set of operations (endpoints, commands, jobs),
+each of which must be accounted for. The map answers one question per operation:
+which scenarios cover it.
 
-| Fact | Required content |
-|---|---|
-| Preconditions | Concrete starting state and inputs, or deterministic construction/selection rules; predecessor scenario IDs only where genuinely required. |
-| Actions | Ordered business actions through a source-backed entry or adapter, naming the stable operation and its inputs. |
-| Observes | Final contractual observation and completion predicate. Record an approved product time threshold, or `business threshold: none specified`. |
-| State Footprint | Resources read, written, and external effects; `none` for an empty class. Every writable/external target names provenance or ownership and allowed lifecycle: `retain`, `restore`, or `delete`. |
-| Capabilities | What judging this scenario needs beyond the entry under test — the probes its observations read and the access they require; `entry only` when the response settles it. Execution selects against this, so a session lacking one blocks that scenario by name instead of discovering it mid-run. |
-| Expected Results | Concrete values, errors, or invariants that distinguish correct from incorrect behavior. |
-| Oracle / Expected Authority | `specified` for approved expected values, or `derived` for an independent reference/relation; name the governing source, revision, and calculation. |
-| Implementation Evidence | Locators supporting the entry, state, observation, and footprint; these establish mechanics, not business correctness. |
+| Operation | Positive coverage | Rejection, partial, and boundary coverage |
+|---|---|---|
+| `OP-07` cancelOrder | ORD-02 step 1 | ORD-02.B1, ORD-02.B2 |
 
-The first five facts are the execution anchors. Resolve business facts here; the
-execution stage resolves live targets, credentials, commands, safety wait bounds,
-owner markers, and cleanup implementations. Keep a known project command when it
-is the stable entry interface. Missing business decisions stay `NEEDS-DECISION`;
-missing source anchors stay `BLOCKED`. Either can be planned, but neither is
-execution-ready.
+A row holds the operation's stable ID, a short name, and scenario, step, or
+variant IDs; an operation nothing covers names its gap. Expected results and
+variants stay in the scenario blocks. A map that restates them hands the executor
+a second, flatter list, and it runs that list instead of the journeys.
+
+Write per-operation reference detail once, keyed by the same operation IDs:
+qualified names, request and response types, legacy route signatures, source
+locators. By default it is one reference table in the plan's coverage section, so
+the plan stays a single file. Move it to an inventory file beside the plan when
+the table would run longer than the scenario tree or a script generated it; name
+the file and its contents in the overview so the run pins it with the plan. The
+inventory holds reference detail only; behavior and expected results stay in the
+scenario blocks. Write source locators relative to the repository root; the
+plan's pinned revision fixes what they point at.

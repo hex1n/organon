@@ -19,7 +19,7 @@ Carry, in this order:
   verbatim: target environment, retained-data preferences, test-code authority.
 - The agent's scope: execution, diagnosis, and rendering only. Product fixes stay
   with the parent whatever the user authorized; the agent writes local issue files
-  per [Defect Handoffs](REFERENCE.md#defect-handoffs) and stops there.
+  per [Defect Handoffs](ISSUES.md#defect-handoffs) and stops there.
 - The user's output path when one was given; otherwise RUN.md's default location
   applies.
 - The return contract below, spelled out.
@@ -38,14 +38,14 @@ The agent returns:
 - report and issue paths;
 - the HTML path and checks that ran on it, or the reason HTML was withheld;
 - every nonzero status count, actionable finding, blocker, retained-data fact,
-  and unresolved decision;
+  harness drift, and unresolved decision;
 - outstanding state obligations.
 
 Relay this result unchanged. The parent need not reread the report to deliver it.
 
 ## Repair loops
 
-Before the first product fix, read [Authorized repair loops](INTAKE.md#authorized-repair-loops):
+Before the first product fix, read [Authorized repair loops](CONTINUE.md#authorized-repair-loops):
 the parent owns the cumulative rerun count and the stopping conditions, the default
 cap included. Each continuation brief names the prior report, the count so far and the
 remaining cap, and the intended fixed build identity the agent must prove loaded

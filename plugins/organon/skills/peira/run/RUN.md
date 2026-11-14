@@ -2,8 +2,8 @@
 
 Run the selected scenarios, establish their verdicts, and leave enough evidence to
 understand and repeat them. Prefer the project's existing harness or adapter. Author
-test code only when the user or the supplied plan's execution method authorizes it;
-a coverage or automation label is not that authorization. Product fixes require
+test code only when the user authorizes it; a plan's coverage or automation label
+is not that authorization. Product fixes require
 their own authorization. Record defects in local issue files linked from the report;
 this workflow never creates issues on a remote tracker.
 
@@ -15,21 +15,29 @@ intended audience.
 ## 1. Select and pin the run
 
 Read the upstream plan or report and the latest user constraints before touching the
-system. For a continuation or inherited scenario fields, read
-[INTAKE.md](INTAKE.md). A straightforward plan can proceed from this
-entrypoint.
+system. Resolve an `execution-anchors/v1` plan's fields and variants with
+[scenario-tree inheritance](#scenario-tree-inheritance) below. For a continuation,
+read [CONTINUE.md](CONTINUE.md).
 
 Honor an explicit scenario subset. Otherwise select the plan's obligations at the
-requested execution boundary, begin with its First Test Slice, and continue ready
-scenarios by priority. The first slice sets execution order; it is not the whole request's
+requested execution boundary, begin with the first slice it names, and continue
+ready scenarios by priority when the plan states one, otherwise in tree order. The
+first slice sets execution order; it is not the whole request's
 completion boundary. Keep unavailable in-scope obligations visible as gaps.
-Record selected IDs and exclusions before execution. Lower-layer test mappings and
-unimplemented follow-ups are coverage context, not extra E2E scenario nodes. Selecting
+Record selected IDs and exclusions before execution. Lower-layer test mappings,
+operation-map rows, and unimplemented follow-ups are coverage context, not extra
+E2E scenario nodes. Selecting
 a subset preserves its shared prerequisites and safety gates.
 
-Establish each selected scenario's Capabilities before finalizing selection.
-If the plan lacks that anchor, derive the capabilities from its observations.
-Block a scenario on any missing capability before running its trigger.
+Select by the plan's scenario and variant IDs. Establish each selected ID's
+Capabilities before finalizing selection.
+If the plan lacks that anchor, derive the capabilities from its preconditions,
+observations, and footprint.
+Hold an ID that carries a plan `NEEDS-DECISION` or `BLOCKED` item or needs a missing
+capability, and every ID whose path runs through it, before running its trigger; a
+base scenario and sibling variants whose own paths are complete stay selected. A
+held ID the user selected is recorded `blocked` with no trigger run; otherwise it
+is listed with the exclusions and what it is missing.
 If the reachable evidence establishes only part of an expectation, narrow the
 claim to that part and keep the rest as a gap. A narrowed claim does not pass
 the whole scenario.
@@ -37,10 +45,14 @@ the whole scenario.
 Resolve each selected scenario's starting inputs/state, legitimate trigger, final
 observation/completion predicate, expected result and authority, and resources it
 reads or changes. `execution-anchors/v1` plans supply these as Preconditions, Actions,
-Observes, State Footprint, and Capabilities plus verdict facts. Missing business
-authority or a contradictory marked anchor is a plan gap; missing live commands, credentials, probes,
-or fixtures is an execution blocker. Derive mechanics from available sources before
-asking for facts; keep unresolved facts explicit.
+Observes, State Footprint, and Capabilities plus verdict facts: the trigger comes
+from Actions, probe and wait from Observes, inputs and dependencies from
+Preconditions, ownership and lifecycle from State Footprint. Mark derived mechanics
+in the report. Missing business authority or a missing or contradictory marked
+anchor is a plan gap, never repaired silently from current code; missing live
+commands, credentials, probes, or fixtures is an execution blocker. Derive
+mechanics from available sources before asking for facts; keep unresolved facts
+explicit.
 
 An entry named in a plan is proposed mechanics, not proof of the caller's route.
 For a user journey, establish how that actor and starting state reach the selected
@@ -60,22 +72,55 @@ a new approved authority or explicit user override; record old/new values, sourc
 and affected scenarios. If code is the designated contract, use its approved revision.
 Unknown authority permits characterization, not a business-correctness pass.
 
-Pin the upstream artifact by content hash. Retain the consumed expectations in
-this run. Create a fresh run directory under the user's output path, or use
-`.scratch/{feature}/e2e/runs/{yyyymmdd-hhmm}/` by default; if it exists, choose the
-next free `-2`, `-3` suffix. Keep historical runs immutable.
+Pin the upstream artifact, and each inventory file it names, by path and content
+hash in the report's run context. Retain the consumed expectations in each
+scenario's record in the report; the hash stands for the rest of the plan. Create
+a fresh run directory under the user's output path, or use
+`.scratch/{feature}/e2e/runs/{yyyymmdd-hhmm}/` by default, with an optional short
+`-{slug}` after the timestamp; if it exists, choose the next free `-2`, `-3`
+suffix. Keep historical runs immutable.
 
 Record these facts as work proceeds in
-`{date}-{feature}-e2e-test-report.md` inside the run directory.
-Use a separate snapshot only to preserve otherwise unavailable source facts
-or complex derived mechanics that a consumer needs.
+`{yyyy-mm-dd}-{feature}-e2e-test-report.md` inside the run directory, in the format
+[REPORTING.md](REPORTING.md) names.
+
+### Scenario-tree inheritance
+
+This is the one statement of how a plan's facts resolve; the planner writes to it.
+
+Resolve shared fields from root to leaf: an omitted field inherits the value of
+the nearest ancestor that defines it; a defined field replaces the whole value.
+Partial append/delete inside an inherited field is invalid; a field that only
+points at its parent inherits like an omitted one. A reference to a named fixture,
+route, footprint, or assertion set with parameter values is a complete value:
+resolve it from that definition with those values, together with any condition
+the field states beside it.
+
+A variant row is the base scenario's whole path with one change: the base's
+effective facts, with the row's changed condition applied at the step it names (an
+input replaced, a step replaced, or a step inserted) and the row's expected
+results replacing the base's Expected Results. The other steps still run, so the
+base's Observes still completes it. A row that names another variant as its
+starting state resolves from that variant first. A variant written as its own
+block resolves like any child of the base. A row whose step, input, or starting
+state cannot be told, or whose change makes the base's Observes unreachable, is a
+plan gap.
+
+Match a fact by its English name. An older plan may use one fixed localized label
+per fact, and a merged label there supplies each fact it names. Priority,
+business-step IDs, requirement links, layer-allocation tables, and a formal ledger
+are optional annotations.
 
 ## 2. Resolve the execution context
 
 Confirm a local or test target from effective configuration and actual connectivity,
 not a profile name. Start from the project's harness (`docs/verify/HARNESS.md`) when
-the repository keeps one. Restricted staging or production requires explicit instructions
-for that environment before proceeding. Record the actual entry/harness, relevant
+the repository keeps one. When this run establishes a target, entry, authentication,
+launch, or cleanup mechanic the harness lacks or contradicts, record it as harness
+drift in the report's run context and the delivery, naming harness mode as the
+refresh; the run leaves `docs/verify/` as it found it. Restricted staging or
+production requires explicit instructions for that environment before proceeding.
+Record the actual entry/harness, relevant
 runtime identity, and proof that the tested process/artifact is the intended build.
 A reachable endpoint alone is insufficient; a local command can use the source bytes
 it actually loads, while a service needs deployed-version or discriminating evidence.
@@ -125,7 +170,9 @@ own slice. A child exit code alone is not proof of all its scenario outcomes.
 | `skipped` | A selected scenario deliberately not executed, with a reason. |
 | `unverified` | Execution occurred but retained evidence or a valid oracle is insufficient. Never use for an unexecuted case. |
 
-A scenario's status aggregates its Expected Results one by one: `passed` needs every
+Each selected ID has its own record and status: a base scenario's covers its own
+Expected Results, and each variant is judged separately. A status aggregates its
+ID's Expected Results one by one: `passed` needs every
 result satisfied with its own evidence; one violated result makes the scenario
 `failed`; one result lacking a valid observation or oracle caps it at `unverified`.
 An expectation corrected under §1 is judged by its corrected value.
@@ -138,20 +185,16 @@ retain their actionable cause once. A process failure or inaccessible dependency
 not automatically a product defect. Retry an intermittent result at most once for
 diagnosis, preserving both outcomes; later success never erases the first failure.
 When a supported finding needs correction or resolution, follow
-[Defect Handoffs](REFERENCE.md#defect-handoffs) to persist its local issue record.
+[Defect Handoffs](ISSUES.md#defect-handoffs) to persist its local issue record.
 
 ## 4. Deliver the result
 
-Read [REPORTING.md](REPORTING.md) when assembling the report and before cleanup.
-The default is one Markdown report with context, scenario results/evidence, and
-continuation or cleanup facts, plus its HTML view once the report is final using
-the report-rendering branch in [../READER-VIEW.md](../READER-VIEW.md).
-Additional sections and files need an
-actual state-management, evidence-size, or handoff purpose.
+Read [REPORTING.md](REPORTING.md) when assembling the report and before cleanup: it
+sets the report's contents, format, HTML view, and final reconciliation.
 
 Completion means every selected ID has an honest terminal status and proof or an
 explicit deficit; any retained data has an allowed lifecycle; evidence, current
 source/build identity, and rerun instructions agree. State whether the requested
 business outcome is covered and name remaining obligations; a completed slice with
 gaps is a partial result. Deliver that result before HTML preparation finishes,
-then supply the checked view. Summarize all nonzero counts and retained state.
+then supply the checked view.

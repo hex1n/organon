@@ -14,9 +14,10 @@ import sys
 from urllib.parse import unquote, urlsplit
 
 STATES = ('passed', 'failed', 'blocked', 'unverified', 'skipped')
-CASE = re.compile(r'^## ([A-Za-z][A-Za-z0-9_-]*) \[(' + '|'.join(STATES) + r')\] (.+)$')
+# A case ID may carry dotted segments: a plan variant such as ORD-02.B1 keeps its ID.
+CASE = re.compile(r'^## ([A-Za-z][A-Za-z0-9_-]*(?:\.[A-Za-z0-9_-]+)*) \[(' + '|'.join(STATES) + r')\] (.+)$')
 SHARED = re.compile(r'^## shared:([A-Za-z][A-Za-z0-9_-]*) (.+)$')
-# Dispositions are the closed vocabulary of run/REFERENCE.md#defect-handoffs and
+# Dispositions are the closed vocabulary of run/ISSUES.md#defect-handoffs and
 # stay in their original spelling under the report language policy.
 DISPOSITIONS = ('OPEN', 'CLOSED', 'MITIGATED', 'ACCEPTED', 'NEEDS-DECISION', 'BLOCKED', 'OUT-OF-SCOPE')
 # Historical reports keep the tokens they were written with.

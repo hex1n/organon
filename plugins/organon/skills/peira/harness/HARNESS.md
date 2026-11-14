@@ -17,6 +17,9 @@ Establish each fact from source and configuration, with the file that states it:
 - the primary surface: web UI, HTTP or RPC API, CLI or TUI, desktop, mobile, library,
   or a worker driven by queues or schedules. List secondary surfaces; draft recipes
   only for the primary one unless asked;
+- the targets verification runs against: a local run, a shared deployed
+  environment, or both. For each, the entry address, how a caller authenticates,
+  and the identity and tenant that login maps to;
 - how the system starts: build and run commands, the configuration profile a local
   run needs, ports, and every dependency the local run reaches (databases, caches,
   registries, brokers, third-party services, private artifact repositories);
@@ -36,18 +39,38 @@ stand-in that lets the build or the start proceed (a stub artifact generated out
 the repository, a local service answering for an external one) is recorded with every
 behaviour it removes, so a run on it never passes for a run on the real thing.
 
-Read an existing `docs/verify/` before writing: refresh the entries the code has
-outdated and keep the rest.
+Read an existing `docs/verify/` before writing. Replace each entry the code or a
+newer run has superseded with the current one and keep the entries that still
+hold: the harness states how the system is verified now, while Git and the proof
+runs keep its history.
 
 ## 2. Write `docs/verify/HARNESS.md`
 
-Five sections in this order, each giving a command or predicate an agent can execute
-as written.
+A targets table, then five sections in this order, each giving a command or
+predicate an agent can execute as written. The table has one row per target: its
+entry address, how a caller authenticates, and the identity and tenant that login
+maps to. Plans cite these rows.
+
+The reader is an agent looking up what to run next. Write each entry as the
+command or predicate, the output that shows it worked, then its status, and place
+it in the section whose question it answers. A section holds one current recipe
+per target: Launch covers the targets an agent starts; Doctor, Drive, Evidence,
+and Cleanup cover every target. What one run observed (process IDs, run
+directories, timestamps, trace IDs, the diagnosis that led to the recipe) stays in
+that run's record, linked from the entry's status.
+
+A script a harness command runs is part of the harness: keep it under
+`docs/verify/` or where the project keeps its tooling. A command whose script
+exists only in a task directory is a blocker, recorded with where the script
+needs to live.
 
 Status belongs to claims, not to sections. Every statement that something works,
-fails, or is required carries its own status: `verified YYYY-MM-DD` when a run in
-this task observed it, or `derived from source` with the file and line it rests on
-and, where one exists, the blocker that kept it from running. A section heading may
+fails, or is required carries its own status: `verified YYYY-MM-DD` with the record
+of the run that observed it on that date, or `derived from source` with the file
+and line it rests on and, where one exists, the blocker that kept it from running.
+A run in this task verifies with today's date; an entry kept from the earlier
+harness keeps its date and record link while the recipe it describes is unchanged.
+A section heading may
 summarize the claims under it, but it never vouches for a sentence the run did not
 exercise, and prose outside any section still needs a status: a reader trusts the
 nearest label, so an unlabelled or broadly labelled sentence reads as checked.
@@ -82,15 +105,17 @@ recorded as a gap.
 
 Run the harness as written, once, from a shell that carries no state from the
 writing session: launch, doctor, drive one feature, capture its evidence, clean up,
-and confirm the evidence still exists. Fix the harness where the run deviated and run
-again. Keep the run's commands and output with the task's evidence; the harness
+and confirm the evidence still exists. On a shared target, drive a read-only
+feature unless the user authorizes writes; authorized writes follow
+[business data and ownership](../run/EXECUTION.md#business-data-and-ownership).
+Fix the harness where the run deviated and run again. Keep the run's commands and output with the task's evidence; the harness
 points to them.
 
 A rejection path that ran is `verified` for that path and leaves the end state
 `derived from source`. A feature left undriven names
 the attempt that failed and where; a reason read from source alone is a guess, and
 the first attempt often fails somewhere else. Anything run only against a
-stand-in, or not run at all, stays `derived from source`. A harness whose Launch
+stand-in, or never run under either status rule above, stays `derived from source`. A harness whose Launch
 could not run says so in its first line, with the blocker.
 
 ## 5. Deliver

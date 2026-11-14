@@ -49,7 +49,7 @@ claude plugin install organon@organon
 | [`historia`](plugins/organon/skills/historia/) | 调研 | 以证据为支撑的调研，交付书面结论而非修复：判断事实真相、行为成因、证据支持哪个选项。 |
 | [`tekton`](plugins/organon/skills/tekton/) | 实现 | 实现、修复、重构、迁移代码，或落地设计文档、已裁决的方案，新写和修改已有代码都适用；不破坏改动波及的调用方、已存数据和测试。先追踪受影响的契约，再按可验证的切片修改；缺陷只在原复现处确认修复；守卫只有找得到真实入口、归属方和一个去掉它就会失败的测试才保留；在最终版本上用证据证明契约仍成立。 |
 | [`euthyna`](plugins/organon/skills/euthyna/) | 审查 | 先建立正确性的判断依据，再由两位独立 reviewer 分别审查业务与系统行为、实现与结构；调查缺陷、不必要的复杂度和实质风险，综合证据，只读报告。 |
-| [`peira`](plugins/organon/skills/peira/) | 验证 | 规划、执行并呈现端到端测试：可溯源的业务场景树、把缺陷交回调用方另行授权修复的证据化执行报告，明确要求时才做有上限的直至全绿循环，以及 HTML 阅读视图。开头带 `plan`、`run`、`render`、`brief` 或 `harness` 时选定模式：plan 出计划并渲染；run 执行并渲染，无计划时先规划；render 只渲染已有产物；brief 为已完成的报告出一页纸摘要，与报告一起交付；harness 在 `docs/verify/` 下写出项目的验证配方，并以一次端到端实跑证明其可用。 |
+| [`peira`](plugins/organon/skills/peira/) | 验证 | 规划、执行并呈现端到端测试：可溯源的业务场景树、把缺陷交回调用方另行授权修复的证据化执行报告，明确要求时才做有上限的直至全绿循环，以及每份报告的 HTML 阅读视图。开头带 `plan`、`run`、`render` 或 `harness` 时选定模式：plan 出计划；run 执行并渲染，无计划时先规划；render 只渲染已有报告；harness 在 `docs/verify/` 下写出项目的验证配方，并以一次端到端实跑证明其可用。 |
 | [`horos`](plugins/organon/skills/horos/) | 落地/验证 | 基于代码契约生成跨 RPC 与 HTTP 协议的后端 API 文档，范围可为单个接口、一个需求的后端 API 或一个分支的 API 变更。 |
 | [`ichnos`](plugins/organon/skills/ichnos/) | 留痕 | 现有记录不足以保留重要选择、转向、阻断或交接依据，或用户明确要求时，记录理由、证据和结果。在任务的 `.scratch/` 文件夹中合并关键检查点，复用工作本身要求的审查。 |
 | [`scholion`](plugins/organon/skills/scholion/) | 导航 | 记录当前代码为什么这样实现，按文件路径或代码片段查找对应的实现理由；记录由个人维护、Git 忽略，支持工作树交接。 |
@@ -161,7 +161,7 @@ claude plugin install organon@organon
 规划   arche → dokimasia   ← 先定方案，再证伪
 实现   tekton              ← 先追根系，再做最小安全改造
 审查   euthyna             ← 证伪实现，也核实发现；只读报告
-验证   peira（plan → run → render · brief）· horos
+验证   peira（plan → run → render）· horos
 调研   historia            ← 按需求证
         ↑ 新发现的未知回馈下一轮规划
 按需   ichnos              ← 保留重要决策和交接依据
@@ -177,8 +177,8 @@ claude plugin install organon@organon
 agent 能力，second-model reviewer 使用 runtime 提供的只读第二模型能力，可用性在冻结时
 一次判定并记录；reviewer 始终只读。
 
-`peira` 在两个宿主中都由模型自动触发；手动输入时开头的 `plan`、`run`、
-`render` 或 `brief` 选定模式：Claude Code 用 `/organon:peira plan …`，Codex 用
+`peira` 在两个宿主中都由模型自动触发；手动输入时开头的 `plan`、`run`
+或 `render` 选定模式：Claude Code 用 `/organon:peira plan …`，Codex 用
 `$organon:peira plan …`。它取代已退役的 `e2e-test-planner` 与 `e2e-test-executor`。
 
 这八个 skill 由 `first-principles-planner`、`assayer`、`arborist`、`scrutineer`、

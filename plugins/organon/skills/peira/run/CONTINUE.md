@@ -1,35 +1,15 @@
-# Intake of an existing artifact
+# Continue a prior run
 
-Read the section the run needs: inherited scenario fields, or a continuation of a
-prior run. Selection, expected authority, source pinning, and
-run-directory rules live in `RUN.md`.
-
-## Scenario-tree inheritance
-
-For `execution-anchors/v1`, resolve shared fields from root to leaf: an omitted child
-field inherits the nearest complete parent value; a defined child field replaces the
-whole value. Partial append/delete inside an inherited field is invalid. A reference
-to a named fixture, route, footprint, or assertion set with parameter values is a
-complete value: resolve it from that definition with those values. Preserve
-all five anchors and the approved verdict facts. Priority, business-step IDs,
-requirement links, layer-allocation tables, and a formal ledger are optional unless
-an existing consumer explicitly requires them. Missing such annotations alone is
-not a plan defect.
-
-Derive live mechanics from the effective facts: trigger from Actions, probe and wait
-from Observes, inputs/dependencies from Preconditions, and ownership/lifecycle from
-State Footprint. Mark derived mechanics in the report; a separate `plan-snapshot.md`
-is useful only when their volume or reuse warrants it. Missing or contradictory
-marked anchors remain plan gaps instead of being silently repaired from current code.
-
-## Continue a prior run
+Read for a continuation of an earlier run or an authorized repair loop. Selection,
+inheritance, expected authority, source pinning, and run-directory rules live in
+`RUN.md`.
 
 Read the previous report and the original plan before acting. Create a fresh
 continuation directory under `RUN.md`'s path rules; never rewrite historical
 reports, evidence, or helpers. Back-link both sources and pin the current consumed
 source revision. Carry forward applicable user overrides and retained-state facts.
 
-### Choose and validate the continuation
+## Choose and validate the continuation
 
 Honor the user's explicit scenario selection. Otherwise resume the requested
 outcome's outstanding obligations, including in-scope scenarios never selected or
@@ -55,7 +35,7 @@ async/dependent work, or retained-state cleanup. A previous failure becomes pass
 only with this run's fresh outcome and retained proof. Record the new disposition
 and evidence here while preserving the original verdict.
 
-### Authorized repair loops
+## Authorized repair loops
 
 This stage supplies execution and diagnosis; the calling agent owns separately
 authorized product fixes. For an explicit iterate-until-green request, retain each

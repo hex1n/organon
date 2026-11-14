@@ -56,7 +56,7 @@ for the distribution vocabulary.
 | [`historia`](plugins/organon/skills/historia/) | investigate | Evidence-backed investigation whose deliverable is written findings, not a fix: what is true, why behavior occurs, which option the evidence supports. |
 | [`tekton`](plugins/organon/skills/tekton/) | implement | Implement, fix, refactor, or migrate code, new or existing, or land a design document or adjudicated plan, without breaking the callers, stored data, or tests the change reaches. Traces the affected contracts first, changes code in verifiable slices, closes a defect only where it was reproduced, keeps a guard only with a real entry, an owner and a test that fails without it, and delivers evidence on the final version that the contracts hold. |
 | [`euthyna`](plugins/organon/skills/euthyna/) | review | Establish what correct means, then independently review business and system behavior alongside implementation and structure; investigate defects, unnecessary complexity and material risks, and synthesize the evidence without editing the candidate. |
-| [`peira`](plugins/organon/skills/peira/) | verify | Plan, execute, and present end-to-end tests: source-backed scenario trees, evidence-backed execution reports that hand defects back for separately authorized fixes, with a capped iterate-until-green loop on explicit request, and HTML reader views. Typed first, `plan`, `run`, `render`, `brief`, or `harness` selects the mode: plan and render it; run, planning first when no plan exists, and render; render an existing artifact; brief a finished report for readers outside the run, delivered with it; or write the project's verification harness under `docs/verify/`, proved by one end-to-end run. |
+| [`peira`](plugins/organon/skills/peira/) | verify | Plan, execute, and present end-to-end tests: source-backed scenario trees, evidence-backed execution reports that hand defects back for separately authorized fixes, with a capped iterate-until-green loop on explicit request, and an HTML reader view of each report. Typed first, `plan`, `run`, `render`, or `harness` selects the mode: plan; run, planning first when no plan exists, and render; render an existing report; or write the project's verification harness under `docs/verify/`, proved by one end-to-end run. |
 | [`horos`](plugins/organon/skills/horos/) | land/verify | Generate backend API docs across RPC and HTTP protocols from code-backed contracts, for one interface, one requirement's backend API, or a branch's API changes. |
 | [`ichnos`](plugins/organon/skills/ichnos/) | record | Preserve consequential choices, pivots, blockers and handoffs with their reasons, evidence and results when existing records are insufficient, or when a trail is requested. Group material checkpoints in the task's `.scratch/` folder and reuse the work's required review. |
 | [`scholion`](plugins/organon/skills/scholion/) | navigate | Record why current code is implemented this way and find the reason by file path or code snippet; keep records personal and Git-ignored, with worktree handoff. |
@@ -145,7 +145,7 @@ look when extending it.
   - **Explicit SUT boundary:** every real dependency and double is declared.
 - Presentation
   - **Single source of truth:** Markdown is canonical; HTML is a checked projection of it.
-  - **A derived view restates, never computes:** a brief carries only values the canonical report already states, each linked back to the case or finding that established it.
+  - **A derived view restates, never computes:** the HTML view carries only what the canonical report states, with counts and the case table computed from its headings.
 
 ### `horos`
 
@@ -172,7 +172,7 @@ look when extending it.
 plan         arche → dokimasia   ← decide the plan, then falsify it
 implement    tekton              ← trace the roots, then shape the smallest safe change
 review-code  euthyna             ← challenge the code and the findings; report without editing
-verify       peira (plan → run → render · brief) · horos
+verify       peira (plan → run → render) · horos
 investigate  historia            ← answer questions from evidence
               ↑ discovered unknowns feed the next plan
 as needed    ichnos              ← preserve consequential decisions and handoffs
@@ -192,7 +192,7 @@ second-model reviewer uses the read-only second-model capability the runtime
 offers, and availability is resolved and recorded once at freeze time.
 
 `peira` is model-invoked in both hosts; typed by hand, a leading `plan`,
-`run`, `render`, or `brief` selects the mode: `/organon:peira plan …` in Claude Code,
+`run`, or `render` selects the mode: `/organon:peira plan …` in Claude Code,
 `$organon:peira plan …` in Codex. It replaces the retired `e2e-test-planner` and
 `e2e-test-executor`.
 

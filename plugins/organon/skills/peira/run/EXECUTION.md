@@ -8,9 +8,8 @@ harness receipt; a named table is unnecessary unless it clarifies the run.
 
 When the repository keeps `docs/verify/HARNESS.md`, its Launch, Doctor, and Drive
 sections are the authority for starting, checking, and reaching the system; use them
-before deriving commands from source. Report an entry the system has outdated with
-the observed difference and leave the harness unchanged during a run; refreshing it
-is harness mode's work.
+before deriving commands from source. Harness drift follows
+[RUN.md](RUN.md#2-resolve-the-execution-context).
 
 Use effective targets for the reached stores, queues, services, and external effects.
 Verify the schema/fields actually used, the tool paths/versions the run's shell loads,
@@ -56,11 +55,9 @@ and external-effect scenarios. Use an owned fixture or an authorized read-only
 alternative when the original route would violate it. Failure injection and replay
 use dedicated fixtures, never an already-succeeded business state.
 
-Existing seed/cleanup commands are valid reproducible handoffs. Generate helpers only
-when existing entry points cannot provide the required replay or retained-data cleanup;
-then read [Replay Entry Points](REFERENCE.md#replay-entry-points). A scriptable write
-alone does not require a new script pair. Preserve enough inputs and exact invocations
-to reconstruct the fixture and restore/delete only the authorized targets.
+Existing seed/cleanup commands are valid reproducible handoffs. Preserve enough
+inputs and exact invocations to reconstruct the fixture and restore/delete only the
+authorized targets; the recorded sequence is the handoff.
 
 ## Order, waits, and interference
 
