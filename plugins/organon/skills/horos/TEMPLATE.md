@@ -1,38 +1,32 @@
 # {Interface or Feature} API Documentation
 
-> Scope: {interfaces or business chain covered}.
-> Protocol: `{rpc|http}`.
-> Comparison baseline: branch `{branch}` compared with `{base}`. Omit this line when no change comparison was requested.
-> Contract authority: {applicable approved contract/design or designated code revision, or unknown}.
-> Implementation evidence: {inspected source revision or snapshot}.
-> Change legend: added / modified / deleted / unchanged.
+> Scope: {interfaces or business chain covered; N operations}.
+> Protocol: `{rpc|http}`. Updated: {date}.
+
+Follow the project's model document for section order and naming when one
+exists; this template is the shape to use without one. Remove the sections the
+scope does not need.
 
 ---
 
-## Interface Convention
+## Conventions
 
-Fill this section from verified project conventions; use an existing profile
-as their discovery index.
+Everything every call shares, written once from verified project conventions:
 
 + RPC: dispatch or gateway endpoint, request envelope, and response envelope.
 + HTTP: base URL, context path, response wrapper, and credential position.
-+ Shared feature-level terms can live here to avoid repeating them in every interface section.
++ Auth, pagination, failure handling, ID and time formats.
++ Examples in this document are illustrative; real IDs and values come from the caller's data.
 
 ---
 
-## Table Of Contents
+## Operations
 
-| # | Interface | Class / Service | Type | Compatibility | Summary |
-| --- | --- | --- | --- | --- | --- |
-| 1 | [{name}](#{name}) | {className} | added / modified / deleted / reused | compatible / breaking / not-assessed | {summary} |
+| # | Interface | Operation identifier or route | Summary |
+| --- | --- | --- | --- |
+| 1 | [{name}](#{name}) | `{operation identifier}` / `{METHOD} {path}` | {summary} |
 
-Compatibility answers whether an existing caller survives, so a reader can see
-which rows force integration work. Classify by affected behavior, including
-shared dependencies; added or reused labels do not establish compatibility.
-Use the SKILL.md evidence rules for every assessed interaction. Omit the column
-when the document describes no change at all.
-
-If enum values come from a lookup interface, point to that interface instead of hard-coding the values here.
+When these interfaces replace older ones, add the old route beside each row.
 
 ---
 
@@ -40,66 +34,74 @@ If enum values come from a lookup interface, point to that interface instead of 
 ## 1. {name} - {display name}
 
 + **API**: RPC -> `{operation identifier or service.method}` / HTTP -> `{METHOD} {full path}`
-+ **Auth**: {verified on the active call path; profile and adapter are discovery indexes}
-+ **Change summary**: {request +fieldA, fieldB required Y->N; response +fieldC}. Omit for reused interfaces.
++ **Auth**: only when it differs from Conventions.
++ Caller-visible preconditions, ordering or idempotency, when the interface has them.
 
-### Request Parameters ({RequestClass})
+**Request** ({RequestClass})
 
-| Field | Description | Type | Position | Required | Change | Compatibility | Notes |
-| --- | --- | --- | --- | --- | --- | --- | --- |
-| {field} | {description} | {type} | {path/query/header/body} | Y/N/conditional/unknown | added / modified / unchanged | compatible / breaking / not-assessed | {value/length/format; condition for conditional requiredness} |
-| {obj}.{sub} | {nested field} | {Type} | body | N | unchanged | - |  |
-| {list}[].{sub} | {list element field} | {Type} | body | N | unchanged | - |  |
-| {deletedField} | {old description} | {old type} | {old position} | - | deleted | compatible / breaking / not-assessed | Removed from the current contract; old contract was ... |
+A few fields fit a list: `{field}` ({type}, required) — {meaning}. Use a table
+for more:
 
-For RPC, omit the Position column unless the verified transport envelope needs it.
-For modified rows, write old->new in Notes, such as `required Y->N` or `Long->String`.
-For deleted fields, read the old type and description from `git show {base}:file`.
-Compatibility carries a verdict only on changed rows; unchanged rows use `-`.
-Judge each change against accepted old inputs and promised outputs using the
-compatibility rules in SKILL.md; the request/response direction alone is insufficient.
-When the document describes no change, omit the Change and Compatibility columns.
-For nested fields, state whether requiredness applies only when the parent is present.
-For responses, record presence and nullability guarantees in Notes, including conditional alternatives.
+| Field | Type | Required | Description |
+| --- | --- | --- | --- |
+| {field} | {type} | required / optional / conditional / unconfirmed | {meaning; value, length or format; the condition for conditional; what to send while unconfirmed} |
+| {obj}.{sub} | {Type} | optional | {state when requiredness applies only if the parent is present} |
+| {list}[] | [{TypeName}](#{typename}) | optional | {a shared type is referenced, not expanded} |
 
-### Request Example
+For HTTP add a Position column (path / query / header / body).
 
 ```json
 { "field": "value" }
 ```
 
-### Response Result ({ResponseClass})
+**Response** `data` ({ResponseClass})
 
-| Field | Description | Type | Change | Compatibility | Notes |
-| --- | --- | --- | --- | --- | --- |
-| data.field | {description} | {Type} | added / modified / unchanged | compatible / breaking / not-assessed |  |
-| data.list[].sub | {description} | {Type} | unchanged | - |  |
+No payload: one line, such as "`data` is null on success". A shared type: name
+it and link to Types. Otherwise:
 
-If the project uses a response wrapper, document the wrapper in Interface Convention and expand the business payload here.
+| Field | Type | Description |
+| --- | --- | --- |
+| data.field | {Type} | {meaning; presence and nullability when the caller must handle them} |
 
-### Response Example
+Add a response example when the shape is not obvious from the table.
 
-```json
-{}
-```
-
-### Error Codes
+**Errors**: only those specific to this interface; shared handling is in Conventions.
 
 | Error code / HTTP status | Message | Meaning |
 | --- | --- | --- |
-| {code} | {validation message} | Required validation failed |
-| - | {business exception message} | {condition} |
+| {code} | {message} | {condition} |
 
 ---
 
 Repeat the interface section until the inventory is complete.
 
+## Types
+
+One section per type that more than one interface uses.
+
+<a name="{typename}"></a>
+### {TypeName}
+
+| Field | Type | Description |
+| --- | --- | --- |
+| {field} | {type} | {meaning} |
+
+## Enums
+
+If enum values come from a lookup interface, point to that interface instead of hard-coding the values here.
+
+## Differences From The Old Interface, If Replacing One
+
+| # | Difference | Old | New |
+| --- | --- | --- | --- |
+| 1 | {what the caller must change} | {old} | {new} |
+
 ## Integration Notes, If Needed
 
-Centralize cross-interface migration rules, fallback behavior, or parameter
-priority here. Include caller-visible business constraints at the operation or
-field they govern. If a confirmed defect affects integration, mention it briefly
-and point to the issue or test; keep the main body as the target contract.
+Cross-interface rules the caller follows: call order, fallback behavior,
+parameter priority. If a confirmed defect affects integration, mention it
+briefly and point to the issue or test; keep the main body as the target
+contract.
 
 Add an interaction diagram only when it clarifies the caller's contract; read
 [DERIVED-VIEWS.md](DERIVED-VIEWS.md) before drawing one.

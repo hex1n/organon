@@ -5,7 +5,8 @@ RPC path. Use project facts rather than assumed framework defaults.
 
 ## Interface Discovery
 
-+ Find service interfaces and implementations. One interface method normally maps to one remote operation.
++ A published interface definition (protobuf, Thrift, an IDL or schema registry) is the first source when the project keeps one current; check it against the implementation it describes.
++ Otherwise find service interfaces and implementations. One interface method normally maps to one remote operation.
 + Use framework markers as search anchors, not as defaults: SOFABoot `@SofaService`, Dubbo `@DubboService`, gRPC `.proto` stubs, or the project's equivalent export mechanism.
 + Discover naming and file layout from the target project. Common names such as `*Facade.java`, `*Service.java`, and `*Impl.java` are search seeds only.
 + Completion criterion: interface, implementation, operation method, and model classes are all located in the target project.
@@ -23,7 +24,7 @@ RPC path. Use project facts rather than assumed framework defaults.
 Read existing declarations only. Leave missing auth unchanged in code.
 Identify method/class annotations, gateway filters, interceptors, or AOP checks
 that validate identity, token, role, or permission.
-If auth cannot be established, mark it unknown and name the missing source.
+If auth cannot be established, mark it `unconfirmed` and name the missing source in the reply.
 Ask only when finishing the requested scope needs a user-owned decision.
 
 ## Requiredness
@@ -32,8 +33,8 @@ Inspect active entry validation, validation groups, schema presence semantics,
 custom assertions and defaults. `@Valid` cascades into a present object;
 it does not require non-null. Distinguish omitted, null, empty and conditionally
 required values. Record intended requirements separately from enforcement
-discrepancies. If the active validation path cannot be established, mark it
-unknown.
+discrepancies. If the active validation path cannot be established, mark the
+field `unconfirmed`.
 
 ## ID Type
 

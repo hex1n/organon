@@ -5,7 +5,9 @@ description: Generates API docs for backend interfaces across protocols (RPC e.g
 
 # Horos — API Documentation
 
-API documentation is a caller contract: write only what a caller needs to invoke the interface correctly. Do not document implementation details.
+API documentation is a caller contract with one reader: the developer, or their
+agent, who will call these interfaces from this document alone. Every line is
+something that reader acts on. Implementation details stay out.
 
 Use this protocol-neutral spine with the relevant **adapter** in
 `adapters/{RPC|HTTP}.md`. An existing project **profile** at
@@ -40,8 +42,13 @@ For missing or contradictory facts, detect the protocol and read
 Update stale facts in an existing profile; create `docs/api-doc-profile.md`
 when reusable project conventions warrant it. Its fields are protocol, base
 endpoint, operation identifier, RPC request envelope, response wrapper, auth,
-required-field rule, module layout, ID convention and output directory.
-Keep unresolved values `unknown`.
+required-field rule, module layout, ID convention, output directory and model
+document. Keep unresolved values `unknown`.
+
+A project may have a **model document**: an API document its callers already
+accepted, named by the user or recorded in the profile. When one exists, match
+its section order, naming, file-name style and level of detail, so a caller who
+knows one document can read the next. Without one, use `TEMPLATE.md`.
 
 ### 2. Build the interface inventory
 
@@ -56,7 +63,7 @@ interfaces.
 Ask once, with the inventory, only for unresolved user-owned scope, contract or
 compatibility decisions needed to proceed. Read factual values from their
 sources; mark missing evidence and its impact. Use code-declared wire types
-where contract authority leaves them open, and the expansion defaults below.
+where contract authority leaves them open.
 
 ### 3. Parse Each Interface From Code
 - Interface declaration: extract address or route and operation identifier from verified project conventions.
@@ -64,26 +71,67 @@ where contract authority leaves them open, and the expansion defaults below.
   guarantees through the active call path. Each guarantee needs the boundaries
   that establish and preserve it; a declaration or helper alone establishes
   only its local behavior.
-- Request and response models: resolve generics, wire names, ignored fields, null handling, defaults, and active validation paths. Expand nested objects and list elements; for recursion, link back to the already-defined type instead of expanding indefinitely.
-- Completion criterion: each documented fact has a source; unresolved type, requiredness, or behavior is explicitly unknown with a next check. Distinguish declared intent from enforced behavior when they disagree.
+- Request and response models: resolve generics, wire names, ignored fields, null handling, defaults, and active validation paths. Follow nested objects and list elements to their leaves.
+- Completion criterion: you can name the source of each fact you will document; an unresolved type, requiredness, or behavior is on your list of unconfirmed items with its next check. Distinguish declared intent from enforced behavior when they disagree.
 
 ### 4. Write Markdown
-- If the profile specifies an output directory, use it. Otherwise, use a filesystem glob to find the majority location of existing `*_API_Doc.md` files. Use `docs/facade/` as the final fallback. Do not use `git ls-files` for discovery because it misses untracked docs.
-- Read `TEMPLATE.md` and fill it using verified project conventions.
-- File names: `{Interface}_API_Doc.md`, `{feature}_API_Doc.md`, or `API_Changes_{date}.md`.
+- If the profile specifies an output directory, use it. Otherwise, use a filesystem glob to find where the project's existing API documents live and write beside them. Use `docs/api/` as the final fallback. Do not use `git ls-files` for discovery because it misses untracked docs.
+- Read `TEMPLATE.md` and fill it using verified project conventions, in the shape [Write for the caller](#write-for-the-caller) sets.
+- File names follow the model document's style; without one, `{Interface}_API_Doc.md`, `{feature}_API_Doc.md`, or `API_Changes_{date}.md`.
 - Output language: write the generated API document in the language explicitly requested by the user; if none is explicit, match the user's prompt language. Use a project documentation convention only when the user is silent. Keep code identifiers, field names, operation keys, and literal enum values unchanged.
 
 ### 5. Self-Check
 - Every Markdown anchor target exists.
-- Table of contents and interface sections match.
-- Every changed or deleted interface carries a Compatibility verdict, and every changed field row carries one; no changed row is left blank.
-- Include caller-visible preconditions, conditional requirements, ordering, idempotency, and errors when supported. Exclude private implementation mechanisms. Check examples against documented fields, wire types, and constraints; label synthetic examples as illustrative.
+- The inventory, the operation table and the interface sections name the same operations; the scope line states their count.
+- Each line passes the caller test: the caller can act on it. Provenance, verification status and other roles' work are in the reply.
+- Each shared type and each convention is written once; each field's requiredness is one of the four values.
+- Include caller-visible preconditions, conditional requirements, ordering, idempotency, and errors when supported. Check examples against documented fields, wire types, and constraints.
 - Known defects are not written as the target contract. Mention at most a short note pointing to the issue or test.
+- A document describing changes passes the checks in [COMPATIBILITY.md](COMPATIBILITY.md).
+
+### 6. Deliver
+
+Reply with the document path and what stays out of the document: the contract
+authority and the source revision inspected, each unconfirmed item with its
+next check, coverage gaps, and any work the document implies for other roles,
+such as server configuration or data setup.
+
+## Write for the caller
+
+The caller reads the document to write calling code, often with nothing else
+open. These rules decide what goes on the page.
+
+- **The page carries the contract; the reply carries how you know it.** Contract
+  authority, inspected revision, source checks and test coverage belong in the
+  reply. On the page a fact is stated plainly, or marked `unconfirmed` where the
+  caller must not rely on it yet.
+- **Only the caller's work.** Server configuration, data setup, deployment steps
+  and constraints on other teams' code are other roles' work.
+- **Say each thing once.** The conventions section holds what every call shares:
+  endpoint, envelope, auth, pagination, failure handling, and the one note that
+  examples are illustrative. A type that more than one interface uses is defined
+  once in the types section and referenced by name. An interface section holds
+  only what is specific to it.
+- **Decide requiredness.** Each request field is `required`, `optional`, or
+  `conditional` with its condition. One the sources cannot settle is
+  `unconfirmed`, with what the caller should send meanwhile. Distinguish missing,
+  null and empty where the server treats them differently. Failure to find a
+  constraint does not prove a field optional.
+- **Size the entry to the interface.** A request with a few fields is a short
+  list; a response with no payload is one line; tables are for many fields. Use
+  `field.sub`, `field[].sub` and `data.field` paths for nesting.
+- **One document per handoff.** A document the user will send on its own is
+  complete on its own: conventions, types, enums and every interface in its
+  scope. Divide by the caller's unit of work, such as a module or a client
+  feature, when the user names one.
+- **Replacing an older interface.** When callers move from old interfaces to new
+  ones, add the old-to-new mapping and one section listing what differs for the
+  caller. Everything else is stated once as the current contract.
 
 ## Contract Rules
 
-**Target contract**: state the intended external contract.
-Name its two sources in the header:
+**Target contract**: state the intended external contract. It has two sources,
+which you report in the reply:
 
 - **Contract authority**: the approved contract, design, or published schema
   that defines what the interface owes. If none applies, use the code revision
@@ -95,59 +143,18 @@ it states. Implementation evidence supplies what the authority leaves open.
 If code contradicts the authority, document the authority's version and treat
 the difference as a known defect. If authority is `unknown`, document the
 implementation evidence as the contract. In that case, no difference is called
-a defect.
-
-**Field expansion**: use `field.sub`, `field[].sub`, and `data.field` paths.
-Expand acyclic fields in place. Use explicit type links for cycles and
-polymorphic alternatives. Distinguish missing, null, empty, and conditionally
-required values. Failure to discover a constraint does not prove optionality.
-
-**Field-level changes**:
-- Add a one-line change summary for added or modified interfaces.
-- Add a Change column when documenting a modified interface.
-- For modified fields, write `old->new` in the note, such as `required Y->N`, `Long->String`, or `enum +ENUM_VALUE`.
-- Deleted fields stay visible. Read their old type and description from `git show {base}:file`, mark them deleted, and note the former contract.
-- A fully added interface can mark the section as added without marking every field.
-
-**Compatibility**: every changed or deleted interface carries exactly one
-verdict — `compatible`, `breaking`, or `not-assessed` — against the supported
-old contract. Establish that contract from its published schema, declarations,
-documented guarantees, or other authoritative evidence. A counterexample that
-was valid under the old contract and fails under the new one establishes
-`breaking`, even when the actual caller inventory is unavailable. Record known
-consumer impact and missing consumer inventory separately; unknown impact
-does not erase a proven contract violation.
-
-Assess compatibility for the supported old caller talking to the new server;
-include the reverse direction when rollout or mixed versions require it.
-Compare accepted inputs, promised outputs, and observable effects, using the
-actual wire format. Include source/library compatibility when callers use
-published signatures or generated clients. Known consumer checks can demonstrate
-additional breaks; absence of observed usage does not retire a published
-guarantee. These are investigation prompts, not automatic verdicts:
-
-| Change | What must be established |
-| --- | --- |
-| Request field added | Old requests remain valid; any required value has a compatible default or negotiated version |
-| Request field removed | Old payloads are still accepted and dropping the value preserves promised semantics |
-| Response field added | Supported consumers tolerate unknown fields and the payload still satisfies the schema |
-| Response field removed or made nullable | Published presence/nullability guarantees remain satisfied; if a guarantee is removed, report breaking |
-| Type, enum, or validation changed | Old valid inputs remain accepted and new outputs remain within consumers' supported domain |
-| Route or operation replaced | The old entry remains supported, or report breaking and name its replacement |
-
-Assign each compatibility verdict in this order:
-
-1. If an old-contract violation is proven, use `breaking`.
-2. If all affected contract obligations are established as preserved, use `compatible`.
-3. Otherwise, use `not-assessed`. Name the undecidable obligation and missing evidence.
-
-For an interface with multiple changes, any `breaking` change makes the interface
-`breaking`. If none is breaking but any remains unknown, use `not-assessed`.
-Describe the breaking interaction and migration, not just the changed declaration.
+a defect. Behavior the inspected sources cannot settle, including whether the
+code actually produces the response it intends, is `unconfirmed` on the page
+and an item in the reply.
 
 Discover **protocol-specific facts** with the adapter from the active project
 path; use a profile as an index when present. Keep project-specific auth,
 envelopes, positions and types out of this portable spine.
+
+When existing callers keep calling an interface that changed (`--diff`, a
+modified or deleted operation), read [COMPATIBILITY.md](COMPATIBILITY.md) for
+field-level change marking and compatibility verdicts. Callers moving to new
+interfaces get the replacement mapping above instead.
 
 ## Large inventories
 
