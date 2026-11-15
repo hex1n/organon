@@ -34,6 +34,11 @@ ask while continuing independent work.
   data sources, test-environment logs.
 - Creating or editing source and tests inside the working tree; writing task
   scratch files.
+- Updating ignored or untracked files so they follow a change this session
+  made: source anchors and descriptions in rationale records, imports and
+  wiring in local tests. Git cannot restore these files, so first save their
+  prior content as a patch in the task's `.scratch/`, then report the files
+  touched.
 - Builds, tests, formatters; `git status/diff/log/add`; dry runs; read-only
   calls the user already asked for.
 - Read-only subagents.
@@ -48,8 +53,9 @@ ask while continuing independent work.
 
 - `git commit`, push (requested in the current turn), branch deletion, and any
   `reset`/`checkout` that discards work.
-- Deleting or rewriting ignored or untracked files this session did not
-  create; Git cannot restore them.
+- Deleting ignored or untracked files this session did not create, or
+  rewriting them beyond what this session's change requires; Git cannot
+  restore them.
 - Writes to shared test environments: database writes, triggering write jobs,
   side-effecting real calls, restarts, configuration changes.
 - Changes to hooks or runtime settings, and any expansion beyond the task's
