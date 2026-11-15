@@ -15,8 +15,8 @@ description: >
 # Tekton — Contract-Preserving Implementation
 
 Deliver the requested behavior and structural improvement with evidence that
-affected contracts hold. Work in verifiable slices; add records or design
-comparison only when they resolve a concrete decision or risk.
+affected contracts hold. Add records or design comparison only when they
+resolve a concrete decision or risk.
 
 ## Establish the contract
 
@@ -24,11 +24,15 @@ Identify the requested outcome, preserved contracts and evidence that would
 distinguish a plausible wrong implementation. Characterization supports
 preservation; a bug fix needs an expectation independent of the defect. Use a
 justified invariant, comparison or replay when exact values are unavailable.
+For a replaced entry, the oracle is what the old entry sends and does,
+captured first, not a declared type.
 
-Before a choice or interpretation materially changes scope, observable behavior
-or operating responsibilities, explain its basis and practical consequence to the
-user. Distinguish confirmed decisions from inferred defaults; surface what could
-change the user's acceptance or next action. Continue within existing authorization.
+Name the footprint before editing: what the request changes and what code stays
+untouched (existing entries, published interfaces, shared build and run
+configuration; verification-only needs stay out of it). An edit outside it, or
+an interpretation that changes scope, observable behavior or operating
+responsibilities, is the user's decision: raise it with basis and consequence
+first, and read a correction as its class.
 
 Trace the affected entry points through decisions, state changes and effects
 to their consumers. Inspect the boundaries that establish identity, order,
@@ -64,25 +68,23 @@ its real entry, owner and oracle:
 Remove a guard that lacks these answers, or reshape the interface instead.
 Report the answers for each kept guard; one that can be neither justified nor
 removed goes to the user's decision, including a guard the user asked for.
-Investigate technical facts directly; ask for missing user intent or authority
-while continuing independent work.
 
 Put needed scratch files in `.scratch/YYYYMMDD-task-name/` in the user's timezone;
 reuse the folder on resumption and honor an explicit output path.
 
 ## Implement coherent slices
 
-Give each rule one authoritative home. Keep business subjects, relationships
+Within the footprint, give each rule one authoritative home; a home that needs
+code outside it is a proposal. Keep business subjects, relationships
 and required dependencies recognizable in executable structure. Trace reused
 helpers through their implementations; matching output shapes alone do not
-establish those relationships. Preserve confirmed structural choices and compare
-alternatives only for an unsettled, material decision.
+establish those relationships. Preserve confirmed structural choices.
 
 Hide coherent complexity behind a small interface. Dependencies lead toward
-the rule owner; adapters translate at that boundary. Add a seam for demonstrated
-variation, isolation or migration, and justify retained state by its owner,
-lifetime and need. Separate modules or intermediate values need an ownership,
-validity or cost reason. Logical dependencies and observable order constrain
+the rule owner; adapters translate at that boundary. Do a job the way the
+project already does it. A seam, type, layer or switch needs variation,
+isolation or migration this change demonstrates; retained state and
+intermediate values need an owner, lifetime and need. Logical dependencies and observable order constrain
 physical execution without prescribing incidental syntax.
 
 Choose a slice with an observable result and keep reachable intermediate states
@@ -92,6 +94,9 @@ assertions after equivalent coverage exists at the relevant interface.
 
 After each meaningful slice, inspect the diff and run focused verification.
 A newly affected contract expands the scope before earlier evidence is reused.
+Once a slice verifies, start the next authorized one. Stop only for a user
+decision, a blocker or the end of scope, and report done, remaining and blocked
+with its next action, in the plan's units.
 For structural work, verify the actual ownership and caller obligations as well
 as values; names and comments do not establish the requested improvement.
 
@@ -113,9 +118,7 @@ expand only for an explicit repository gate or a concrete coverage or diagnostic
 need. A repository's default full-suite command alone does not establish that need.
 For work spanning boundaries, verify the requested outcome at its final consumer
 after the change. A successful intermediate command or acknowledgement establishes
-only that step. Continue the remaining authorized work; when a needed capability,
-access or user decision is unavailable, report completed and open parts separately,
-with the missing connection and next action.
+only that step.
 
 A defect closes where it was reproduced: establish failure before and success
 after through the same entry, inputs and environment, using
@@ -134,8 +137,8 @@ to concurrency, authorization, data spanning versions, hard-to-recover effects,
 or deletion/consolidation of a shared guard. Follow governing delegation and model
 authorization. Use the named reviewer's protocol; if using installed
 [euthyna](../euthyna/SKILL.md#enter-a-fresh-review-context), read its caller
-instructions before dispatch or remediation. No sibling skill is required.
-Unavailable required review leaves acceptance open; other work is self-reviewed.
+instructions before dispatch or remediation.
+Other work is self-reviewed.
 
 Reuse evidence only while its relevant source, inputs and environment remain
 applicable. Rerun invalidated checks and follow the repository's final-version
@@ -168,7 +171,7 @@ each finding against the repair; keep independent defects separate.
 
 ## Close the requested outcomes
 
-Check the final diff for scope and unintended changes. Lead with the user-visible
+Check the final diff against the footprint and for unintended changes. Lead with the user-visible
 outcome, its verification boundary and material gaps in the user's language.
 Carry still-material choices and scope interpretations into delivery, distinguishing
 user decisions from implementation assumptions. A progress record establishes what

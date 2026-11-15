@@ -97,8 +97,10 @@ assumptions, and limits, and distinguish their findings from the proposed
 adaptation. Preserve confirmed requirements and governing contracts; keep
 proposals and replaceable technical choices open.
 
-**Revise and prune:** prefer replacing, merging, or removing guidance over
-appending rules. Review the complete instruction path, including references.
+**Revise and prune:** before writing a rule, find the existing sentence it
+replaces or merges into; append only when there is none. Report each changed
+skill's size before and after, and for a net increase name the trial difference
+that pays for it. Review the complete instruction path, including references.
 Remove generic tutorials, repetition and obsolete rules; use fixed steps only
 for a real dependency or demonstrated risk. Check which behavior each retained
 or removed instruction changes; preserve required contracts and keep evidence

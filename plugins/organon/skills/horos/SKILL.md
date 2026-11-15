@@ -10,10 +10,7 @@ agent, who will call these interfaces from this document alone. Every line is
 something that reader acts on. Implementation details stay out.
 
 Use this protocol-neutral spine with the relevant **adapter** in
-`adapters/{RPC|HTTP}.md`. An existing project **profile** at
-`docs/api-doc-profile.md` indexes reusable conventions; recheck its facts.
-
-Before writing, build the interface inventory.
+`adapters/{RPC|HTTP}.md`.
 
 ## Commands
 
@@ -48,7 +45,7 @@ document. Keep unresolved values `unknown`.
 A project may have a **model document**: an API document its callers already
 accepted, named by the user or recorded in the profile. When one exists, match
 its section order, naming, file-name style and level of detail, so a caller who
-knows one document can read the next. Without one, use `TEMPLATE.md`.
+knows one document can read the next.
 
 ### 2. Build the interface inventory
 
@@ -72,41 +69,37 @@ where contract authority leaves them open.
   that establish and preserve it; a declaration or helper alone establishes
   only its local behavior.
 - Request and response models: resolve generics, wire names, ignored fields, null handling, defaults, and active validation paths. Follow nested objects and list elements to their leaves.
-- Completion criterion: you can name the source of each fact you will document; an unresolved type, requiredness, or behavior is on your list of unconfirmed items with its next check. Distinguish declared intent from enforced behavior when they disagree.
+- Completion criterion: you can name the source of each fact; what the sources cannot settle is an unconfirmed item with its next check. Distinguish declared intent from enforced behavior when they disagree.
 
 ### 4. Write Markdown
 - If the profile specifies an output directory, use it. Otherwise, use a filesystem glob to find where the project's existing API documents live and write beside them. Use `docs/api/` as the final fallback. Do not use `git ls-files` for discovery because it misses untracked docs.
-- Read `TEMPLATE.md` and fill it using verified project conventions, in the shape [Write for the caller](#write-for-the-caller) sets.
+- Fill the model document's shape, or `TEMPLATE.md` without one, by [Write for the caller](#write-for-the-caller).
 - File names follow the model document's style; without one, `{Interface}_API_Doc.md`, `{feature}_API_Doc.md`, or `API_Changes_{date}.md`.
 - Output language: write the generated API document in the language explicitly requested by the user; if none is explicit, match the user's prompt language. Use a project documentation convention only when the user is silent. Keep code identifiers, field names, operation keys, and literal enum values unchanged.
 
 ### 5. Self-Check
 - Every Markdown anchor target exists.
 - The inventory, the operation table and the interface sections name the same operations; the scope line states their count.
-- Each line passes the caller test: the caller can act on it. Provenance, verification status and other roles' work are in the reply.
-- Each shared type and each convention is written once; each field's requiredness is one of the four values.
+- Every line passes [Write for the caller](#write-for-the-caller).
 - Include caller-visible preconditions, conditional requirements, ordering, idempotency, and errors when supported. Check examples against documented fields, wire types, and constraints.
 - Known defects are not written as the target contract. Mention at most a short note pointing to the issue or test.
-- A document describing changes passes the checks in [COMPATIBILITY.md](COMPATIBILITY.md).
 
 ### 6. Deliver
 
-Reply with the document path and what stays out of the document: the contract
-authority and the source revision inspected, each unconfirmed item with its
-next check, coverage gaps, and any work the document implies for other roles,
-such as server configuration or data setup.
+Reply with the document path and what stays off the page: the contract
+authority and source revision inspected, each unconfirmed item with its next
+check, coverage gaps, and work the document implies for other roles.
 
 ## Write for the caller
 
 The caller reads the document to write calling code, often with nothing else
 open. These rules decide what goes on the page.
 
-- **The page carries the contract; the reply carries how you know it.** Contract
-  authority, inspected revision, source checks and test coverage belong in the
-  reply. On the page a fact is stated plainly, or marked `unconfirmed` where the
-  caller must not rely on it yet.
-- **Only the caller's work.** Server configuration, data setup, deployment steps
-  and constraints on other teams' code are other roles' work.
+- **The page carries the contract; the reply carries how you know it.** On the
+  page a fact is stated plainly, or marked `unconfirmed` where the caller must
+  not rely on it yet.
+- **Only the caller's work.** Server configuration, data setup and constraints
+  on other teams' code are other roles' work.
 - **Say each thing once.** The conventions section holds what every call shares:
   endpoint, envelope, auth, pagination, failure handling, and the one note that
   examples are illustrative. A type that more than one interface uses is defined
@@ -143,13 +136,8 @@ it states. Implementation evidence supplies what the authority leaves open.
 If code contradicts the authority, document the authority's version and treat
 the difference as a known defect. If authority is `unknown`, document the
 implementation evidence as the contract. In that case, no difference is called
-a defect. Behavior the inspected sources cannot settle, including whether the
-code actually produces the response it intends, is `unconfirmed` on the page
-and an item in the reply.
-
-Discover **protocol-specific facts** with the adapter from the active project
-path; use a profile as an index when present. Keep project-specific auth,
-envelopes, positions and types out of this portable spine.
+a defect. What the sources cannot settle, including whether the code produces
+the response it intends, is `unconfirmed`.
 
 When existing callers keep calling an interface that changed (`--diff`, a
 modified or deleted operation), read [COMPATIBILITY.md](COMPATIBILITY.md) for

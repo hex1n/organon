@@ -1,8 +1,7 @@
 # Adapter: HTTP / REST
 
-An HTTP interface is a method plus a path. Discover both, and everything bound
-to them, from how this project declares routes; the framework names below are
-search seeds, not defaults.
+An HTTP interface is a method plus a path. Discover both from how this project
+declares routes; framework names below are search seeds, not defaults.
 
 ## Interface Discovery
 
@@ -16,8 +15,7 @@ search seeds, not defaults.
 
 + Base URL: read server port, context or mount path, gateway prefix, README, or deployment docs.
 + API line: write `METHOD {baseUrl}{prefix}{path}` or the project profile's equivalent.
-+ Response wrapper: if the project wraps all responses, read the wrapper fields and document the wrapper in the conventions section. The response table expands the business payload.
-+ Status codes: record the ones the handler and its error middleware actually produce.
++ Response wrapper and status codes: read the wrapper fields and the statuses the handler and its error handling actually produce. The wrapper goes in the conventions section; the response table expands the business payload.
 
 ## Parameter Positions
 
@@ -38,7 +36,7 @@ user-owned decision.
 
 + Resolve requiredness per concrete route and active parameter binding, including optional parameter types and declared defaults; document the effective default.
 + A path variable in a matched route template is required. Where a framework lets one handler serve a route without the variable, document the routes separately.
-+ Query and header parameters: read the binding's own rule (required by default in some frameworks, optional in others) and any validation that can still reject the bound value.
++ Query and header parameters: read the binding's own rule and any validation that can still reject the bound value.
 + Body fields: inspect the validation that actually runs on this route, whether a schema library, validation annotations with their groups, a deserializer, or hand-written checks. A cascade into a nested object validates it when present; it does not make the object required. Record conditional constraints explicitly. A missing rule alone does not prove optionality.
 + Distinguish an absent request body from an absent, null, or empty field.
 

@@ -1,8 +1,6 @@
 # Documenting changes
 
-Read when the document describes changes to an existing interface: `--diff`, or
-any modified or deleted operation. A document with no change to describe uses
-none of this.
+For a document describing changes to an interface its callers keep calling.
 
 ## Marking changes
 
@@ -62,8 +60,3 @@ Assign each compatibility verdict in this order:
 For an interface with multiple changes, any `breaking` change makes the interface
 `breaking`. If none is breaking but any remains unknown, use `not-assessed`.
 Describe the breaking interaction and migration, not just the changed declaration.
-
-## Checks
-
-- Every changed or deleted interface carries a Compatibility verdict, and every changed field row carries one; no changed row is left blank.
-- Judge each change against accepted old inputs and promised outputs; the request/response direction alone is insufficient.

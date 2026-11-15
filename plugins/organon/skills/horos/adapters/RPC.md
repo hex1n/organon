@@ -5,7 +5,7 @@ RPC path. Use project facts rather than assumed framework defaults.
 
 ## Interface Discovery
 
-+ A published interface definition (protobuf, Thrift, an IDL or schema registry) is the first source when the project keeps one current; check it against the implementation it describes.
++ A published interface definition (protobuf, Thrift, an IDL) is the first source when kept current.
 + Otherwise find service interfaces and implementations. One interface method normally maps to one remote operation.
 + Use framework markers as search anchors, not as defaults: SOFABoot `@SofaService`, Dubbo `@DubboService`, gRPC `.proto` stubs, or the project's equivalent export mechanism.
 + Discover naming and file layout from the target project. Common names such as `*Facade.java`, `*Service.java`, and `*Impl.java` are search seeds only.

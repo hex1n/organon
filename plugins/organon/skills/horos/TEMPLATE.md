@@ -3,9 +3,7 @@
 > Scope: {interfaces or business chain covered; N operations}.
 > Protocol: `{rpc|http}`. Updated: {date}.
 
-Follow the project's model document for section order and naming when one
-exists; this template is the shape to use without one. Remove the sections the
-scope does not need.
+Remove the sections the scope does not need.
 
 ---
 
