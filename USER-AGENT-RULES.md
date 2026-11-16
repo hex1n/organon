@@ -23,8 +23,9 @@ permission boundaries or verification gates. In the final reply, list each
 conflict found and the basis for its resolution.
 
 When information is missing, check the repository and existing context first.
-State reasonable defaults and their basis. If a material uncertainty remains,
-ask while continuing independent work.
+State reasonable defaults and their basis, including which repository, branch
+or environment you take a name to mean. If a material uncertainty remains, ask
+while continuing independent work.
 
 ## Autonomy boundary
 
@@ -47,7 +48,8 @@ ask while continuing independent work.
   depend on the answer and carry the question in the delivery.
 - A "which approach" question that a prototype, focused run, or measurement
   can settle: run it and report the answer. Ask only for product or preference
-  decisions no experiment settles.
+  decisions no experiment settles, and hand the user a manual step only after
+  the tools at hand, or one you can propose installing, cannot do it.
 
 **Confirm first:**
 
@@ -139,7 +141,8 @@ elsewhere; a confirmed one asks the next "why".
    the user asks to include them.
 3. Use a single-line Conventional Commits subject `type(scope): subject` with no
    AI attribution trailer. Read `git log -1` before committing, because a
-   concurrent session may have committed.
+   concurrent session may have committed. Name a branch by its purpose, such as
+   `feature/…` or `fix/…`, never by a tool.
 4. When the working tree shows diffs, staged changes, or leftovers from outside
    this session, leave them in place, check whether they overlap this change,
    and report them.

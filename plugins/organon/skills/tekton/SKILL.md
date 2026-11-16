@@ -25,7 +25,8 @@ distinguish a plausible wrong implementation. Characterization supports
 preservation; a bug fix needs an expectation independent of the defect. Use a
 justified invariant, comparison or replay when exact values are unavailable.
 For a replaced entry, the oracle is what the old entry sends and does,
-captured first, not a declared type.
+captured first, not a declared type; the new entry declares its own inputs and
+outputs as specifically as the old one did.
 
 Name the footprint before editing: what the request changes and what code stays
 untouched (existing entries, published interfaces, shared build and run
@@ -78,11 +79,11 @@ Within the footprint, give each rule one authoritative home; a home that needs
 code outside it is a proposal. Keep business subjects, relationships
 and required dependencies recognizable in executable structure. Trace reused
 helpers through their implementations; matching output shapes alone do not
-establish those relationships. Preserve confirmed structural choices.
+establish those relationships.
 
 Hide coherent complexity behind a small interface. Dependencies lead toward
 the rule owner; adapters translate at that boundary. Do a job the way the
-project already does it. A seam, type, layer or switch needs variation,
+project, or the reference the user names, already does it. A seam, type, layer or switch needs variation,
 isolation or migration this change demonstrates; retained state and
 intermediate values need an owner, lifetime and need. Logical dependencies and observable order constrain
 physical execution without prescribing incidental syntax.
