@@ -47,28 +47,9 @@ Preview evidence does not establish the effectful path, and an earlier
 observation does not replace required enforcement at the effect boundary.
 
 Before adding, removing, narrowing or moving a guard (a null/empty, duplicate,
-range or state check, a cross-store equality, a fail-closed branch), establish
-its real entry, owner and oracle:
-
-- **Real entry:** the production path that delivers the illegal shape. A value
-  that could theoretically be absent, or that a sample happens to lack, is not an
-  entry; a model, database or upstream constraint may already exclude it.
-- **Owner:** the database, model or constructor, input boundary or module that
-  owns the invariant. Establish which operations the guard can reject or skip
-  and which obligations remain on either branch. Reuse an invariant upstream
-  already establishes. When a guard only keeps parallel maps, parameters or
-  indexes consistent, merge them
-  into one type so the contradiction cannot be expressed. Keep backfill,
-  migration and repair equalities in SQL, deployment checks or a one-off gate,
-  off the business path.
-- **Oracle:** a production-reachable case whose test fails when the guard is
-  removed or returns the wrong error code. Removing or relaxing a guard needs the
-  inverse: the entry is gone or the owner enforces the rule, and the owning test
-  still passes on the required behavior.
-
-Remove a guard that lacks these answers, or reshape the interface instead.
-Report the answers for each kept guard; one that can be neither justified nor
-removed goes to the user's decision, including a guard the user asked for.
+range or state check, a cross-store equality, a fail-closed branch), read
+[Guards](references/GUARDS.md): each guard needs a real entry, an owner and an
+oracle.
 
 Put needed scratch files in `.scratch/YYYYMMDD-task-name/` in the user's timezone;
 reuse the folder on resumption and honor an explicit output path.
@@ -101,72 +82,53 @@ with its next action, in the plan's units.
 For structural work, verify the actual ownership and caller obligations as well
 as values; names and comments do not establish the requested improvement.
 
-## Verify the affected properties
+## Verify what the delivery will claim
 
-Derive checks from the user's outcome and governing contracts; proposed control
-flow is a candidate, not the oracle. When conditions interact, use a combined
-case that distinguishes their scopes and exposes required work skipped by an
-early exit. Use the smallest surface that preserves the conditions deciding the
-outcome, exercises the relevant logic and observes its result. Add or strengthen
-a test for a missing case; routine reversible edits need no new test that repeats
-the implementation.
+List the claims the delivery will make: the requested outcome, each preserved
+contract and, unless the user narrows it, that the whole application still
+builds and starts. Give each claim the cheapest check that fails if the claim
+is false, and run no check that supports no claim. When the user names the
+claims they want, verify those. A claim left unchecked is reported as
+unverified.
 
-Select tests by changed contracts and their callers and dependencies. Run the
-narrowest set covering the affected behavior, integrations and configuration.
-Include committed effects, recovery, repeated execution, concurrency and
-version/data compatibility where affected. Keep that scope for final verification;
-expand only for an explicit repository gate or a concrete coverage or diagnostic
-need. A repository's default full-suite command alone does not establish that need.
-For work spanning boundaries, verify the requested outcome at its final consumer
-after the change. A successful intermediate command or acknowledgement establishes
-only that step.
+Check changed behavior in the smallest assembly that preserves the conditions
+deciding it. Where the project only runs whole, use the slice entry its
+verification notes (`docs/verify/`) describe: the changed parts plus declared
+doubles for what they call. When there is none, build it once and keep it with
+those notes for the next task. The whole build and start runs once on the final
+revision, or earlier when the change touches dependencies, configuration or
+wiring.
 
-A defect closes where it was reproduced: establish failure before and success
-after through the same entry, inputs and environment, using
-`docs/verify/HARNESS.md` when present. A different surface, a unit test alone,
-or an inconclusive run leaves the original defect open. A check passing both
-versions may protect behavior without reproducing the defect. Keep unavailable
-or intermittent reproduction explicit; revert a change whose motivating
-hypothesis the evidence refutes, preserving concurrent work.
+Proposed control flow is a candidate, not the oracle. When conditions interact,
+use a combined case that distinguishes their scopes and exposes required work
+skipped by an early exit. Include committed effects, recovery, repeated
+execution, concurrency and version/data compatibility where a claim covers
+them. For work spanning boundaries, verify the requested outcome at its final
+consumer; a successful intermediate command or acknowledgement establishes only
+that step. Add or strengthen a test for a missing case; routine reversible
+edits need no new test that repeats the implementation.
 
-Use targeted mutation or fault injection when a plausible critical mistake
-could escape the selected checks, especially after guard changes; read its
-branch below before selecting a fault.
-
-Obtain independent review when the task or repository requires it, or for changes
-to concurrency, authorization, data spanning versions, hard-to-recover effects,
-or deletion/consolidation of a shared guard. Follow governing delegation and model
-authorization. Use the named reviewer's protocol; if using installed
-[euthyna](../euthyna/SKILL.md#enter-a-fresh-review-context), read its caller
-instructions before dispatch or remediation.
-Other work is self-reviewed.
-
-Reuse evidence only while its relevant source, inputs and environment remain
-applicable. Rerun invalidated checks and follow the repository's final-version
-gate rules. Once a failed run establishes a pre-existing or environmental blocker,
-reuse its receipt and keep that gate open. Retry when inputs relevant to the failure
-change, or when the run can distinguish a concrete new diagnostic hypothesis.
-Use a proven focused entry for independent claims; its success does not pass the
-blocked gate. Rederive claims of the same kind when a finding refutes one.
-Test a suspected shared cause before repairing several defects, then validate
-each finding against the repair; keep independent defects separate.
+Fault injection ([Fault injection](references/FAULTS.md)) and independent review
+([Evidence](references/EVIDENCE.md#independent-review)) are for changes to
+concurrency, authorization, data spanning versions, hard-to-recover effects or
+a shared guard, and for a task or repository that requires either.
 
 ## Load branch details when needed
 
-- **Writing or changing a test:** read
-  [Writing tests](references/VERIFICATION.md#writing-tests) before writing it.
+- **Writing or changing a test, a test double or a slice:** read
+  [Tests](references/TESTS.md) first.
 - **Structural refactoring:** read [Refactoring](references/REFACTORING.md) before
   choosing the transition. For compatibility/data migration alone, start at
   [Choose the transition](references/REFACTORING.md#choose-the-transition).
-- **Structural assertions, deciding test doubles or reduced contexts:** read
-  [Checking the oracle](references/VERIFICATION.md#checking-the-oracle).
-- **Mutation or fault injection:** read
-  [Targeted mutation](references/VERIFICATION.md#targeted-mutation-and-fault-injection)
-  before selecting or applying a fault.
+- **Fixing a defect:** read
+  [Closing a defect](references/EVIDENCE.md#closing-a-defect); it closes where
+  it was reproduced.
+- **A check failed, or earlier evidence is being reused:** read
+  [Reusing evidence](references/EVIDENCE.md#reusing-evidence-and-retrying).
 - **Performance work:** inspect operation counts, sharing scope, invalidation and
   retained state on effectful and no-effect paths at relevant scale. Reuse may
   change cost only within its valid observation scope. Before reporting measured
-  numbers, read [Measured numbers](references/VERIFICATION.md#measured-numbers).
+  numbers, read [Measured numbers](references/MEASURES.md).
 - **Diagrams or interactive views:** before delivering one, read
   [Derived views](references/DERIVED-VIEWS.md).
 
@@ -185,8 +147,8 @@ invented tradeoff or reconsideration condition. Judge behavior, structure and co
 separately. Explain structural gains in rule ownership, caller knowledge or
 coordinated edit points; name any remaining migration stage and exit condition.
 
-Bind verification and required review, with findings dispositioned, to the final
-material revision. Classify failed checks as introduced, pre-existing or
+Bind each claim's check, and required review with findings dispositioned, to the
+final material revision; name each claim left unverified. Classify failed checks as introduced, pre-existing or
 environmental. A missing essential check or required review leaves the affected
 acceptance open; report what is implemented and locally verified, and continue
 independent work.

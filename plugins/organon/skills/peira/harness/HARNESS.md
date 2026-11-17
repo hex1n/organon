@@ -17,8 +17,8 @@ Establish each fact from source and configuration, with the file that states it:
 - the primary surface: web UI, HTTP or RPC API, CLI or TUI, desktop, mobile, library,
   or a worker driven by queues or schedules. List secondary surfaces; draft recipes
   only for the primary one unless asked;
-- the targets verification runs against: a local run, a shared deployed
-  environment, or both. For each, the entry address, how a caller authenticates,
+- the targets verification runs against: a local run of the whole system, a
+  local slice holding only the parts under change, a shared deployed environment. For each, the entry address, how a caller authenticates,
   and the identity and tenant that login maps to;
 - how the system starts: build and run commands, the configuration profile a local
   run needs, ports, and every dependency the local run reaches (databases, caches,
@@ -80,7 +80,7 @@ run shows them.
 
 | Section | Content |
 |---|---|
-| Launch | Build and start commands for a local run from an empty data directory; the readiness predicate, which is an endpoint, log line, or file that appears only once the system can serve; teardown. Each dependency the local run reaches and how it is provided: a local service, a container, a declared double, or a blocker. |
+| Launch | Build and start commands from an empty data directory; the readiness predicate, which is an endpoint, log line, or file that appears only once the system can serve; teardown. Each dependency the run reaches and how it is provided: a local service, a container, a declared double, or a blocker. For a slice: how to name the parts it loads. |
 | Doctor | Read-only checks that decide whether an already running instance is worth driving: identity (version, build, profile), reachability, dependency health. No writes. |
 | Drive | One recipe per surface: how to reach it and send a request, action, or command, using identifiers from the repository (routes, selectors, test IDs, CLI flags). Doubles only at boundaries production already treats as replaceable. |
 | Evidence | What to capture for a claim on this surface and the command that produces each item: responses, state reads, logs, screenshots. Evidence lands in the task's evidence directory, not in the repository. |
