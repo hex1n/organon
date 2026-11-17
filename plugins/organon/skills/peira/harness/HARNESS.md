@@ -17,9 +17,9 @@ Establish each fact from source and configuration, with the file that states it:
 - the primary surface: web UI, HTTP or RPC API, CLI or TUI, desktop, mobile, library,
   or a worker driven by queues or schedules. List secondary surfaces; draft recipes
   only for the primary one unless asked;
-- the targets verification runs against: a local run of the whole system, a
-  local slice holding only the parts under change, a shared deployed environment. For each, the entry address, how a caller authenticates,
-  and the identity and tenant that login maps to;
+- the targets verification can run against, cheapest first: the project's own
+  test suites, a local slice holding only the parts under change, a local run of
+  the whole system, a shared deployed environment;
 - how the system starts: build and run commands, the configuration profile a local
   run needs, ports, and every dependency the local run reaches (databases, caches,
   registries, brokers, third-party services, private artifact repositories);
@@ -36,8 +36,9 @@ a build that does not compile documents nothing. A build that only the writing
 environment cannot run (an unreachable artifact repository, a missing service) is a
 blocker, not a reason to stop: record it with what would lift it, and continue. A
 stand-in that lets the build or the start proceed (a stub artifact generated outside
-the repository, a local service answering for an external one) is recorded with every
-behaviour it removes, so a run on it never passes for a run on the real thing.
+the repository, a local service answering for an external one) and each effect
+switched off for the run go into the target's row as behaviour it removes, so a run
+on it never passes for a run on the real thing.
 
 Read an existing `docs/verify/` before writing. Replace each entry the code or a
 newer run has superseded with the current one and keep the entries that still
@@ -47,9 +48,15 @@ runs keep its history.
 ## 2. Write `docs/verify/HARNESS.md`
 
 A targets table, then five sections in this order, each giving a command or
-predicate an agent can execute as written. The table has one row per target: its
-entry address, how a caller authenticates, and the identity and tenant that login
-maps to. Plans cite these rows.
+predicate an agent can execute as written. The table has one row per target,
+cheapest first: its entry address, how a caller authenticates, the identity and
+tenant that login maps to, what runs as in production, what is replaced or left
+out, what it touches that the run does not own, and what it costs (one start, and
+each further scenario on that start). Plans cite these rows; a claim is checked
+on the cheapest target where everything deciding its outcome is real. A target
+serves every module when its parts come from the application's own configuration,
+with the module to load as a parameter; one that lists parts by hand serves the
+change it was cut for, and its row says so.
 
 The reader is an agent looking up what to run next. Write each entry as the
 command or predicate, the output that shows it worked, then its status, and place
@@ -80,10 +87,10 @@ run shows them.
 
 | Section | Content |
 |---|---|
-| Launch | Build and start commands from an empty data directory; the readiness predicate, which is an endpoint, log line, or file that appears only once the system can serve; teardown. Each dependency the run reaches and how it is provided: a local service, a container, a declared double, or a blocker. For a slice: how to name the parts it loads. |
+| Launch | Build and start commands from an empty data directory; the readiness predicate, which is an endpoint, log line, or file that appears only once the system can serve; teardown. Each dependency the run reaches and how it is provided: a local service or container the run owns, a declared double, a shared service the user authorized, or a blocker. For a slice: how to name the parts it loads. Scenarios share one start, kept apart by their data, unless they need a different assembly. |
 | Doctor | Read-only checks that decide whether an already running instance is worth driving: identity (version, build, profile), reachability, dependency health. No writes. |
-| Drive | One recipe per surface: how to reach it and send a request, action, or command, using identifiers from the repository (routes, selectors, test IDs, CLI flags). Doubles only at boundaries production already treats as replaceable. |
-| Evidence | What to capture for a claim on this surface and the command that produces each item: responses, state reads, logs, screenshots. Evidence lands in the task's evidence directory, not in the repository. |
+| Drive | One recipe per surface, the same on every target that has it: how to reach it and send a request, action, or command, with the operation and its input as parameters and identifiers from the repository (routes, selectors, test IDs, CLI flags). Scenario files call this recipe and the state read under Evidence, so one file runs on every target. Doubles only where the target's row lists them. |
+| Evidence | What to capture for a claim on this surface and the command that produces each item: responses, state reads, logs, screenshots. The state read takes its query as a parameter and is the same call on every target. Evidence lands in the task's evidence directory, not in the repository. |
 | Cleanup | What a run leaves behind and the command that removes only what the run created. Evidence survives cleanup. |
 
 ## 3. Write `docs/verify/features/`
@@ -105,7 +112,8 @@ recorded as a gap.
 
 Run the harness as written, once, from a shell that carries no state from the
 writing session: launch, doctor, drive one feature, capture its evidence, clean up,
-and confirm the evidence still exists. On a shared target, drive a read-only
+and confirm the evidence still exists; the row's cost is what this run measured.
+On a shared target, drive a read-only
 feature unless the user authorizes writes; authorized writes follow
 [business data and ownership](../run/EXECUTION.md#business-data-and-ownership).
 Fix the harness where the run deviated and run again. Keep the run's commands and output with the task's evidence; the harness

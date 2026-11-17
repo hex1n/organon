@@ -1,11 +1,19 @@
 # Execution stage
 
 Run the selected scenarios, establish their verdicts, and leave enough evidence to
-understand and repeat them. Prefer the project's existing harness or adapter. Author
-test code only when the user authorizes it; a plan's coverage or automation label
-is not that authorization. Product fixes require
-their own authorization. Record defects in local issue files linked from the report;
-this workflow never creates issues on a remote tracker.
+understand and repeat them. Prefer the project's existing harness or adapter. Product
+fixes require their own authorization. Record defects in local issue files linked
+from the report; this workflow never creates issues on a remote tracker.
+
+Keep each scenario this run executes as a runnable file under
+`docs/verify/scenarios/{feature}/`, named by its ID, that calls the harness's drive
+and state-read recipes, so the next run repeats it with one command. Write it for
+the strictest target: it asserts only on records it created, found by the run's own
+marker, never on a table's or a list's total, so the same file runs on a local
+target and on the shared environment; one that needs a capability some target
+lacks, such as restarting the service, says so in its first lines. Adding it to the project's own test suites or
+committing it needs the user's authorization; a plan's coverage or automation label
+is not that authorization.
 
 Use the user's requested language, otherwise the plan's language, then the prior
 report's, then the user's prompt. Localize headings and prose; preserve IDs, commands,
@@ -15,7 +23,9 @@ intended audience.
 ## 1. Select and pin the run
 
 Read the upstream plan or report and the latest user constraints before touching the
-system. Resolve an `execution-anchors/v1` plan's fields and variants with
+system. A selected scenario with a kept file under `docs/verify/scenarios/` runs
+from that file on the chosen target; where the file and the plan differ, record a
+plan gap before the run. Resolve an `execution-anchors/v1` plan's fields and variants with
 [scenario-tree inheritance](#scenario-tree-inheritance) below. For a continuation,
 read [CONTINUE.md](CONTINUE.md).
 
@@ -115,10 +125,19 @@ are optional annotations.
 
 Confirm a local or test target from effective configuration and actual connectivity,
 not a profile name. Start from the project's harness (`docs/verify/HARNESS.md`) when
-the repository keeps one. When this run establishes a target, entry, authentication,
-launch, or cleanup mechanic the harness lacks or contradicts, record it as harness
-drift in the report's run context and the delivery, naming harness mode as the
-refresh; the run leaves `docs/verify/` as it found it. Restricted staging or
+the repository keeps one, on the cheapest target it lists where everything deciding
+the selected outcomes is real. When no listed target can run them, the place this
+run builds is the next run's target, whatever module that run covers: take its
+parts from the application's own configuration, with the module to load as a
+parameter, write its launch, drive, and teardown scripts under `docs/verify/` from
+the first file, with paths, ports, and the operation to drive as parameters and
+the scenario's steps kept out of them, start it once for every scenario it can
+serve, and add its
+[row](../harness/HARNESS.md#2-write-docsverifyharnessmd) to the harness with this
+run as its record, creating the file with that row and the target's five sections
+when the repository has none. Where the run contradicts an existing harness entry, record
+harness drift in the report's run context and the delivery, naming harness mode as
+the refresh; the run changes no existing entry. Restricted staging or
 production requires explicit instructions for that environment before proceeding.
 Record the actual entry/harness, relevant
 runtime identity, and proof that the tested process/artifact is the intended build.
@@ -156,6 +175,12 @@ For each executed scenario retain, together:
   observed assertion result. Persistent-state proof includes the pre-cleanup read and
   output; response-only proof includes the independent calculation/reference context.
 
+On a target the run owns and can start again, the rerun command stands in for
+retained raw output: keep expected versus actual for each assertion, what the
+driver records by itself, and failure scenes. Hashes, process and network
+snapshots, and receipts are for what a rerun cannot reproduce: a shared
+environment's state, asynchronous timing, an intermittent result.
+
 Capture volatile failure scenes immediately, before retries or cleanup can destroy
 them. Include the state, events, logs, and configuration needed to reproduce the
 observed mismatch; redact secrets while preserving usable reproduction identifiers.
@@ -190,11 +215,10 @@ When a supported finding needs correction or resolution, follow
 ## 4. Deliver the result
 
 Read [REPORTING.md](REPORTING.md) when assembling the report and before cleanup: it
-sets the report's contents, format, HTML view, and final reconciliation.
+sets the report's contents and final reconciliation.
 
 Completion means every selected ID has an honest terminal status and proof or an
 explicit deficit; any retained data has an allowed lifecycle; evidence, current
 source/build identity, and rerun instructions agree. State whether the requested
 business outcome is covered and name remaining obligations; a completed slice with
-gaps is a partial result. Deliver that result before HTML preparation finishes,
-then supply the checked view.
+gaps is a partial result.

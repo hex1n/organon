@@ -16,8 +16,7 @@ Use one stable issue ID/file per distinct problem, linking all affected scenario
 combine only established duplicates. Reuse the current run's issue when more evidence
 arrives. A continuation links the earlier issue and records new evidence/disposition
 in its own directory, preserving historical records. With no qualifying findings,
-create no empty issue files or directory. A request to render an existing report
-does not invent findings absent from its source.
+create no empty issue files or directory.
 
 | Disposition | Meaning |
 |---|---|
