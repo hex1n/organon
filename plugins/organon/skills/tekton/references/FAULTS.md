@@ -15,8 +15,10 @@ observable state. For rollback, the operation must change business state before
 the failure; after an idempotent rerun or other no-op, omitted rollback leaves
 the same state, so the check cannot detect it.
 
-Reuse the successful build/test invocation, toolchain and resolved dependencies.
-Preserve compile-time and runtime settings where they differ; a runtime launcher
+Reuse the successful build/test invocation, toolchain and resolved dependencies,
+narrowed to the tests that observe the affected property; when that run still
+takes minutes, batch the selected faults into as few runs as their isolation
+allows. Preserve compile-time and runtime settings where they differ; a runtime launcher
 shortcut does not establish that a separate compiler resolves the same dependencies.
 Change only the fault and the source/output locations required by isolation.
 

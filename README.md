@@ -268,6 +268,10 @@ The [personal Git hooks](tools/git-hooks/) are another user-level tool linked
 under `~/.agents/tools`. Repositories opt in with their own test-path settings;
 the tool installer does not change global Git hooks or Agent Stop hooks.
 
+[Long run](tools/long-run/) is linked the same way. It runs one build or test
+at a time on the machine, keeps the complete output in a file, and reports the
+elapsed time; check it with `node scripts/contract-long-run.mjs`.
+
 The installer links the formatter into `~/.agents/tools`. It also removes what
 earlier installs placed for the hook: the global Stop handler in each runtime's
 settings and the `~/.agents/tools/scholion` link, keeping unrelated hooks and settings.

@@ -18,6 +18,7 @@ const LEGACY_RULES_SOURCE_NAMES = ["global-agent-rules.md", "user-agent-rules.md
 const ASSET_SPECS = [
   { name: "java-formatter", source: ["tools", "java-formatter"], install: [".agents", "tools", "java-formatter"] },
   { name: "git-hooks", source: ["tools", "git-hooks"], install: [".agents", "tools", "git-hooks"] },
+  { name: "long-run", source: ["tools", "long-run"], install: [".agents", "tools", "long-run"] },
 ];
 // The organon plugin now carries the Stop hook and the scholion checker it
 // runs. Earlier installs linked the checker here and wrote this Stop handler

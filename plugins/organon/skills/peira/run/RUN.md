@@ -124,9 +124,10 @@ are optional annotations.
 ## 2. Resolve the execution context
 
 Confirm a local or test target from effective configuration and actual connectivity,
-not a profile name. Start from the project's harness (`docs/verify/HARNESS.md`) when
-the repository keeps one, on the cheapest target it lists where everything deciding
-the selected outcomes is real. When no listed target can run them, the place this
+not a profile name. Start from the project's harness (`docs/verify/HARNESS.md`),
+written first in [harness mode](../harness/HARNESS.md) when the repository has
+none, on the cheapest target it lists where everything deciding the selected
+outcomes is real. When no listed target can run them, the place this
 run builds is the next run's target, whatever module that run covers: take its
 parts from the application's own configuration, with the module to load as a
 parameter, write its launch, drive, and teardown scripts under `docs/verify/` from
@@ -134,8 +135,7 @@ the first file, with paths, ports, and the operation to drive as parameters and
 the scenario's steps kept out of them, start it once for every scenario it can
 serve, and add its
 [row](../harness/HARNESS.md#2-write-docsverifyharnessmd) to the harness with this
-run as its record, creating the file with that row and the target's five sections
-when the repository has none. Where the run contradicts an existing harness entry, record
+run as its record. Where the run contradicts an existing harness entry, record
 harness drift in the report's run context and the delivery, naming harness mode as
 the refresh; the run changes no existing entry. Restricted staging or
 production requires explicit instructions for that environment before proceeding.
