@@ -12,7 +12,9 @@ environment variable that carries them.
 
 ## 1. Interview the repository
 
-Establish each fact from source and configuration, with the file that states it:
+Ask the user first for what they can state in a line: how they start it locally,
+the profile, which dependencies a run may reach, the test environment's entry.
+Then establish each fact from source and configuration, with the file that states it:
 
 - the primary surface: web UI, HTTP or RPC API, CLI or TUI, desktop, mobile, library,
   or a worker driven by queues or schedules. List secondary surfaces; draft recipes
@@ -89,14 +91,15 @@ run shows them.
 |---|---|
 | Launch | Build and start commands from an empty data directory; the readiness predicate, which is an endpoint, log line, or file that appears only once the system can serve; teardown. Each dependency the run reaches and how it is provided: a local service or container the run owns, a declared double, a shared service the user authorized, or a blocker. For a slice: how to name the parts it loads. Scenarios share one start, kept apart by their data, unless they need a different assembly. |
 | Doctor | Read-only checks that decide whether an already running instance is worth driving: identity (version, build, profile), reachability, dependency health. No writes. |
-| Drive | One recipe per surface, the same on every target that has it: how to reach it and send a request, action, or command, with the operation and its input as parameters and identifiers from the repository (routes, selectors, test IDs, CLI flags). Scenario files call this recipe and the state read under Evidence, so one file runs on every target. Doubles only where the target's row lists them. |
-| Evidence | What to capture for a claim on this surface and the command that produces each item: responses, state reads, logs, screenshots. The state read takes its query as a parameter and is the same call on every target. Evidence lands in the task's evidence directory, not in the repository. |
+| Drive | One recipe per surface, the same on every target that has it: how to reach it and send a request, action, or command, with the operation and its input as parameters and identifiers from the repository (routes, selectors, test IDs, CLI flags), written so a scenario can load it as a library as well as call it from the command line. Scenario files call this recipe and the state read under Evidence, so one file runs on every target. Doubles only where the target's row lists them. |
+| Evidence | What to capture for a claim on this surface and the command that produces each item: responses, state reads, logs, screenshots. The state read takes its query as a parameter and is the same call on every target; a target's row names the state a run cannot read there. Evidence lands in the task's evidence directory, not in the repository. |
 | Cleanup | What a run leaves behind and the command that removes only what the run created. Evidence survives cleanup. |
 
 ## 3. Write `docs/verify/features/`
 
-`index.md` lists each feature file with one line on the outcome it covers. One file
-per key feature, three to five at first, each with:
+`index.md` lists each feature file with one line on the outcome it covers. Write
+the file for the feature the proof run drives, and add one when a run first drives
+another feature. Each has:
 
 - **Reach:** the entry and preconditions, including the data the feature needs;
 - **Drive:** the exact actions or requests, in order;
@@ -113,6 +116,8 @@ recorded as a gap.
 Run the harness as written, once, from a shell that carries no state from the
 writing session: launch, doctor, drive one feature, capture its evidence, clean up,
 and confirm the evidence still exists; the row's cost is what this run measured.
+Prove the cheapest target that serves the request at hand; the other rows stay
+`derived from source` until a run needs them, unless the user asks for more.
 On a shared target, drive a read-only
 feature unless the user authorizes writes; authorized writes follow
 [business data and ownership](../run/EXECUTION.md#business-data-and-ownership).

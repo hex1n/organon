@@ -48,7 +48,8 @@ For run, select the starting artifact in this order:
 
 Harness mode starts from the repository and its existing `docs/verify/`, not from
 a plan or report. Run mode reads that harness; in a repository without one it
-writes the harness in harness mode first, then runs.
+first writes the harness in harness mode for the target this run needs, and its
+run of the selected scenarios is that harness's proof run.
 
 A report means a continuation of the outcome it covers. A harness supplies
 execution mechanics, not scenario coverage. When `docs/verify/scenarios/` already

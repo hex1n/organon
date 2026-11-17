@@ -6,8 +6,9 @@ fixes require their own authorization. Record defects in local issue files linke
 from the report; this workflow never creates issues on a remote tracker.
 
 Keep each scenario this run executes as a runnable file under
-`docs/verify/scenarios/{feature}/`, named by its ID, that calls the harness's drive
-and state-read recipes, so the next run repeats it with one command. Write it for
+`docs/verify/scenarios/{feature}/`, named by its ID, that loads the harness's drive
+and state-read recipes into its own process rather than starting one per step, so
+the next run repeats it with one command. Write it for
 the strictest target: it asserts only on records it created, found by the run's own
 marker, never on a table's or a list's total, so the same file runs on a local
 target and on the shared environment; one that needs a capability some target

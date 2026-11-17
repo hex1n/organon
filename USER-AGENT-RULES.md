@@ -125,7 +125,9 @@ required repository gate. Use the repository's verification guidance when presen
 broaden checks for a concrete coverage or diagnostic need. Start a build or test
 run that takes minutes through `~/.agents/tools/long-run/long-run.cjs` where it is
 installed: it waits for other long runs on the machine, keeps the complete output
-in a file and reports the time. Report results and what
+in a file and reports the time. Where starting a process takes seconds, as on a
+managed virtual desktop, read and search with the built-in tools and do multi-step
+shell work in one script rather than a pipeline or a loop of commands. Report results and what
 stays unproven. Apart from the decision trail below, write process documents only
 when asked. Detailed reproduction and verification methods belong to the selected
 workflow.
