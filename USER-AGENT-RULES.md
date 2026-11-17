@@ -122,13 +122,10 @@ Before delivery, check this session's changes against the code conventions above
 Establish the relevant facts before changing behavior, then verify the final
 revision against affected contracts with the narrowest sufficient checks and each
 required repository gate. Use the repository's verification guidance when present;
-broaden checks for a concrete coverage or diagnostic need. When one run of a check
-takes minutes, first run the cheaper check that can fail earlier (compile before
-test), keep the run's complete output in a file and filter that file, and run it
-once on the final revision; go back for a baseline only to tell whether a failure
-predates the change. Where `~/.agents/tools/long-run/long-run.cjs` is installed,
-start such a run through it: it waits for other long runs on the machine, keeps
-the output and reports the time. Report results and what
+broaden checks for a concrete coverage or diagnostic need. Start a build or test
+run that takes minutes through `~/.agents/tools/long-run/long-run.cjs` where it is
+installed: it waits for other long runs on the machine, keeps the complete output
+in a file and reports the time. Report results and what
 stays unproven. Apart from the decision trail below, write process documents only
 when asked. Detailed reproduction and verification methods belong to the selected
 workflow.
