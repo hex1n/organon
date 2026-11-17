@@ -87,26 +87,11 @@ as values; names and comments do not establish the requested improvement.
 List the claims the delivery will make: the requested outcome, each preserved
 contract and, unless the user narrows it, that the whole application still
 builds and starts. Give each claim the cheapest check that fails if the claim
-is false, and run no check that supports no claim. When the user names the
-claims they want, verify those. A claim left unchecked is reported as
-unverified.
-
-Check changed behavior in the smallest assembly that preserves the conditions
-deciding it. Where the project only runs whole, use the slice entry its
-verification notes (`docs/verify/`) describe: the changed parts plus declared
-doubles for what they call. When there is none, build it once and keep it with
-those notes for the next task. The whole build and start runs once on the final
-revision, or earlier when the change touches dependencies, configuration or
-wiring.
-
-Proposed control flow is a candidate, not the oracle. When conditions interact,
-use a combined case that distinguishes their scopes and exposes required work
-skipped by an early exit. Include committed effects, recovery, repeated
-execution, concurrency and version/data compatibility where a claim covers
-them. For work spanning boundaries, verify the requested outcome at its final
-consumer; a successful intermediate command or acknowledgement establishes only
-that step. Add or strengthen a test for a missing case; routine reversible
-edits need no new test that repeats the implementation.
+is false, and run no check that supports no claim. Run it where the project's
+verification notes (`docs/verify/`) place that kind of change, otherwise in the
+smallest assembly that preserves the conditions deciding the outcome, and
+verify the requested outcome at its final consumer. A claim left unchecked is
+reported as unverified.
 
 Fault injection ([Fault injection](references/FAULTS.md)) and independent review
 ([Evidence](references/EVIDENCE.md#independent-review)) are for changes to
