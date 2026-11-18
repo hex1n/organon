@@ -37,11 +37,18 @@ viewed with that encoding, not necessarily on the console.
 
 ## Runtime contract
 
-The queue is a lock directory in the user's temp directory
-(`organon-long-run.lock`, or the path in `ORGANON_LONG_RUN_LOCK`) holding the
-owner's process ID. A lock whose owner has exited is taken over. Only runs
-started through this tool are queued; a build started directly is neither seen
-nor delayed.
+The queue is a local endpoint the running holder listens on: a named pipe
+`\\.\pipe\organon-long-run` on Windows, an abstract socket on Linux, and a socket
+file in the temp directory elsewhere. `ORGANON_LONG_RUN_LOCK` names a separate
+queue. The operating system closes the endpoint when the holder exits by any
+means, including a forced kill, so no record is left to go stale and a reused
+process ID cannot keep the queue held. A waiter reads the holder's label and
+process ID from the endpoint. When no endpoint can be created the run goes ahead
+without waiting and says so; the queue saves time and never blocks a run for good.
+
+A forced kill of this tool does not stop the command it started; that command
+keeps running and the next queued run may overlap it once. Only runs started through this
+tool are queued; a build started directly is neither seen nor delayed.
 
 ## Verification
 
@@ -50,6 +57,6 @@ node scripts/contract-long-run.mjs
 ```
 
 The contract runs the real entry point: output capture and exit code, two runs
-started together, a lock left by a dead process, `--parallel`, and a command that
-cannot start. Runtime portability claims cover only the operating systems
+started together, a holder killed without cleanup, a leftover lock record naming
+a live unrelated process, `--parallel`, and a command that cannot start. Runtime portability claims cover only the operating systems
 actually exercised.

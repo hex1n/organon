@@ -3,19 +3,29 @@
 // in a file, and reports how long it waited and ran. Node.js built-ins only.
 "use strict";
 
+const crypto = require("node:crypto");
 const fs = require("node:fs");
+const net = require("node:net");
 const os = require("node:os");
 const path = require("node:path");
-const { spawn } = require("node:child_process");
+const { spawn, spawnSync } = require("node:child_process");
 
 const USAGE = "usage: long-run.cjs [--log <file>] [--label <text>] [--tail <lines>] [--parallel] -- <command> [args...]";
 const POLL_MS = 2000;
 const NOTICE_MS = 60000;
-// A lock directory without an owner record this old was left by a crashed start.
-const HALF_WRITTEN_MS = 10000;
+const OWNER_READ_MS = 2000;
 
-function lockPath() {
-  return process.env.ORGANON_LONG_RUN_LOCK || path.join(os.tmpdir(), "organon-long-run.lock");
+/**
+ * The queue is a local endpoint the holder listens on. The operating system closes
+ * it when the holder exits by any means, so a killed holder never leaves the
+ * queue held. ORGANON_LONG_RUN_LOCK names a separate queue.
+ */
+function endpoint() {
+  const queue = process.env.ORGANON_LONG_RUN_LOCK;
+  const name = queue ? `organon-long-run-${crypto.createHash("sha256").update(queue).digest("hex").slice(0, 16)}` : "organon-long-run";
+  if (process.platform === "win32") return `\\\\.\\pipe\\${name}`;
+  if (process.platform === "linux") return `\0${name}`;
+  return path.join(os.tmpdir(), `${name}.sock`);
 }
 
 function parseArgs(argv) {
@@ -36,39 +46,48 @@ function parseArgs(argv) {
   return options;
 }
 
-function alive(pid) {
-  try { process.kill(pid, 0); return true; } catch (error) { return error.code === "EPERM"; }
+/** Reads the holder's description; null when nothing answers, as with a socket file left by a killed holder. */
+function readOwner(name) {
+  return new Promise((resolve) => {
+    let text = "";
+    const socket = net.connect(name);
+    const finish = (owner) => { socket.destroy(); resolve(owner); };
+    socket.setTimeout(OWNER_READ_MS, () => finish({ pid: 0, label: "a run that does not answer" }));
+    socket.on("data", (chunk) => { text += chunk; });
+    socket.on("end", () => {
+      try { finish(JSON.parse(text)); } catch { finish({ pid: 0, label: "another run" }); }
+    });
+    socket.on("error", () => finish(null));
+  });
 }
 
-/** Takes the machine-wide lock, or returns the run that holds it. */
-function tryAcquire(owner, lock = lockPath()) {
-  for (;;) {
-    try {
-      fs.mkdirSync(lock);
-      fs.writeFileSync(path.join(lock, "owner.json"), JSON.stringify(owner));
-      return null;
-    } catch (error) {
-      if (error.code !== "EEXIST") throw error;
-    }
-    let held = null;
-    try { held = JSON.parse(fs.readFileSync(path.join(lock, "owner.json"), "utf8")); } catch { /* being written, or left behind */ }
-    if (held && alive(held.pid)) return held;
-    if (!held) {
-      let age = Infinity;
-      try { age = Date.now() - fs.statSync(lock).mtimeMs; } catch { continue; }
-      if (age < HALF_WRITTEN_MS) return { pid: 0, label: "a run that is starting" };
-    }
-    // Only one waiter wins the rename, so a fresh lock is never removed by a second one.
-    const stale = `${lock}.stale-${process.pid}`;
-    try { fs.renameSync(lock, stale); fs.rmSync(stale, { recursive: true, force: true }); } catch { /* another waiter took it over */ }
+/**
+ * Takes the queue. Resolves { server } when taken, { held } with the holder's
+ * description while another run holds it, or { unavailable } when no endpoint
+ * can be created; the caller then runs without the queue.
+ */
+async function tryAcquire(owner, name = endpoint()) {
+  for (let attempt = 0; attempt < 2; attempt += 1) {
+    const server = net.createServer((socket) => socket.end(JSON.stringify(owner)));
+    const error = await new Promise((resolve) => {
+      server.once("error", resolve);
+      server.listen(name, () => resolve(null));
+    });
+    if (!error) return { server };
+    if (error.code !== "EADDRINUSE") return { unavailable: error };
+    const held = await readOwner(name);
+    if (held) return { held };
+    // A Unix socket file outlives a killed holder; Windows pipes and Linux abstract sockets do not.
+    if (name.startsWith("\0") || process.platform === "win32") return { held: { pid: 0, label: "another run" } };
+    try { fs.unlinkSync(name); } catch { /* another waiter removed it */ }
   }
+  return { held: { pid: 0, label: "another run" } };
 }
 
-function release(lock = lockPath()) {
-  try {
-    const held = JSON.parse(fs.readFileSync(path.join(lock, "owner.json"), "utf8"));
-    if (held.pid === process.pid) fs.rmSync(lock, { recursive: true, force: true });
-  } catch { /* not ours, or already gone */ }
+/** Stops the command and everything it started; on Windows the shell's children outlive a plain kill. */
+function stopTree(child) {
+  if (process.platform === "win32") spawnSync("taskkill", ["/pid", String(child.pid), "/T", "/F"], { stdio: "ignore", windowsHide: true });
+  else child.kill();
 }
 
 function quoteForCmd(arg) {
@@ -103,17 +122,22 @@ async function main(argv) {
   fs.mkdirSync(path.dirname(log), { recursive: true });
 
   const queued = Date.now();
+  let queue = null;
   if (!options.parallel) {
     const owner = { pid: process.pid, label, cwd: process.cwd(), since: new Date().toISOString() };
     let noticed = 0;
-    for (let held = tryAcquire(owner); held; held = tryAcquire(owner)) {
+    for (let state = await tryAcquire(owner); ; state = await tryAcquire(owner)) {
+      if (state.server) { queue = state.server; break; }
+      if (state.unavailable) {
+        process.stdout.write(`long-run: queue unavailable (${state.unavailable.code || state.unavailable.message}), running without waiting\n`);
+        break;
+      }
       if (Date.now() - noticed >= NOTICE_MS) {
-        process.stdout.write(`long-run: waiting for ${held.label}${held.pid ? ` (pid ${held.pid})` : ""}\n`);
+        process.stdout.write(`long-run: waiting for ${state.held.label}${state.held.pid ? ` (pid ${state.held.pid})` : ""}\n`);
         noticed = Date.now();
       }
       await sleep(POLL_MS);
     }
-    process.on("exit", () => release());
   }
   const began = Date.now();
   process.stdout.write(`long-run: running, log=${log}\n`);
@@ -135,13 +159,14 @@ async function main(argv) {
   const beat = setInterval(() => {
     process.stdout.write(`long-run: still running after ${Math.round((Date.now() - began) / 1000)}s\n`);
   }, NOTICE_MS);
-  for (const signal of ["SIGINT", "SIGTERM"]) process.on(signal, () => { child.kill(); });
+  for (const signal of ["SIGINT", "SIGTERM"]) process.on(signal, () => { stopTree(child); });
 
   const code = await new Promise((resolve) => {
     child.on("error", (error) => { keep(Buffer.from(`long-run: could not start: ${error.message}\n`)); resolve(127); });
     child.on("close", (exit, signal) => resolve(exit ?? (signal ? 130 : 1)));
   });
   clearInterval(beat);
+  if (queue) queue.close();
   if (partial) tail.push(partial);
   await new Promise((resolve) => out.end(resolve));
   if (options.tail) process.stdout.write(`${tail.slice(-options.tail).join("\n")}\n`);
@@ -150,7 +175,7 @@ async function main(argv) {
   return code;
 }
 
-module.exports = { parseArgs, tryAcquire, release, quoteForCmd };
+module.exports = { parseArgs, tryAcquire, quoteForCmd };
 
 if (require.main === module) {
   main(process.argv.slice(2)).then((code) => { process.exitCode = code; });
