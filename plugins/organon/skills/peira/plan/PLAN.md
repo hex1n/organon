@@ -12,7 +12,11 @@ and exclusions. Separate **expected-result authority** (approved requirements,
 decisions, policies, external contracts, or explicit user direction) from
 **implementation evidence** (code, configuration, schemas, tests, and logs).
 
-Pin intended behavior to its authority and revision. Current code and tests establish
+Pin intended behavior to its authority and revision. An authority approves what it
+states. For a consequence the plan derives from an approved change, such as a record,
+log, or event the old path produced and the new path lacks once a step moves to
+another system, the expected result stays the old path's until an authority states
+otherwise. Current code and tests establish
 reachability and current behavior; they define correctness only when explicitly
 designated as the contract at a particular revision. With no established authority,
 retain useful characterization scenarios and mark the intended result

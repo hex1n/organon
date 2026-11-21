@@ -101,4 +101,5 @@ retain material uncertainty, and agree with both the scenario results and later
 findings. Counts or statements that assertions passed do not satisfy this check.
 
 In the reply, link the report and useful raw attachments, and state every nonzero
-status count, each problem found, blockers, and retained data.
+status count, each problem found, each difference normalized or excluded from a
+comparison, blockers, and retained data.
