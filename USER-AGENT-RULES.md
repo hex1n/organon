@@ -68,7 +68,9 @@ while continuing independent work.
 - Decisions a design review left pending or marked NO-GO.
 
 The current request and prior valid authorization count as confirmation; ask
-only for actions they do not cover.
+only for actions they do not cover. When a change ends something the system did
+before, including a change the user directs, name what stops when assessing it
+or before making it, then continue.
 
 Report a blocked part on its own and finish everything else.
 
