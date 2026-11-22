@@ -81,9 +81,11 @@ triggered [system probes](references/PROBES.md#system-behavior) for deeper check
 
 Independently check how the code represents the business subjects and rules.
 Locate each invariant's owner, the knowledge callers must carry, and the actual
-dependency direction. Judge structural requirements in executable relationships;
-matching values, renamed types and explanatory comments alone do not establish
-that responsibilities moved or became simpler.
+dependency direction. That knowledge includes each implementation you had to
+open to predict what an interface does; cite those reads as evidence. Judge
+structural requirements in executable relationships; matching values, renamed
+types and explanatory comments alone do not establish that responsibilities
+moved or became simpler.
 
 Investigate smells as hypotheses about concrete cost: duplicated rule ownership,
 contradictory state, needless coordination, speculative abstraction or complexity
