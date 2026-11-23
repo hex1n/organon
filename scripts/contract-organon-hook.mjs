@@ -2,8 +2,7 @@
 
 // Contract for the organon plugin's Stop hook, run as each runtime runs it: the
 // hook script with the Stop input on stdin and the session's directory as cwd.
-// Fixtures are scratch Git repositories; the rationale check runs the plugin's
-// own scholion checker against a real record.
+// Fixtures are scratch Git repositories with optional delivery dispatchers.
 
 import assert from "node:assert/strict";
 import fs from "node:fs";
@@ -68,58 +67,27 @@ function runGitUnavailable(temporaryDir, stateRoot) {
   assert.match(blocked.reason, /git could not start/u);
 }
 
-// A repository that opts into neither check is left exactly as it was.
-function runNoOptIn(temporaryDir, stateRoot) {
+// A repository without a delivery dispatcher is left exactly as it was.
+function runWithoutDispatcher(temporaryDir, stateRoot) {
   const repo = makeRepo(path.join(temporaryDir, "plain"));
   write(path.join(repo, "staged.txt"), "staged( )\n");
   git(repo, ["add", "staged.txt"]);
   write(path.join(repo, "notes.txt"), "edited( )\n");
+  const note = path.join(repo, "docs", "rationale", "demo", "01-demo.md");
+  const contents = "A personal note with no record header.\n";
+  write(note, contents);
   const index = path.join(repo, ".git", "index");
   const indexBefore = fs.readFileSync(index);
-  assert.deepEqual(stop(repo, stateRoot), {});
+  assert.deepEqual(stop(repo, stateRoot), {}, "personal notes do not enable a gate");
   assert.deepEqual(fs.readFileSync(index), indexBefore, "Stop must not stage or rewrite the index");
   assert.equal(fs.readFileSync(path.join(repo, "notes.txt"), "utf8"), "edited( )\n");
-}
-
-function runRationale(temporaryDir, stateRoot) {
-  const repo = makeRepo(path.join(temporaryDir, "rationale"));
-  fs.mkdirSync(path.join(repo, "docs", "rationale"), { recursive: true });
-  assert.deepEqual(stop(repo, stateRoot), {}, "an empty record set passes");
-
-  // With an active record the incremental JSON lists every changed path; here it
-  // exceeds spawnSync's 1 MiB default.
-  write(path.join(repo, "a.txt"), "first();\n");
-  write(path.join(repo, "docs", "rationale", "demo", "01-demo.md"),
-    "# demo\n> TL;DR：演示记录。\n\n## W-001 · 改名会破坏调用顺序\n\n"
-    + "- **文件路径** `a.txt`\n- **代码片段** `first();`\n- **实现理由** 演示。\n");
-  assert.deepEqual(stop(repo, stateRoot), {}, "a valid record passes and seeds incremental state");
-  const bulk = path.join(repo, "bulk");
-  fs.mkdirSync(bulk);
-  for (let index = 0; index < 10000; index++) {
-    fs.writeFileSync(path.join(bulk, `${"u".repeat(100)}-${String(index).padStart(5, "0")}.txt`), "");
-  }
-  assert.deepEqual(stop(repo, stateRoot), {}, "a large untracked listing passes");
-  fs.rmSync(bulk, { recursive: true, force: true });
-
-  // Schema-valid record whose snippet is absent from its file: the checker
-  // reports W-001 and also emits selectedPaths, which the reason must omit.
-  write(path.join(repo, "a.txt"), "first();\n");
-  write(path.join(repo, "docs", "rationale", "demo", "01-demo.md"),
-    "# demo\n> TL;DR：演示记录。\n\n## W-001 · 改名会破坏调用顺序\n\n"
-    + "- **文件路径** `a.txt`\n- **代码片段** `second();`\n- **实现理由** 演示。\n");
-  const codex = stop(repo, stateRoot);
-  assert.equal(codex.decision, "block");
-  assert.match(codex.reason, /Rationale records require attention: 1 failure\(s\)/u);
-  assert.match(codex.reason, /W-001 .*code snippet occurs 0 times in a\.txt/u);
-  assert.doesNotMatch(codex.reason, /selectedPaths|selectedIds/u);
-
-  const claude = stop(repo, stateRoot, { stop_hook_active: true });
-  assert.equal(claude.continue, false);
-  assert.match(claude.stopReason, /W-001/u);
+  assert.equal(fs.readFileSync(note, "utf8"), contents);
+  assert.equal(fs.existsSync(stateRoot), false, "Stop must not create rationale state");
 }
 
 function runDispatcher(temporaryDir, stateRoot) {
   const repo = makeRepo(path.join(temporaryDir, "dispatcher"));
+  write(path.join(repo, "docs", "rationale", "demo", "01-demo.md"), "A personal note.\n");
   const dispatcher = path.join(repo, "docs", "tools", "run-agent-gates.mjs");
   write(dispatcher,
     "import fs from 'node:fs';\nconst input = fs.readFileSync(0, 'utf8');\n"
@@ -131,6 +99,10 @@ function runDispatcher(temporaryDir, stateRoot) {
   const blocked = stop(repo, stateRoot);
   assert.equal(blocked.decision, "block");
   assert.match(blocked.reason, /Repository delivery gates failed: 1 failure\(s\)\n- G-1 format: Peer\.txt/u);
+
+  const claude = stop(repo, stateRoot, { stop_hook_active: true });
+  assert.equal(claude.continue, false);
+  assert.equal(claude.stopReason, blocked.reason);
 }
 
 const temporaryDir = fs.mkdtempSync(path.join(os.tmpdir(), "organon-hook-contract-"));
@@ -138,8 +110,7 @@ try {
   const stateRoot = path.join(temporaryDir, "state");
   runOutsideRepository(temporaryDir, stateRoot);
   runGitUnavailable(temporaryDir, stateRoot);
-  runNoOptIn(temporaryDir, stateRoot);
-  runRationale(temporaryDir, stateRoot);
+  runWithoutDispatcher(temporaryDir, stateRoot);
   runDispatcher(temporaryDir, stateRoot);
   process.stdout.write("organon Stop hook contract OK\n");
 } finally {

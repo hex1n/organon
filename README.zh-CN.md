@@ -30,12 +30,22 @@ claude plugin install organon@organon
 改动源文件后在下一个会话或 `/reload-plugins` 后生效。Codex 运行的是缓存副本：改完 skill
 要重新运行安装器，门禁的 installation-state 检查会报告过期副本。
 
-普通门禁仅核对 Claude 的安装登记，不启动其 CLI。运行
-`node scripts/contract-installation-state.mjs` 可核对 Claude 报告的实际加载目录和版本，
-并比较缓存插件的内容。
-运行 `node scripts/contract-installation-state.mjs --self-test`，可在不安装 agent 的情况下，
-用隔离场景验证安装检查和安装预览。CI 矩阵配置为在 Windows、Linux、macOS 上使用 Node.js 24
-执行门禁和这些场景，覆盖空格与 Unicode 路径及目录别名；本机结果只证明实际执行的平台。
+### 验证安装
+
+| 命令 | 适用环境 | 验证内容 |
+| --- | --- | --- |
+| `node scripts/assert-installation-state.cjs` | 本地检出，普通门禁也会运行 | 检查已安装的受管副本是否与源码一致，并核对 Claude 的安装登记，无需启动其 CLI。 |
+| `node scripts/contract-installation-state.mjs` | 已安装 Claude CLI 的本机 | 进一步查询 Claude 实际加载的插件目录和版本，并在使用缓存时比对其内容。 |
+| `node scripts/contract-installation-state.mjs --self-test` | 隔离夹具，无需安装 agent | 验证安装状态报告、缓存漂移检测、安装预览，以及 Codex 同版本刷新与回滚。 |
+| `node scripts/contract-installation-state.mjs --codex-refresh <absolute-path-to-codex.exe>` | Windows、PowerShell 和真实 Codex 可执行文件 | 验证缓存父目录或配置文件被占用时仍可刷新同版本缓存。版本目录被占用时，刷新失败应保留旧缓存，释放句柄后重试应成功。每个场景都核对最终缓存内容和配置文件字节。 |
+
+CI 矩阵在 Windows、Linux、macOS 上使用 Node.js 24 运行门禁和 `--self-test`。这些夹具
+覆盖含空格和 Unicode 的路径及目录别名。`--codex-refresh` 在其他平台输出 `SKIP`，退出码为 0。
+
+同版本刷新用例在隔离的已注册缓存夹具中运行安装器 CLI。应用后应修复被修改、缺失和多余的文件，
+保留配置字节，且不调用运行时 CLI。再次应用应显示零变更。回滚用例在旧缓存移走后注入激活失败，
+检查旧目录已还原，并验证重试后缓存与源码一致。每个场景记录被测源码的提交或差异、命令、平台和
+结果，含 `SKIP`。
 
 ## Skills
 
@@ -51,8 +61,7 @@ claude plugin install organon@organon
 | [`euthyna`](plugins/organon/skills/euthyna/) | 审查 | 先建立正确性的判断依据，再由两位独立 reviewer 分别审查业务与系统行为、实现与结构；调查缺陷、不必要的复杂度和实质风险，综合证据，只读报告。 |
 | [`peira`](plugins/organon/skills/peira/) | 验证 | 规划、执行并呈现端到端测试：可溯源的业务场景树、把缺陷交回调用方另行授权修复的证据化执行报告，明确要求时才做有上限的直至全绿循环。开头带 `plan`、`run` 或 `harness` 时选定模式：plan 出计划；run 执行，无计划时先规划；harness 在 `docs/verify/` 下写出项目的验证配方，并以一次端到端实跑证明其可用。 |
 | [`horos`](plugins/organon/skills/horos/) | 落地/验证 | 基于代码契约生成跨 RPC 与 HTTP 协议的后端 API 文档，范围可为单个接口、一个需求的后端 API 或一个分支的 API 变更。 |
-| [`ichnos`](plugins/organon/skills/ichnos/) | 留痕 | 现有记录不足以保留重要选择、转向、阻断或交接依据，或用户明确要求时，记录理由、证据和结果。在任务的 `.scratch/` 文件夹中合并关键检查点，复用工作本身要求的审查。 |
-| [`scholion`](plugins/organon/skills/scholion/) | 导航 | 记录当前代码为什么这样实现，按文件路径或代码片段查找对应的实现理由；记录由个人维护、Git 忽略，支持工作树交接。 |
+| [`ichnos`](plugins/organon/skills/ichnos/) | 留痕 | 重要决定、转向或阻断发生时，主动判断理由和证据是否影响下一步，需要时当场记录。普通接手用简短的 Markdown 交接。 |
 
 ## 命名
 
@@ -66,7 +75,6 @@ claude plugin install organon@organon
 | `tekton`（τέκτων） | `arborist` | 建造者、木匠；architect 一词由它构成 | 按契约施工：新代码立得住，已有代码的调用方、数据和测试不被弄坏 |
 | `euthyna`（εὔθυνα） | `scrutineer` | 雅典官员卸任时的问责审计；审计官只驳回指控或移交法庭 | 代码建成后受审，发现交回，不代为修复 |
 | `historia`（ἱστορία） | `deep-research` | 调查；希罗多德称其著作为"调查的展示" | 以书面结论交付的调研 |
-| `scholion`（σχόλιον） | `rationale-records` | 抄本页边针对某一段的批注 | 锚定到代码片段、写在项目文档之外的个人记录 |
 | `horos`（ὅρος） | `generating-api-docs` | 界石；雅典的 horos 公示地块上的负担 | 在边界上写调用方契约，不写实现 |
 | `peira`（πεῖρα） | `e2e-test-workflow` | 试验、尝试；empirical 一词的来源 | 在真实环境中试跑场景 |
 | `ichnos`（ἴχνος） | —（新增） | 足迹、踪迹；猎人循迹找到猎物 | 复核者顺着留痕找回每个决策及其证据 |
@@ -139,13 +147,6 @@ claude plugin install organon@organon
 - **目标契约**：写意图中的外部契约，不写当前缺陷。
 - **权威与证据分离**：已批准的契约决定接口承诺什么，被查阅的源码版本补全契约没写的部分；两者不一致时作为缺陷报告。
 
-### `scholion`
-
-- **切斯特顿的栅栏**：记下代码为什么这样实现，以及看似更简单的改写会破坏什么行为。
-- **DRY 的原义（Hunt & Thomas）**：一条不变量只有一个当前所有者。
-- **从代码查理由**：每条记录用文件路径和在文件内唯一匹配的代码片段定位实现，便于修改者找到对应理由。
-- **记录是一次中断**：标题写"改成更自然的写法会破坏什么"——读者是在改代码的当口到达的，适不适用已由锚点回答。
-
 ### `ichnos`
 
 - **同步、可归属的记录（ALCOA 数据完整性原则）**：在重要选择发生时记录，每次参与运行标明自己写的行。
@@ -161,7 +162,7 @@ claude plugin install organon@organon
 验证   peira（plan → run）· horos
 调研   historia            ← 按需求证
         ↑ 新发现的未知回馈下一轮规划
-按需   ichnos              ← 保留重要决策和交接依据
+按需   ichnos              ← 留下可审计的决策变更历史
 ```
 
 这些技能保证「事情做对」。对用户已有方案的拷问（访谈 / grill 类技能）位于
@@ -178,11 +179,12 @@ agent 能力，second-model reviewer 使用 runtime 提供的只读第二模型�
 或 `harness` 选定模式：Claude Code 用 `/organon:peira plan …`，Codex 用
 `$organon:peira plan …`。它取代已退役的 `e2e-test-planner` 与 `e2e-test-executor`。
 
-这八个 skill 由 `first-principles-planner`、`assayer`、`arborist`、`scrutineer`、
-`deep-research`、`rationale-records`、`generating-api-docs`、`e2e-test-workflow`
-改名而来（见[命名](#命名)）。`node scripts/install-plugin.cjs --apply` 会删除所有
-指向本仓库的逐个 skill 链接（包括改名留下的），并安装插件。真实目录和指向别处的链接都会保留。`scholion` 的状态仍放在
-`~/.agents/state/rationale-records` 下，已有索引和未消费的工作树交接记录照常可用。
+`node scripts/install-plugin.cjs --apply` 安装插件，并清理指向本仓库的单个 skill 链接，
+包括旧名链接。
+
+Scholion 已退役。Git 忽略的 `docs/rationale/` 中已有的文件可直接用 Markdown 阅读。
+若有待完成的工作树交接，使用提交 `a2836ca` 中的 Scholion CLI 和
+`~/.agents/state/rationale-records` 中的现有状态继续处理。
 
 受管插件缓存是本仓库源码的可重建副本。执行 `--apply` 计划中的缓存刷新时，会以
 当前源码为准，覆盖缓存中的改动、补齐缺失文件并移除多余文件。源码更新和缓存手改
@@ -214,11 +216,9 @@ USER-AGENT-RULES.md    # 适用于任意仓库的用户级通用规则
 
 ## Agent 工具
 
-organon 插件自带一个 Stop Hook：[`hooks/stop.mjs`](plugins/organon/hooks/stop.mjs)，Claude Code
-通过 `hooks/hooks.json` 注册，Codex 通过插件清单注册。代理结束前，仓库有 `docs/rationale` 时它运行
-[scholion](plugins/organon/skills/scholion/) 检查，仓库有 `docs/tools/run-agent-gates.mjs` 时运行该仓库自己的门禁；
-两者都没有的仓库不受任何影响。Codex 第一次运行前、以及 Hook 改动后，需要你确认信任一次。
-业务仓库可以在 `docs/rationale` 下保存 Git 忽略的个人记录，但不保存 formatter/checker 执行器、运行时 Hook 或 rationale 状态。
+organon 插件的 Stop Hook [`hooks/stop.mjs`](plugins/organon/hooks/stop.mjs) 由 Claude Code
+通过 `hooks/hooks.json` 注册，Codex 通过插件清单注册。代理结束前，Hook 会运行仓库中已有的
+`docs/tools/run-agent-gates.mjs`。Codex 首次运行 Hook 前和 Hook 改动后会要求确认信任。
 
 [可移植 Java formatter](tools/java-formatter/) 仍是用户级工具，由仓库的门禁脚本调用：
 
@@ -226,12 +226,11 @@ organon 插件自带一个 Stop Hook：[`hooks/stop.mjs`](plugins/organon/hooks/
     node scripts/install-agent-tools.cjs --apply
     node scripts/contract-java-formatter.mjs
     node scripts/contract-organon-hook.mjs
-    node scripts/contract-scholion.mjs
 
 [个人 Git 钩子](tools/git-hooks/) 同样作为用户级工具链接到 `~/.agents/tools`。
 每个仓库通过自己的测试路径配置单独接入；工具安装器不修改全局 Git 钩子或 Agent Stop Hook。
 
-[Long run](tools/long-run/) 以同样方式链接。它让本机一次只跑一个构建或测试，把完整输出存成文件，
+[run-queued](tools/long-run/) 以同样方式链接。它让本机一次只跑一个构建或测试，把完整输出存成文件，
 并报告耗时；用 `node scripts/contract-long-run.mjs` 检查。
 
 安装器把 formatter 链接到 `~/.agents/tools`，并清理早先安装为这个 Hook 留下的东西：各运行时

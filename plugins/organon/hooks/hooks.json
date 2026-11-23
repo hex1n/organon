@@ -1,5 +1,5 @@
 {
-  "description": "Check personal rationale records and run the repository's own delivery gates before an agent stops",
+  "description": "Run the repository's delivery gates before an agent stops",
   "hooks": {
     "Stop": [
       {

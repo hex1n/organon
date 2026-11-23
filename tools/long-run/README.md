@@ -1,7 +1,7 @@
-# Long run
+# run-queued
 
-Runs a command that takes minutes (a build, a test suite, an application start)
-so that it costs as little as it can on a shared machine:
+Runs a command through a local queue and saves its complete output. It can wrap
+a build, a test suite, or an application start.
 
 - **One at a time.** It waits while another long run started through this tool is
   still going, in any session or runtime on this machine. Builds that overlap on a
@@ -17,8 +17,11 @@ Requirements: Node.js 22 or newer. No other dependency.
 ## Use
 
 ```sh
-node ~/.agents/tools/long-run/long-run.cjs -- mvn -o -pl some-module -am test
+node ~/.agents/tools/run-queued/run-queued.cjs -- mvn -o -pl some-module -am test
 ```
+
+The previous entry point, `~/.agents/tools/long-run/long-run.cjs`, also works.
+Both entry points share the same queue.
 
 | Option | Meaning |
 |---|---|
@@ -26,6 +29,10 @@ node ~/.agents/tools/long-run/long-run.cjs -- mvn -o -pl some-module -am test
 | `--label <text>` | Name shown to runs that wait for this one and used in the default log name. Default: the command's name. |
 | `--tail <lines>` | Lines of output shown on the console at the end. Default 40; `0` shows none. |
 | `--parallel` | Run without waiting and without making others wait. For a command that is long but light. |
+
+When a default log name already exists, the tool tries `-2`, `-3`, and so on
+before `.log` until it creates a new file. An explicit `--log` uses the supplied
+path. If it names an existing regular file, the tool replaces its contents.
 
 The tool exits with the command's exit code. Its own lines start with `long-run:`;
 the last one is `long-run: exit=<code> elapsed=<s>s waited=<s>s log=<file>`.
@@ -56,7 +63,8 @@ tool are queued; a build started directly is neither seen nor delayed.
 node scripts/contract-long-run.mjs
 ```
 
-The contract runs the real entry point: output capture and exit code, two runs
-started together, a holder killed without cleanup, a leftover lock record naming
-a live unrelated process, `--parallel`, and a command that cannot start. Runtime portability claims cover only the operating systems
-actually exercised.
+The contract runs the installed entry points: output capture and exit code, separate
+default logs for same-second parallel runs, two queued runs using both names, a
+holder killed without cleanup, a leftover lock record naming a live unrelated
+process, `--parallel`, and a command that cannot start. Runtime portability claims
+cover only the operating systems actually exercised.

@@ -144,9 +144,6 @@ When changing these targets:
 - `plugins/organon/hooks/`: run `node scripts/contract-organon-hook.mjs`, then
   refresh the Codex copy with `node scripts/install-plugin.cjs --apply` and
   re-trust the changed hook in Codex.
-- `plugins/organon/skills/scholion/`: read
-  [its README](plugins/organon/skills/scholion/README.md) and run
-  `node scripts/contract-scholion.mjs`.
 - `USER-AGENT-RULES.md`: run `node scripts/install-agent-tools.cjs --apply` so a
   Codex copy made where a file symlink was unavailable follows the source.
 

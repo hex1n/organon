@@ -4,7 +4,7 @@ const fs = require("node:fs");
 const os = require("node:os");
 const path = require("node:path");
 
-const { classify, linkSkill } = require("./install-plugin.cjs");
+const { classify, linkSkill, samePath } = require("./install-plugin.cjs");
 
 const ROOT = path.join(__dirname, "..");
 // The user-level rules file is one source with two runtime entry points:
@@ -19,10 +19,9 @@ const ASSET_SPECS = [
   { name: "java-formatter", source: ["tools", "java-formatter"], install: [".agents", "tools", "java-formatter"] },
   { name: "git-hooks", source: ["tools", "git-hooks"], install: [".agents", "tools", "git-hooks"] },
   { name: "long-run", source: ["tools", "long-run"], install: [".agents", "tools", "long-run"] },
+  { name: "run-queued", source: ["tools", "long-run"], install: [".agents", "tools", "run-queued"] },
 ];
-// The organon plugin now carries the Stop hook and the scholion checker it
-// runs. Earlier installs linked the checker here and wrote this Stop handler
-// into both runtimes' settings; left in place, every Stop would run twice.
+// Earlier installs wrote a global Stop handler and a separate Scholion tool link.
 const RETIRED_LINK = { source: ["plugins", "organon", "skills", "scholion"], install: [".agents", "tools", "scholion"] };
 const MANAGED_FRAGMENT = ".agents/tools/java-formatter/run-agent-hook.mjs";
 
@@ -244,6 +243,20 @@ function describeRule(rule, apply) {
   }
 }
 
+function isRetiredToolLink(installPath, sourceDir) {
+  try {
+    const storedTarget = fs.readlinkSync(installPath);
+    const target = path.resolve(fs.realpathSync(path.dirname(installPath)), storedTarget);
+    if (samePath(target, sourceDir)) return true;
+    // Resolve directory aliases while the removed skill itself is dangling.
+    const targetParent = fs.realpathSync(path.dirname(target));
+    const sourceParent = fs.realpathSync(path.dirname(sourceDir));
+    return samePath(path.join(targetParent, path.basename(target)), path.join(sourceParent, path.basename(sourceDir)));
+  } catch {
+    return false;
+  }
+}
+
 function planInstall(home = os.homedir(), sourceRoot = ROOT) {
   const assets = ASSET_SPECS.map((spec) => {
     const source = path.join(sourceRoot, ...spec.source);
@@ -251,8 +264,7 @@ function planInstall(home = os.homedir(), sourceRoot = ROOT) {
     return { name: spec.name, source, installPath, linkState: classify(installPath, source) };
   });
   const retiredPath = path.join(home, ...RETIRED_LINK.install);
-  // Only a link back at this checkout's scholion is ours to remove.
-  const retired = classify(retiredPath, path.join(sourceRoot, ...RETIRED_LINK.source)) === "linked" ? [retiredPath] : [];
+  const retired = isRetiredToolLink(retiredPath, path.join(sourceRoot, ...RETIRED_LINK.source)) ? [retiredPath] : [];
   const configs = [];
   for (const [runtime, file] of [
     ["codex", path.join(home, ".codex", "hooks.json")],

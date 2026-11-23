@@ -13,6 +13,7 @@ tmp/
 __pycache__/
 *.py[cod]
 .pytest_cache/
+/scripts/skill-validation/node_modules/
 tools/java-formatter/target/
 
 # Local research and evaluation artifacts may contain private project data.

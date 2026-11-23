@@ -27,6 +27,19 @@ before crediting it to the revision.
 For generalization claims, probe contrasting task shapes and limit conclusions
 to what ran.
 
+## Skill metadata
+
+CI parses the published `SKILL.md` frontmatter with a pinned YAML parser. To
+run the same check locally:
+
+```sh
+npm ci --prefix scripts/skill-validation --ignore-scripts --no-audit --no-fund
+node scripts/contract-skill-frontmatter.mjs
+```
+
+This contract checks YAML and required metadata. Use the runtime's skill
+inventory separately when verifying discovery.
+
 ## Script conventions
 
 The gate is named `gate.mjs` rather than `check-all` because it deliberately

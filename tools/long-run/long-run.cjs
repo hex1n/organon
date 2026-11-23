@@ -10,7 +10,6 @@ const os = require("node:os");
 const path = require("node:path");
 const { spawn, spawnSync } = require("node:child_process");
 
-const USAGE = "usage: long-run.cjs [--log <file>] [--label <text>] [--tail <lines>] [--parallel] -- <command> [args...]";
 const POLL_MS = 2000;
 const NOTICE_MS = 60000;
 const OWNER_READ_MS = 2000;
@@ -74,14 +73,29 @@ async function tryAcquire(owner, name = endpoint()) {
       server.listen(name, () => resolve(null));
     });
     if (!error) return { server };
-    if (error.code !== "EADDRINUSE") return { unavailable: error };
+    if (error.code !== "EADDRINUSE" && error.code !== "EEXIST") return { unavailable: error };
     const held = await readOwner(name);
     if (held) return { held };
+    // A competing pathname bind can return EEXIST before the winner starts listening.
+    if (error.code === "EEXIST") return { held: { pid: 0, label: "another run is starting" } };
     // A Unix socket file outlives a killed holder; Windows pipes and Linux abstract sockets do not.
     if (name.startsWith("\0") || process.platform === "win32") return { held: { pid: 0, label: "another run" } };
     try { fs.unlinkSync(name); } catch { /* another waiter removed it */ }
   }
   return { held: { pid: 0, label: "another run" } };
+}
+
+function openDefaultLog(log) {
+  const { dir, name, ext } = path.parse(log);
+  for (let index = 1; ; index += 1) {
+    const candidate = index === 1 ? log : path.join(dir, `${name}-${index}${ext}`);
+    try {
+      const fd = fs.openSync(candidate, "wx");
+      return { log: candidate, out: fs.createWriteStream(candidate, { fd }) };
+    } catch (error) {
+      if (error.code !== "EEXIST") throw error;
+    }
+  }
 }
 
 /** Stops the command and everything it started; on Windows the shell's children outlive a plain kill. */
@@ -111,15 +125,15 @@ function defaultLog(label) {
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
-async function main(argv) {
+async function main(argv, commandName) {
   let options;
   try { options = parseArgs(argv); } catch (error) {
-    process.stderr.write(`long-run: ${error.message}\n${USAGE}\n`);
+    process.stderr.write(`long-run: ${error.message}\nusage: ${commandName} [--log <file>] [--label <text>] [--tail <lines>] [--parallel] -- <command> [args...]\n`);
     return 64;
   }
   const label = options.label || path.basename(options.command[0]);
-  const log = path.resolve(options.log || defaultLog(label));
-  fs.mkdirSync(path.dirname(log), { recursive: true });
+  const logPath = path.resolve(options.log || defaultLog(label));
+  fs.mkdirSync(path.dirname(logPath), { recursive: true });
 
   const queued = Date.now();
   let queue = null;
@@ -139,10 +153,18 @@ async function main(argv) {
       await sleep(POLL_MS);
     }
   }
+  let logFile;
+  try {
+    logFile = options.log ? { log: logPath, out: fs.createWriteStream(logPath) } : openDefaultLog(logPath);
+  } catch (error) {
+    if (queue) queue.close();
+    process.stderr.write(`long-run: could not open log: ${error.message}\n`);
+    return 1;
+  }
+  const { log, out } = logFile;
   const began = Date.now();
   process.stdout.write(`long-run: running, log=${log}\n`);
 
-  const out = fs.createWriteStream(log);
   const tail = [];
   let partial = "";
   const keep = (chunk) => {
@@ -175,8 +197,10 @@ async function main(argv) {
   return code;
 }
 
-module.exports = { parseArgs, tryAcquire, quoteForCmd };
-
-if (require.main === module) {
-  main(process.argv.slice(2)).then((code) => { process.exitCode = code; });
+function runCli() {
+  main(process.argv.slice(2), path.basename(process.argv[1])).then((code) => { process.exitCode = code; });
 }
+
+module.exports = { parseArgs, tryAcquire, quoteForCmd, runCli };
+
+if (require.main === module) runCli();

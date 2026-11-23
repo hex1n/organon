@@ -24,5 +24,11 @@ jobs:
           package-manager-cache: false
       - name: Repository gate
         run: node scripts/gate.mjs
+      - name: Install skill validation dependency
+        if: runner.os == 'Linux'
+        run: npm ci --prefix scripts/skill-validation --ignore-scripts --no-audit --no-fund
+      - name: Skill frontmatter contract
+        if: runner.os == 'Linux'
+        run: node scripts/contract-skill-frontmatter.mjs
       - name: Installation state contract with isolated fixtures
         run: node scripts/contract-installation-state.mjs --self-test

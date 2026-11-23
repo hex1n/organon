@@ -60,7 +60,10 @@ When every selected scenario ran from its kept file and passed, the report is
 short and in the previous report's language: the opening with the counts, the
 source revision that ran, the rerun command, one line per scenario linking the
 file's own output, what differs from the previous run, and any data the run left
-behind. A scenario that failed, was blocked, or ran against a
+behind. A passing attempt on the same effective target leaves an applicable
+intermittent failure open. State its unresolved impact and next distinguishing
+check in the opening, and link the earlier failure receipt.
+A scenario that failed, was blocked, or ran against a
 changed expectation gets its full record as above.
 
 ## Issue records

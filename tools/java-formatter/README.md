@@ -6,11 +6,10 @@ P3C-derived profile in codestyle.xml, plus the fluent-chain pass in src/.
 Maven dependencies are pinned so JDK 8 remains sufficient.
 
 The installer links this directory under ~/.agents/tools. The organon
-plugin's Stop hook checks rationale anchors and invokes
-docs/tools/run-agent-gates.mjs when present, with ASDF_SHARED_JAVA_FORMATTER=1
-so a dispatcher can call this formatter. The hook never runs the formatter.
-Repository dispatchers own their own side effects; the shared formatter does
-not infer file ownership from timestamps.
+plugin's Stop hook invokes the repository's `docs/tools/run-agent-gates.mjs`
+when present, with `ASDF_SHARED_JAVA_FORMATTER=1` so the dispatcher can call
+this formatter. Repository dispatchers own their side effects and select the
+files to format.
 
 The formatter keeps Javadoc blocks byte-for-byte and preserves LF/CRLF layout.
 Removing unused imports stays outside its contract.
@@ -44,11 +43,9 @@ without --include-tests; the error names each such path and nothing is written.
 Relative paths resolve against the working directory. Production Java is the default scope;
 --include-tests admits explicitly requested test files.
 
-Stop neither formats nor checks formatting: it only runs the rationale and
-repository checks, so another task's Java changes or a formatter upgrade cannot
-create unsolicited source changes. A read-only format check is
-format-changed-java.mjs --check --files <paths>. Old observation cache files are
-unused and may remain on disk.
+Run `format-changed-java.mjs --check --files <paths>` for a read-only format
+check of the current task's files. Old observation cache files are unused and
+may remain on disk.
 
 Requirements: Node.js 18+, JDK 8+, Maven 3.6+, and Git. Maven builds
 target/java-formatter.jar on first use and again whenever pom.xml or the Java

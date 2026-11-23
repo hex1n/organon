@@ -1,26 +1,24 @@
 ---
 name: ichnos
 description: >
-  Record consequential choices, pivots, blockers and handoffs whose reasons
-  and evidence need to survive substantial multi-step work. Use for explicit
-  留痕 / 决策记录 / show your work requests and for carrying material decisions
-  across sessions.
+  Record consequential decisions, reversals and blockers as they arise
+  when their reasons or evidence matter to later work, such as material
+  choices about scope, approach, authorization or acceptance. Also use for
+  explicit decision-trail requests (留痕 / 决策记录).
 ---
 
 # Ichnos — Decision Trail
 
-A trail preserves consequential decisions a later worker could not recover
-from the diff, native logs and delivery. Start when such a decision arises,
-or when the user requests a trail. Record the choice, reason, evidence and result.
-
-Routine reversible edits, reads, checks and Git operations use existing records.
-An existing trail does not require an entry for every follow-up. If routine work
-reveals a consequential choice or blocker, record that event and continue.
+Decide as work progresses which choices, pivots and blockers need a record.
+Start or append to the trail when the event happens and its rationale or
+evidence matters to what happens next. Start one when the user asks.
+Use native logs for routine work. A brief Markdown handoff carries the
+current decision, evidence links, open checks and next action.
 
 ## Task folder
 
-Keep everything the task generates in one folder: `.scratch/YYYYMMDD-task-name/`
-at the root of the repository the task works in, dated in the user's timezone.
+Keep the trail and supporting artifacts together in `.scratch/YYYYMMDD-task-name/`
+at the task repository's root, dated in the user's timezone.
 Use the folder the user named or another workflow already opened for this task,
 and reuse it when the task resumes. It holds:
 
@@ -42,16 +40,16 @@ Leave the folder unstaged. Commit the trail only when the user wants it in histo
 | `evidence` | Pointers that resolve: a path relative to the task folder or repository root, `file:line`, a commit, a URL. Wrap a path that contains spaces in backticks. |
 | `result` | The outcome or state: `focused 48/48 green`, `reverted`, `17/17 mutants detected`, `open`, `blocked: <what>`. |
 
-Record decisions that change the contract, approach, authorization scope,
-acceptance or handoff:
+Record decisions that materially change the contract, approach, authorization
+or acceptance:
 
-- a consequential choice and why the alternatives were rejected;
+- a consequential choice and why it won. When relevant, include the cost of
+  switching each way, what would reopen the choice, or why a limit was accepted.
 - a material pivot or revert, with the evidence or user decision that caused it;
 - a blocker or finding that changes the next action or leaves acceptance open;
 - a completed workstream's decisive verification and remaining gaps.
 
-Group related commands and checks in one checkpoint. Reuse native output and
-existing receipts; create a script only when execution itself benefits from it.
+Group related commands and checks. Add scripts when they aid execution.
 
 Append through the helper, which keeps every cell on one line and writes each
 row in one write, so parallel writers do not interleave:
@@ -60,8 +58,8 @@ row in one write, so parallel writers do not interleave:
 node <skill-dir>/scripts/trail.cjs append <decision-trail.tsv> <phase> <decision> <reason> <evidence> <result>
 ```
 
-Point at evidence a reviewer can inspect or rerun. Save a decisive command and
-its output when no existing receipt records them; cite rather than duplicate it.
+Pin mutable evidence to the revision, snapshot or run used. Reuse a receipt
+or save the decisive command and output.
 
 The trail is append-only. A revert or replaced design is a new `pivot` row that
 names the row it replaces; the replaced row stays checked, because its evidence
@@ -69,6 +67,18 @@ still shows what happened then. A `correction` row repairs a row that is wrong a
 written or whose evidence moved: its decision names that row's timestamp, and
 `check` stops checking that row's evidence. Backfill an earlier consequential
 decision only when supported by visible evidence; mark its result `backfilled`.
+
+## Durable project decisions
+
+When discussion settles a material business rule, requirement boundary or
+design choice that future work must honor, preserve the decision and its
+rationale in project docs. Reuse a requirement or design document that already
+explains the decision. Otherwise, when repository edits are in scope, write a
+short ADR with the context, decision, rationale and consequences. Include the
+confirmed edge cases and deliberate exclusions that define the boundary.
+Follow the project's ADR convention, or use `docs/adr/` for the first ADR.
+Link the record from the trail. Use the trail for temporary constraints and
+open choices that affect the task.
 
 ## Runs
 

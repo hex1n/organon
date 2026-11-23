@@ -34,14 +34,26 @@ directory marketplace in place, so source edits apply at the next session or
 `/reload-plugins`. Codex runs a cached copy: re-run the installer after editing
 a skill, and the gate's installation-state check reports a stale copy.
 
-The default gate checks Claude's installation registration without starting its
-CLI. Run `node scripts/contract-installation-state.mjs` to check the actual load
-directory and version reported by Claude, including cached plugin contents.
-Use `node scripts/contract-installation-state.mjs --self-test` to exercise the
-installation checks and installer previews with isolated fixtures, without
-installed agents. The CI matrix runs the gate and these fixtures on Windows,
-Linux, and macOS with Node.js 24, including paths with spaces and Unicode and
-directory aliases. Local results establish only the platform actually executed.
+### Verify installation
+
+| Command | Environment | What it verifies |
+| --- | --- | --- |
+| `node scripts/assert-installation-state.cjs` | Local checkout, also run by the default gate | Checks installed managed copies for drift and checks Claude's registration without starting its CLI. |
+| `node scripts/contract-installation-state.mjs` | Local installation with the Claude CLI | Also queries Claude for the actual plugin load directory and version and checks its cached contents where applicable. |
+| `node scripts/contract-installation-state.mjs --self-test` | Isolated fixtures without installed agents | Checks installation-state reporting, cache drift detection, installer previews, and same-version Codex refresh and rollback. |
+| `node scripts/contract-installation-state.mjs --codex-refresh <absolute-path-to-codex.exe>` | Windows, PowerShell and a real Codex executable | Exercises same-version refresh while the cache parent or config is held open. Holding the version directory must preserve the old cache on failure and allow a successful retry after release. All cases check final cache contents and config bytes. |
+
+The CI matrix runs the gate and `--self-test` on Windows, Linux, and macOS with
+Node.js 24. Those fixtures cover paths with spaces and Unicode and directory
+aliases. `--codex-refresh` prints `SKIP` and exits zero on other platforms.
+
+The same-version fixture runs the installer CLI against an isolated registered
+cache. Apply must repair changed, missing and extra files, preserve config bytes
+and make no runtime CLI calls. A second apply must report zero changes. The
+rollback fixture injects an activation failure after the old cache has moved
+aside, checks that the old tree is restored, and verifies that retry converges.
+Record the tested source revision or diff, command, platform and result for each
+scenario, including any `SKIP`.
 
 ## Skills
 
@@ -58,8 +70,7 @@ for the distribution vocabulary.
 | [`euthyna`](plugins/organon/skills/euthyna/) | review | Establish what correct means, then independently review business and system behavior alongside implementation and structure; investigate defects, unnecessary complexity and material risks, and synthesize the evidence without editing the candidate. |
 | [`peira`](plugins/organon/skills/peira/) | verify | Plan, execute, and present end-to-end tests: source-backed scenario trees, evidence-backed execution reports that hand defects back for separately authorized fixes, with a capped iterate-until-green loop on explicit request. Typed first, `plan`, `run`, or `harness` selects the mode: plan; run, planning first when no plan exists; or write the project's verification harness under `docs/verify/`, proved by one end-to-end run. |
 | [`horos`](plugins/organon/skills/horos/) | land/verify | Generate backend API docs across RPC and HTTP protocols from code-backed contracts, for one interface, one requirement's backend API, or a branch's API changes. |
-| [`ichnos`](plugins/organon/skills/ichnos/) | record | Preserve consequential choices, pivots, blockers and handoffs with their reasons, evidence and results when existing records are insufficient, or when a trail is requested. Group material checkpoints in the task's `.scratch/` folder and reuse the work's required review. |
-| [`scholion`](plugins/organon/skills/scholion/) | navigate | Record why current code is implemented this way and find the reason by file path or code snippet; keep records personal and Git-ignored, with worktree handoff. |
+| [`ichnos`](plugins/organon/skills/ichnos/) | record | Record consequential decisions, reversals or blockers as they arise when their reasons or evidence matter to what happens next. Use a brief Markdown handoff for routine continuation. |
 
 ## Naming
 
@@ -74,7 +85,6 @@ survive only in history and in install links made before the rename; see
 | `tekton` (τέκτων) | `arborist` | builder, carpenter; the root of *architect* | builds to contract: new code that holds up, existing code whose callers, data, and tests stay intact |
 | `euthyna` (εὔθυνα) | `scrutineer` | Athenian accounting of an official at the end of a term; its examiners dismissed a charge or referred it to a court | code is examined after it is built, and findings go back without repairs |
 | `historia` (ἱστορία) | `deep-research` | inquiry; Herodotus called his work the display of his inquiry | investigation delivered as written findings |
-| `scholion` (σχόλιον) | `rationale-records` | marginal note on a manuscript, keyed to one passage | a personal note anchored to one code snippet, outside the project docs |
 | `horos` (ὅρος) | `generating-api-docs` | boundary stone; Athenian horoi publicly declared the obligation on a plot | the caller contract at the boundary, never the implementation |
 | `peira` (πεῖρα) | `e2e-test-workflow` | trial, attempt; the root of *empirical* | scenarios are tried against a real environment |
 | `ichnos` (ἴχνος) | — (new) | track, footprint; the trace a hunter reads back to the animal | a reviewer follows the trail back to each decision and its evidence |
@@ -150,13 +160,6 @@ look when extending it.
 - **Target contract:** the intended external contract, never a current defect.
 - **Authority separated from evidence:** the approved contract decides what the interface promises, the inspected revision fills in what the contract leaves open, and a disagreement between them is reported as a defect.
 
-### `scholion`
-
-- **Chesterton's fence:** record why code is implemented this way and what behavior a seemingly simpler rewrite would break.
-- **DRY in its original sense (Hunt & Thomas):** one invariant, one current owner.
-- **Code-to-reason lookup:** each record pairs a file path with a code snippet that matches exactly once in that file, so a maintainer can find the implementation rationale from the code.
-- **A record is an interruption:** its title names what a natural rewrite would break, because the reader arrives mid-edit and the anchor has already answered whether the record applies to them.
-
 ### `ichnos`
 
 - **Contemporaneous, attributable records (ALCOA data-integrity principles):** record consequential choices when they arise; each contributing run identifies its rows.
@@ -172,7 +175,7 @@ review-code  euthyna             ← challenge the code and the findings; report
 verify       peira (plan → run) · horos
 investigate  historia            ← answer questions from evidence
               ↑ discovered unknowns feed the next plan
-as needed    ichnos              ← preserve consequential decisions and handoffs
+as needed    ichnos              ← keep an auditable decision history
 ```
 
 These skills keep the work itself correct. Stress-testing a plan the user
@@ -193,14 +196,12 @@ offers, and availability is resolved and recorded once at freeze time.
 `$organon:peira plan …` in Codex. It replaces the retired `e2e-test-planner` and
 `e2e-test-executor`.
 
-The eight skills were renamed from `first-principles-planner`, `assayer`,
-`arborist`, `scrutineer`, `deep-research`, `rationale-records`,
-`generating-api-docs`, and `e2e-test-workflow` (see [Naming](#naming)).
-`node scripts/install-plugin.cjs --apply` removes every per-skill link into
-this repository, including those a renamed skill left behind, and installs the
-plugin. Real directories and links elsewhere stay. `scholion` keeps its state
-under `~/.agents/state/rationale-records`, so existing indexes and pending
-worktree handoffs carry over.
+`node scripts/install-plugin.cjs --apply` installs the plugin and removes
+per-skill links targeting this checkout, including former names.
+
+Scholion has retired. Read existing Git-ignored files under `docs/rationale/`
+as Markdown. For a pending worktree handoff, use the Scholion CLI from commit
+`a2836ca` with the existing state under `~/.agents/state/rationale-records`.
 
 Managed plugin caches are replaceable copies of this repository. Applying a
 planned cache refresh with `--apply` replaces cache-local edits, restores missing
@@ -214,9 +215,6 @@ user configuration. Initial installation, version upgrades and marketplace moves
 use the runtime CLI. If the version directory is in use, refresh leaves the old
 cache intact; retry after its reader releases it. Rerunning after an interrupted
 version switch rebuilds the registered cache from source.
-
-On Windows, exercise the cache and configuration handle cases with
-`node scripts/contract-installation-state.mjs --codex-refresh <absolute-path-to-codex.exe>`.
 
 `euthyna` can run directly or in a fresh-context reviewer delegated by an
 implementation workflow. It owns code review, `tekton` owns implementation,
@@ -248,12 +246,9 @@ demand, and optional `scripts/` and local-only `tests/`.
 
 The organon plugin carries one Stop hook, [`hooks/stop.mjs`](plugins/organon/hooks/stop.mjs),
 registered for Claude Code in `hooks/hooks.json` and for Codex in its plugin
-manifest. Before an agent stops it runs the [scholion](plugins/organon/skills/scholion/)
-check when the repository has `docs/rationale`, and the repository's own
-`docs/tools/run-agent-gates.mjs` when present; a repository with neither is left
-untouched. Codex asks you to trust the hook once, and again after it changes.
-Business repositories may carry Git-ignored personal records under
-`docs/rationale`, but never formatter/checker executables, runtime hooks, or rationale state.
+manifest. Before an agent stops, the hook runs the repository's
+`docs/tools/run-agent-gates.mjs` when present. Codex asks you to trust the
+hook once, and again after it changes.
 
 The [portable Java formatter](tools/java-formatter/) stays a user-level tool that
 repository dispatchers call:
@@ -262,13 +257,12 @@ repository dispatchers call:
     node scripts/install-agent-tools.cjs --apply
     node scripts/contract-java-formatter.mjs
     node scripts/contract-organon-hook.mjs
-    node scripts/contract-scholion.mjs
 
 The [personal Git hooks](tools/git-hooks/) are another user-level tool linked
 under `~/.agents/tools`. Repositories opt in with their own test-path settings;
 the tool installer does not change global Git hooks or Agent Stop hooks.
 
-[Long run](tools/long-run/) is linked the same way. It runs one build or test
+[run-queued](tools/long-run/) is linked the same way. It runs one build or test
 at a time on the machine, keeps the complete output in a file, and reports the
 elapsed time; check it with `node scripts/contract-long-run.mjs`.
 

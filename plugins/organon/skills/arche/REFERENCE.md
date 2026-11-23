@@ -388,6 +388,9 @@ The plan names its next verification step: the cheapest check that could flip
 the decision or reshape the chosen mechanism — a fact to confirm, a log to
 read, a measurement to run; a thin spike only when nothing cheaper can
 falsify it, with its flip condition stated before it runs.
+When a check settles a choice, carry its distinguishing scenario, observed
+result and resulting decision with the receipt into the implementation
+handoff. State what the final implementation still needs to prove.
 
 A BUILD plan names the observations that establish the target outcome and
 distinguish a plausible wrong implementation. Include relevant interactions with
@@ -492,6 +495,12 @@ dates to canonical docs such as `CONTEXT.md`, ADRs, or project profiles.
 When saving a plan:
 
 1. Write/update the artifact first.
-2. Lead with the decision, acceptance evidence and next check; place supporting
-   analysis afterward.
+2. Lead with the decision, acceptance evidence and next check. For a handoff,
+   link the sources for settled constraints and the evidence needed to resume.
+   Use paths or URLs the recipient can resolve. For a command-based check,
+   verify the full invocation against the target revision's docs or code.
+   A runnable step includes required arguments, prerequisites and inputs the
+   recipient must supply. If the invocation is unverified, make inspecting
+   the named source the next action and leave the run command unspecified.
+   Place supporting analysis afterward.
 3. Chat response gives only summary, path and unresolved risks.

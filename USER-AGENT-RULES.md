@@ -125,8 +125,8 @@ Establish the relevant facts before changing behavior, then verify the final
 revision against affected contracts with the narrowest sufficient checks and each
 required repository gate. Use the repository's verification guidance when present;
 broaden checks for a concrete coverage or diagnostic need. Start a build or test
-run that takes minutes through `~/.agents/tools/long-run/long-run.cjs` where it is
-installed: it waits for other long runs on the machine, keeps the complete output
+run that takes minutes through `~/.agents/tools/run-queued/run-queued.cjs` where it is
+installed: it waits for other queued runs on the machine, keeps the complete output
 in a file and reports the time. Where starting a process takes seconds, as on a
 managed virtual desktop, read and search with the built-in tools and do multi-step
 shell work in one script rather than a pipeline or a loop of commands. Report results and what
@@ -161,11 +161,10 @@ decision is the user's. Leaving it unanswered is none of these.
 ## Decision trail
 
 Keep task-generated material in the task's `.scratch/` folder. Use organon
-`ichnos` when consequential choices, pivots, blockers or handoffs need reasons
-and evidence beyond the diff, native logs and delivery, or when the user asks
-for a trail. Routine reversible edits, checks and Git operations use those
-existing records; changing a file or finding an existing trail does not by
-itself require a row. Reuse the task folder and record material changes only.
+`ichnos` as decisions, pivots or blockers arise when their reasons or evidence
+matter to what happens next, or when the user asks for a trail. For a routine
+handoff, summarize the current decision, evidence, open checks and next action.
+Reuse existing receipts and record material changes only.
 
 ## Parallel work
 

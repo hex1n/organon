@@ -16,6 +16,7 @@ const ROOT = fileURLToPath(new URL("../", import.meta.url));
 
 async function selfTest() {
   const { test, after } = await import("node:test");
+  const { planInstall, applyInstall } = await import("./install-agent-tools.cjs");
   const scratch = path.join(ROOT, ".scratch");
   fs.mkdirSync(scratch, { recursive: true });
   const temporary = fs.mkdtempSync(path.join(scratch, "installation-state-contract-"));
@@ -76,6 +77,81 @@ async function selfTest() {
       return { status: result.status, output: JSON.parse(result.stdout), stderr: result.stderr };
     }
     return { root, home, source, cache, bin, report, run };
+  }
+
+  function registerCodex({ root, home, source }) {
+    const { version } = JSON.parse(fs.readFileSync(path.join(source, ".codex-plugin/plugin.json"), "utf8"));
+    const cache = path.join(home, ".codex/plugins/cache/organon/organon", version);
+    fs.cpSync(source, cache, { recursive: true });
+    const registered = process.platform === "win32" ? "\\\\?\\" + root : root;
+    const config = path.join(home, ".codex/config.toml");
+    fs.writeFileSync(config,
+      "[marketplaces.organon]\nsource_type = \"local\"\nsource = '" + registered +
+      "'\n\n[plugins.\"organon@organon\"]\nenabled = true\n\n[unrelated]\nkeep = true\n");
+    return { cache, config };
+  }
+
+  function snapshot(directory) {
+    return new Map(fs.readdirSync(directory, { recursive: true, withFileTypes: true }).map((entry) => {
+      const file = path.join(entry.parentPath, entry.name);
+      return [path.relative(directory, file), entry.isDirectory() ? null : fs.readFileSync(file)];
+    }));
+  }
+
+  function codexRefreshFixture() {
+    const f = fixture("no-directory");
+    const { cache, config } = registerCodex(f);
+    fs.writeFileSync(path.join(cache, "skill.md"), "stale\n");
+    fs.unlinkSync(path.join(cache, ".claude-plugin/plugin.json"));
+    fs.writeFileSync(path.join(cache, "extra.md"), "extra\n");
+    const before = fs.readFileSync(config);
+    const scripts = path.join(f.root, "scripts");
+    fs.mkdirSync(scripts);
+    for (const name of ["install-plugin.cjs", "plugin-cache.cjs"]) {
+      fs.copyFileSync(path.join(ROOT, "scripts", name), path.join(scripts, name));
+    }
+    const preload = path.join(scripts, "contract-preload.cjs");
+    const fault = path.join(f.home, "activation-fault");
+    const externalAttempt = path.join(f.home, "external-runtime-attempt");
+    fs.writeFileSync(preload, `
+      const fs = require("node:fs");
+      const assert = require("node:assert/strict");
+      const cache = ${JSON.stringify(cache)};
+      require("node:os").homedir = () => ${JSON.stringify(f.home)};
+      const processes = require("node:child_process");
+      for (const method of ["spawn", "spawnSync", "exec", "execSync", "execFile", "execFileSync", "fork"]) {
+        processes[method] = (file) => {
+          fs.writeFileSync(${JSON.stringify(externalAttempt)}, String(file));
+          throw new Error("unexpected external runtime: " + file);
+        };
+      }
+      if (process.env.ORGANON_CONTRACT_FAIL_ACTIVATION === "1") {
+        const rename = fs.renameSync;
+        let retired;
+        fs.renameSync = (from, to) => {
+          if (retired && to === cache && from !== retired) {
+            assert.equal(fs.existsSync(cache), false);
+            assert.equal(fs.existsSync(retired), true);
+            retired = undefined;
+            fs.writeFileSync(${JSON.stringify(fault)}, "EBUSY");
+            throw Object.assign(new Error("fixture blocked cache activation"), { code: "EBUSY" });
+          }
+          rename(from, to);
+          if (from === cache) retired = to;
+        };
+      }
+    `);
+    function run(args = [], failActivation = false) {
+      const result = spawnSync(process.execPath, ["--require", preload, path.join(scripts, "install-plugin.cjs"), ...args], {
+        cwd: f.root, encoding: "utf8", windowsHide: true, timeout: 15000,
+        env: { ...process.env, ORGANON_CONTRACT_FAIL_ACTIVATION: failActivation ? "1" : "0" },
+      });
+      assert.ifError(result.error);
+      assert.equal(fs.existsSync(externalAttempt), false, "same-version refresh must avoid the runtime CLI");
+      assert.deepEqual(fs.readFileSync(config), before);
+      return result;
+    }
+    return { source: f.source, cache, fault, run };
   }
 
   test("offline checks identify registration-only results without claiming a runtime check", () => {
@@ -199,12 +275,7 @@ async function selfTest() {
 
   test("Codex cache checks use the native platform path representation", () => {
     const f = fixture();
-    const cache = path.join(f.home, ".codex/plugins/cache/organon/organon/0.7.8");
-    fs.cpSync(f.source, cache, { recursive: true });
-    const registered = process.platform === "win32" ? "\\\\?\\" + f.root : f.root;
-    fs.writeFileSync(path.join(f.home, ".codex/config.toml"),
-      "[marketplaces.organon]\nsource_type = \"local\"\nsource = '" + registered +
-      "'\n\n[plugins.\"organon@organon\"]\nenabled = true\n");
+    const { cache } = registerCodex(f);
     const current = f.run(false);
     assert.equal(current.status, 0, current.stderr);
     assert(current.output.current.some((entry) => entry.runtime === ".codex"));
@@ -228,6 +299,70 @@ async function selfTest() {
     }
   });
 
+  test("the tools installer retires only its dangling Scholion link", () => {
+    const { root, home } = fixture("no-directory");
+    const link = path.join(home, ".agents", "tools", "scholion");
+    const source = path.join(root, "plugins", "organon", "skills", "scholion");
+    const alias = path.join(path.dirname(root), "repo alias");
+    const linkType = process.platform === "win32" ? "junction" : "dir";
+    fs.mkdirSync(path.dirname(link), { recursive: true });
+    fs.mkdirSync(source, { recursive: true });
+    fs.symlinkSync(root, alias, linkType);
+    fs.symlinkSync(path.join(alias, path.relative(root, source)), link, linkType);
+    fs.rmdirSync(source);
+
+    const { retired } = planInstall(home, root);
+    assert.deepEqual(retired, [link]);
+    assert(fs.lstatSync(link).isSymbolicLink());
+    applyInstall({ assets: [], configs: [], rules: [], retired });
+    assert.throws(() => fs.lstatSync(link), { code: "ENOENT" });
+
+    const foreign = path.join(path.dirname(root), "foreign", "scholion");
+    fs.mkdirSync(foreign, { recursive: true });
+    fs.symlinkSync(foreign, link, linkType);
+    fs.rmdirSync(foreign);
+    assert.deepEqual(planInstall(home, root).retired, []);
+    assert(fs.lstatSync(link).isSymbolicLink());
+
+    fs.unlinkSync(link);
+    fs.mkdirSync(link);
+    assert.deepEqual(planInstall(home, root).retired, []);
+  });
+
+  test("the installer previews and applies a same-version Codex cache refresh directly", () => {
+    const f = codexRefreshFixture();
+    const old = snapshot(f.cache);
+    const source = snapshot(f.source);
+    const preview = f.run();
+    assert.equal(preview.status, 0, preview.stderr);
+    assert.match(preview.stdout, /^would refresh Codex cache:/mu);
+    assert.match(preview.stdout, /1 change\(s\)/u);
+    assert.deepEqual(snapshot(f.cache), old);
+
+    const apply = f.run(["--apply"]);
+    assert.equal(apply.status, 0, apply.stderr);
+    assert.deepEqual(snapshot(f.cache), source);
+
+    const again = f.run(["--apply"]);
+    assert.equal(again.status, 0, again.stderr);
+    assert.match(again.stdout, /0 change\(s\)/u);
+    assert.deepEqual(snapshot(f.cache), source);
+  });
+
+  test("a failed Codex cache activation restores the previous cache and permits retry", () => {
+    const f = codexRefreshFixture();
+    const old = snapshot(f.cache);
+    const source = snapshot(f.source);
+    const failed = f.run(["--apply"], true);
+    assert.equal(failed.status, 1, failed.stdout + failed.stderr);
+    assert.equal(fs.readFileSync(f.fault, "utf8"), "EBUSY");
+    assert.deepEqual(snapshot(f.cache), old);
+
+    const retry = f.run(["--apply"]);
+    assert.equal(retry.status, 0, retry.stderr);
+    assert.deepEqual(snapshot(f.cache), source);
+  });
+
 }
 
 async function codexRefreshContract(executable, scratch) {
@@ -249,7 +384,7 @@ async function codexRefreshContract(executable, scratch) {
   fs.cpSync(source, cache, { recursive: true });
   fs.writeFileSync(config, `[marketplaces.organon]\nsource_type = "local"\nsource = '${ROOT}'\n\n[plugins."organon@organon"]\nenabled = true\n`);
   const configBefore = fs.readFileSync(config);
-  const payload = path.join(cache, "skills/scholion/README.md");
+  const payload = path.join(cache, "skills/arche/SKILL.md");
   const planFile = path.join(temporary, "plan.json");
   const helper = path.join(temporary, "handles.ps1");
   fs.writeFileSync(helper, String.raw`

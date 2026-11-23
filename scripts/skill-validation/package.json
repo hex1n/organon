@@ -1,0 +1,7 @@
+{
+  "name": "organon-skill-validation",
+  "private": true,
+  "devDependencies": {
+    "yaml": "2.9.1"
+  }
+}
