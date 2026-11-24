@@ -22,7 +22,10 @@ When comparing revisions, keep inputs and conditions fixed where possible and
 disclose differences that limit attribution. Count prompted repairs separately
 from first-attempt success. Report each arm's run count and spread, and rule out
 other readings of a gap, including skipped tasks, unequal conditions and noise,
-before crediting it to the revision.
+before crediting it to the revision. When every arm succeeds on every task, the
+trial has not separated the revisions: report that, and claim no regression on
+those tasks only once the acceptance criterion has failed a known-bad work
+product.
 
 For generalization claims, probe contrasting task shapes and limit conclusions
 to what ran.
