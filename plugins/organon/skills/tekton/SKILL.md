@@ -2,14 +2,15 @@
 name: tekton
 description: >
   Use for 实施 / 实现 / 修复 / 改进 / 重构 / 迁移 / 落地 work on new or existing
-  code without breaking the callers, stored data, or tests it reaches: new
-  features and modules; extraction, consolidation, or ownership moves of a rule,
-  constant, or value domain (magic values, divergent copies of one rule);
-  schema, API, protocol, or data migrations; adding, removing, merging, or
-  relaxing a validation or guard; edits that reach more than one module or a
-  published interface; landing a design document or adjudicated plan — even
-  when the user only says 改一下. Delivers the change with evidence that
-  affected contracts hold.
+  code without breaking the callers, stored data, or tests it reaches, including
+  short change asks (改成 / 加个 / 补一个 / 改名): new features, fields and
+  modules; extraction, consolidation, or ownership moves of a rule, constant, or
+  value domain (magic values, divergent copies of one rule); schema, API,
+  protocol, or data migrations; adding, removing, merging, or relaxing a
+  validation or guard; edits that reach more than one module or a published
+  interface; landing a design document or adjudicated plan — even when the user
+  only says 改一下. Start here before searching the code for the change. Delivers
+  the change with evidence that affected contracts hold.
 ---
 
 # Tekton — Contract-Preserving Implementation

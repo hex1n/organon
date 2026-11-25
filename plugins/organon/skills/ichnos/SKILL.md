@@ -5,7 +5,7 @@ description: >
   reviewed design, or gives background that changes a conclusion, and when
   the work itself forces a pivot or hits a blocker: what later work must
   honor as an ADR in project docs, the rest in the task's trail. Also use for
-  explicit decision-trail requests (留痕 / 决策记录).
+  explicit decision-trail requests (留痕 / 决策记录 / 记一下这个决定).
 ---
 
 # Ichnos — Decision Trail

@@ -3,8 +3,9 @@ name: arche
 description: >
   Plan or decide from the root problem: compare mechanisms and return the
   current-best path with its failure condition and next check. Use while options
-  are still open: 最佳方案 / 方案选型 / 要不要做（ROI） asks, and a challenge to a
-  recommendation just given.
+  are still open, including short asks: 最佳方案 / 方案选型 / 选哪个 / A 还是 B /
+  哪个更好 / 该设多少 / 要不要做（ROI）; turning a design into an implementation
+  plan or slices; and a challenge to a recommendation just given.
 ---
 
 # Arche — First-Principles Planner

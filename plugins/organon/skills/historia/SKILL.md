@@ -2,9 +2,10 @@
 name: historia
 description: >
   Evidence-backed investigation that delivers written findings. Use when the
-  user asks to 调研 / 梳理 a system, 追踪 a behaviour across components, or
-  对比 / 评估 options: questions whose answer needs several sources or a
-  cross-component trace.
+  user asks to 调研 / 梳理 a system, 追踪 a behaviour across components, 评估 the
+  impact of an upgrade or change (会影响哪些 / 要改哪些), or 对比 how two
+  implementations or versions differ, often with sources (给出处): questions
+  whose answer needs several sources or a cross-component trace.
 ---
 
 # Historia — Deep Research
