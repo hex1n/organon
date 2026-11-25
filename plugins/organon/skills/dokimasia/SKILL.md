@@ -166,6 +166,9 @@ technical_verdict: GO | NO_GO | SUSPENDED | NONE
 implementation_decision: BUILD | DEFER | NO_BUILD | UNCHANGED
 ```
 
+Only this delivery track writes `NO_GO`; reviewer returns and the ledger keep
+the reviewer vocabulary's `NO-GO`.
+
 Correctness-only always uses `UNCHANGED`, naming the standing decision or its
 absence. Authorization scope reports only a still-valid frozen decision; after
 invalidation use `UNCHANGED` and leave that gate unpassed pending renewal.
