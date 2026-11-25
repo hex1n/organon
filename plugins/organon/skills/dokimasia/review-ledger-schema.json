@@ -2,6 +2,7 @@
   "title": "Dokimasia review ledger",
   "type": "object",
   "required": [
+    "review_mode",
     "current_revision",
     "required_rubric_dimensions",
     "required_reviewers",
