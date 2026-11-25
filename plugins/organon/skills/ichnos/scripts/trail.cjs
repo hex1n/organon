@@ -77,12 +77,15 @@ function evidenceTokens(cell) {
   return tokens;
 }
 
-function classify(token, roots) {
+function classify(token, roots, quoted = false) {
   if (/^[a-z][a-z0-9+.-]*:\/\//iu.test(token)) return { kind: "url" };
   if (/^[0-9a-f]{7,40}$/u.test(token) && /[a-f]/u.test(token) && /[0-9]/u.test(token)) return { kind: "commit" };
   const target = token.replace(/#L\d+(-L?\d+)?$/u, "").replace(/:\d+(-\d+)?$/u, "");
   const explicit = /^(\.{1,2}[\\/]|[\\/]|~[\\/]|[A-Za-z]:[\\/])/u.test(target);
-  const named = /[^\\/]\.[A-Za-z][A-Za-z0-9]{0,9}$/u.test(target);
+  // A bare dotted word ("Node.js", "e.g") is prose unless it is quoted, carries a
+  // line suffix, or exists; a missing file named that way must use one of those.
+  const named = /[^\\/]\.[A-Za-z][A-Za-z0-9]{0,9}$/u.test(target) &&
+    (quoted || target !== token || roots.some((root) => fs.existsSync(path.join(root, target))));
   const first = target.split(/[\\/]/u)[0];
   const rooted = /[\\/]/u.test(target) && first && roots.some((root) => fs.existsSync(path.join(root, first)));
   return explicit || named || rooted ? { kind: "path", target } : { kind: "text" };
@@ -132,8 +135,9 @@ function checkTrail(file, { root } = {}) {
       counts.superseded += 1;
       continue;
     }
+    const quoted = new Set([...cells[4].matchAll(/`([^`]+)`/gu)].map((match) => match[1].trim()));
     for (const token of evidenceTokens(cells[4])) {
-      const found = classify(token, roots);
+      const found = classify(token, roots, quoted.has(token));
       if (found.kind === "text") continue;
       if (found.kind === "url") {
         counts.unchecked += 1;

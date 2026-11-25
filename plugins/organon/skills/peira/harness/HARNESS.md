@@ -33,8 +33,10 @@ Then establish each fact from source and configuration, with the file that state
 - whether several instances can run side by side: ports, data directories,
   namespaces.
 
-Fix a build the repository itself breaks before writing the harness; a recipe for
-a build that does not compile documents nothing. A build that only the writing
+A build the repository itself breaks is a product defect: record it with what
+would lift it and ask before fixing it, since product fixes need their own
+authorization. A recipe for a build that does not compile documents nothing, so
+the proof run waits for that fix. A build that only the writing
 environment cannot run (an unreachable artifact repository, a missing service) is a
 blocker, not a reason to stop: record it with what would lift it, and continue. A
 stand-in that lets the build or the start proceed (a stub artifact generated outside

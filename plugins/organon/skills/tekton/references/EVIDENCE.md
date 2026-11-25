@@ -16,9 +16,10 @@ hypothesis the evidence refutes, preserving concurrent work.
 ## Independent review
 
 Follow governing delegation and model
-authorization. Use the named reviewer's protocol; if using installed
-[euthyna](../../euthyna/SKILL.md#enter-a-fresh-review-context), read its caller
-instructions before dispatch or remediation.
+authorization. Use the named reviewer's protocol; if using installed euthyna, read
+[its reviewer setup](../../euthyna/SKILL.md#enter-a-fresh-review-context) before
+dispatch and [its re-review rule](../../euthyna/SKILL.md#deliver-and-re-review)
+before remediation.
 Other work is self-reviewed.
 
 ## Reusing evidence and retrying
