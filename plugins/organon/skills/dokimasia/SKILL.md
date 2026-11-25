@@ -3,8 +3,8 @@ name: dokimasia
 description: >
   Falsify one completed design or plan through independent review, iterating on
   the exact final revision when revision is requested. Use on an explicit review
-  ask: 审查到通过 / 方案评审 / 计划评审 / 证伪现有方案, or a second-model review
-  before implementation.
+  ask for a design or plan: 评审一下这个方案 / 审查到通过 / 方案评审 / 计划评审 /
+  证伪现有方案, or a second-model review before implementation.
 ---
 
 # Dokimasia — Plan Review
