@@ -160,11 +160,15 @@ decision is the user's. Leaving it unanswered is none of these.
 
 ## Decision trail
 
-Keep task-generated material in the task's `.scratch/` folder. Use organon
-`ichnos` as decisions, pivots or blockers arise when their reasons or evidence
-matter to what happens next, or when the user asks for a trail. For a routine
-handoff, summarize the current decision, evidence, open checks and next action.
-Reuse existing receipts and record material changes only.
+Keep task-generated material in the task's `.scratch/` folder. When a user
+message picks between options, overrides a plan or reviewed design, or gives
+background that changes a conclusion, record it with organon `ichnos` in that
+turn before the next edit, and say where: a rule, boundary or design choice
+later work must honor goes in the project's docs, as an ADR where the project
+keeps them; what is still open or matters only to this task goes in the task's
+trail. Record a pivot or blocker the work itself forces the same way. For a
+routine handoff, summarize the current decision, evidence, open checks and next
+action. Reuse existing receipts.
 
 ## Parallel work
 

@@ -89,7 +89,9 @@ function classify(token, roots) {
 }
 
 function resolvesPath(target, roots) {
-  const expanded = target.startsWith("~") ? path.join(os.homedir(), target.slice(1)) : target;
+  let expanded = target.startsWith("~") ? path.join(os.homedir(), target.slice(1)) : target;
+  // Git Bash writes a Windows drive path as /c/dir, and passes it to Node unconverted inside a longer argument.
+  if (process.platform === "win32") expanded = expanded.replace(/^\/([A-Za-z])\//u, "$1:/");
   if (path.isAbsolute(expanded)) return fs.existsSync(expanded);
   return roots.some((root) => fs.existsSync(path.join(root, expanded)));
 }
@@ -99,14 +101,35 @@ function resolvesCommit(sha, repo) {
   return spawnSync("git", ["-C", repo, "cat-file", "-e", `${sha}^{commit}`]).status === 0;
 }
 
+function trailRoots(file, root) {
+  const trailDir = path.dirname(path.resolve(file));
+  // The first append creates the task folder, so the repository is found from the nearest folder that exists.
+  let existing = trailDir;
+  while (!fs.existsSync(existing) && path.dirname(existing) !== existing) existing = path.dirname(existing);
+  const repo = root ? path.resolve(root) : gitRoot(existing);
+  return { repo, roots: [trailDir, ...(repo ? [repo] : [])] };
+}
+
+function evidenceStatus(cell, roots, repo) {
+  const status = { unresolved: [], resolved: 0, unchecked: 0 };
+  for (const token of evidenceTokens(cell)) {
+    const found = classify(token, roots);
+    if (found.kind === "text") continue;
+    const ok = found.kind === "url" ? null
+      : found.kind === "commit" ? resolvesCommit(token, repo) : resolvesPath(found.target, roots);
+    if (ok === null) status.unchecked += 1;
+    else if (ok) status.resolved += 1;
+    else status.unresolved.push(token);
+  }
+  return status;
+}
+
 function checkTrail(file, { root } = {}) {
   const problems = [];
   const counts = { rows: 0, resolved: 0, unchecked: 0, superseded: 0 };
   const { header, rows } = parseTrail(fs.readFileSync(file, "utf8"));
   if (header !== HEADER) problems.push(`line 1: header must be ${COLUMNS.join(" | ")}`);
-  const trailDir = path.dirname(path.resolve(file));
-  const repo = root ? path.resolve(root) : gitRoot(trailDir);
-  const roots = [trailDir, ...(repo ? [repo] : [])];
+  const { repo, roots } = trailRoots(file, root);
   const superseded = new Set();
   // Latest first, so a correction that a later one supersedes no longer takes effect.
   for (const { line, cells } of rows.filter((row) => row.cells[1] === "correction").reverse()) {
@@ -132,18 +155,10 @@ function checkTrail(file, { root } = {}) {
       counts.superseded += 1;
       continue;
     }
-    for (const token of evidenceTokens(cells[4])) {
-      const found = classify(token, roots);
-      if (found.kind === "text") continue;
-      if (found.kind === "url") {
-        counts.unchecked += 1;
-        continue;
-      }
-      const ok = found.kind === "commit" ? resolvesCommit(token, repo) : resolvesPath(found.target, roots);
-      if (ok === null) counts.unchecked += 1;
-      else if (ok) counts.resolved += 1;
-      else problems.push(`${where}: evidence does not resolve: ${token}`);
-    }
+    const evidence = evidenceStatus(cells[4], roots, repo);
+    counts.resolved += evidence.resolved;
+    counts.unchecked += evidence.unchecked;
+    for (const token of evidence.unresolved) problems.push(`${where}: evidence does not resolve: ${token}`);
   }
   return { problems, counts };
 }
@@ -151,6 +166,18 @@ function checkTrail(file, { root } = {}) {
 function main(argv) {
   const [command, file, ...rest] = argv;
   if (command === "append" && file) {
+    if (rest.length === COLUMNS.length - 1) {
+      // A written row cannot be edited, so a pointer `check` would fail is turned away before the write.
+      const { repo, roots } = trailRoots(file);
+      const { unresolved } = evidenceStatus(cleanCell(rest[3]), roots, repo);
+      if (unresolved.length) {
+        process.stderr.write(
+          `trail.cjs: row not written, evidence does not resolve: ${unresolved.join(", ")}\n` +
+          "  A pointer is a path from the trail's folder or its repository root, or an absolute path for a file outside both.\n",
+        );
+        return 1;
+      }
+    }
     process.stdout.write(appendRow(file, rest));
     return 0;
   }
