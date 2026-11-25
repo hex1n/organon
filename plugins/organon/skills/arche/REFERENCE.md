@@ -29,8 +29,8 @@ Use this section only when request language, route examples, or saved artifact l
 
 ### Chinese Route Examples
 
-- `是否应该替换 X?` / `还有更好的吗?` / `最佳了吗?` -> Decision.
-- `先不写代码，给最佳方案` / `给一个架构演进方案` -> Plan; `给最佳方案` selects the route, `先不写代码` only bounds scope.
+- `是否应该替换 X?` / `还有更好的吗?` / `最佳了吗?` -> Planner.
+- `先不写代码，给最佳方案` / `给一个架构演进方案` -> Planner; `给最佳方案` selects the route, `先不写代码` only bounds scope.
 - `深度分析为什么失败` -> Research-first; plan only if the user asks for a fix path.
 - `把方案转成实施计划` / `拆成切片、阶段、工单` -> use the settled-work conversion rule in `SKILL.md`.
 - `审查这个方案有没有问题` -> use a review skill; re-plan only if asked.

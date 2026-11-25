@@ -33,7 +33,8 @@ untouched (existing entries, published interfaces, shared build and run
 configuration; verification-only needs stay out of it). An edit outside it, or
 an interpretation that changes scope, observable behavior or operating
 responsibilities, is the user's decision: raise it with basis and consequence
-first, and read a correction as its class.
+first. When the user corrects one such decision, apply the correction to every
+decision of the same kind in this task, not only the instance raised.
 
 Trace the affected entry points through decisions, state changes and effects
 to their consumers. Inspect the boundaries that establish identity, order,
@@ -93,10 +94,10 @@ smallest assembly that preserves the conditions deciding the outcome, and
 verify the requested outcome at its final consumer. A claim left unchecked is
 reported as unverified.
 
-Fault injection ([Fault injection](references/FAULTS.md)) and independent review
-([Evidence](references/EVIDENCE.md#independent-review)) are for changes to
+Run fault injection ([Fault injection](references/FAULTS.md)) and independent
+review ([Evidence](references/EVIDENCE.md#independent-review)) for changes to
 concurrency, authorization, data spanning versions, hard-to-recover effects or
-a shared guard, and for a task or repository that requires either.
+a shared guard, and when the task or repository requires either.
 
 ## Load branch details when needed
 

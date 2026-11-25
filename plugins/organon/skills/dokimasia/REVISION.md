@@ -4,7 +4,8 @@ Read only for authorized candidate edits or another revision round. Use the shar
 [Evidence Loop](SKILL.md#evidence-loop) for disclosure, validation and disposition.
 Entering this mode, at the start or after a review-only verdict, freezes the
 [Exact Gate](SKILL.md#exact-gate) for the loop with a budget counted in complete
-rounds: three at full depth unless calibration or the user sets another.
+rounds: three at full depth and two at shallow depth, unless calibration or the
+user sets another. Two is the least that lets a fix be re-reviewed.
 
 ## Revise from evidence
 
@@ -32,6 +33,9 @@ or decision-blocking gap remains, run a complete review on the same revision.
 
 Send the complete revised candidate and ledger for re-review in each required
 reviewer's existing session, which already holds the evidence it verified.
+When that session cannot be resumed, give a new session of the same independence
+class that reviewer's prior findings and the same materials; its round receipt
+carries the new session handle.
 Mid-loop, a reviewer that has returned GO or optional-only findings on
 consecutive revisions may pause while still-falsifying lanes continue. The
 closing round includes every required reviewer on the exact final bytes, all

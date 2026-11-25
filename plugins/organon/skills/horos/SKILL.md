@@ -23,7 +23,8 @@ Use this protocol-neutral spine with the relevant **adapter** in
 ```
 These are Claude Code forms; Codex takes the same arguments after
 `$organon:horos`. A standalone install drops the `organon:` prefix.
-Detect an unspecified protocol from the active interface path.
+Detect an unspecified protocol from how the interface is declared: routes or an
+HTTP schema mean HTTP; an exported service interface or IDL means RPC.
 
 ## Workflow
 

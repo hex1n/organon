@@ -92,7 +92,7 @@ a fresh run directory under the user's output path, or use
 suffix. Keep historical runs immutable.
 
 Record these facts as work proceeds in
-`{yyyy-mm-dd}-{feature}-e2e-test-report.md` inside the run directory, in the format
+`{yyyymmdd}-{feature}-e2e-test-report.md` inside the run directory, in the format
 [REPORTING.md](REPORTING.md) names.
 
 ### Scenario-tree inheritance

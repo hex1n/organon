@@ -232,7 +232,7 @@ or blocked case its own variant ID, so the executor holds that ID while the base
 scenario and its other variants stay ready. Keep unresolved
 items and missing lower-layer tests visible without inflating the E2E tree.
 
-Save Markdown as `.scratch/{feature}/e2e/{yyyy-mm-dd}-{feature}-e2e-test-plan.md` unless the
+Save Markdown as `.scratch/{feature}/e2e/{yyyymmdd}-{feature}-e2e-test-plan.md` unless the
 user specifies a path, and link it in the reply. Planning alone authorizes neither
 test execution nor test-code changes.
 

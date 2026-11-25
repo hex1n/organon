@@ -129,7 +129,9 @@ result from the broader claim the experiment cannot establish.
 
 After both independent returns, have each reviewer try to falsify the other's
 material conclusions: claims that affect acceptance, business scope or a required
-remedy. Challenge agreement and favorable judgments as well as reported defects.
+remedy. If a reviewer cannot be resumed, give a fresh reviewer on the current
+model its returned findings and the same sources, and disclose the replacement.
+Challenge agreement and favorable judgments as well as reported defects.
 Test business authority, reachability, invariant ownership and claimed structural
 cost against the strongest supported alternative explanation. For additional
 challenges of favorable judgments, use existing coverage to prioritize unresolved

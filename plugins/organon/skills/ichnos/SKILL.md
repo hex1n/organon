@@ -12,8 +12,9 @@ description: >
 
 Start or append to the trail in the turn the decision, pivot or blocker
 happens, before the next edit, or when the user asks for one.
-Use native logs for routine work. A brief Markdown handoff carries the
-current decision, evidence links, open checks and next action.
+Use native logs for routine work. When work will continue in another session,
+write `handoff.md` in the task folder with the current decision, evidence links,
+open checks and next action.
 
 ## Task folder
 
@@ -25,7 +26,8 @@ and reuse it when the task resumes. It holds:
 - `decision-trail.tsv`, the trail;
 - the evidence rows point to: saved command output, logs, result files, and
   scripts that rerun a check;
-- `decision-trail-review.md`, the reviewer's flags, when a reviewer runs.
+- `decision-trail-review.md`, the reviewer's flags, when a reviewer runs;
+- `handoff.md`, when work continues in another session.
 
 Leave the folder unstaged. Commit the trail only when the user wants it in history.
 
@@ -64,7 +66,8 @@ or save the decisive command and output.
 
 The trail is append-only. A revert or replaced design is a new `pivot` row that
 names the row it replaces; the replaced row stays checked, because its evidence
-still shows what happened then. A `correction` row repairs a row that is wrong as
+still shows what happened then. If the revert removed that evidence, add a
+`correction` row pointing to the commit that holds it. A `correction` row repairs a row that is wrong as
 written or whose evidence moved: its decision names that row's timestamp, and
 `check` stops checking that row's evidence. Backfill an earlier consequential
 decision only when supported by visible evidence; mark its result `backfilled`.

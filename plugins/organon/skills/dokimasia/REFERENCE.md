@@ -20,7 +20,8 @@ review_scope: implementation-authorization | correctness-only
 review_budget:
 ```
 
-Reuse an existing explicit user decision as `decision: BUILD, source: user`.
+Reuse an existing explicit user decision as `decision: BUILD` and state that the
+user made it.
 A revision changing cost, benefit, mechanism, scope or key assumptions invalidates
 the authorization envelope: suspend that gate until the user or upstream decision
 renews it. Correctness-only can continue with changed assumptions stated, unless
