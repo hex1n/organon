@@ -155,7 +155,8 @@ Before reporting GO, run `node <skill>/scripts/validate-review-ledger.cjs <ledge
 when Node is available. This mechanical check supplements parent validation and
 reviewer judgment. Restart all required closing reviews after a late material edit.
 
-Every delivery includes the exact final revision, reviewers and independence,
+Every delivery includes the exact final revision and the revision each reviewer
+last read, reviewers and independence,
 rounds and per-round model/cost, complete findings and parent validations,
 dispositions, remaining gaps and next action. Choose chat or saved records under
 [Review Artifacts](REFERENCE.md#review-artifacts). Report both closed-vocabulary
