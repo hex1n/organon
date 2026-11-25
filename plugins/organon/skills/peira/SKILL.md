@@ -57,8 +57,8 @@ holds runnable files for the requested outcome, run them as their first lines sa
 on a harness target the run owns, and deliver the result with a
 [short report](run/REPORTING.md#rerun-of-kept-scenarios). Open [RUN.md](run/RUN.md)
 only for a scenario that fails, is blocked, has no file, or must run on a shared
-target, and plan only what the files do not cover. Otherwise,
-for run mode without an applicable business plan, follow planning first; establish
+target, and plan only what the files do not cover. When no runnable file covers
+the requested outcome and no applicable business plan exists, plan first: establish
 the scenario tree and gaps before selecting an executable slice.
 A scenario described only in the ask is planning input; planning can scale to one
 scenario while retaining the requested outcome and affected flows.

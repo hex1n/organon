@@ -131,8 +131,9 @@ verification_gap: [{id, claim, missing_check, affected_section,
 A complete return covers every frozen rubric dimension and all four severities.
 A blocker sweep covers the rubric with blocker and verification-gap severities
 only. Each gap states `gap_scope: decision_blocking | outside_closing_scope` and
-an evidence-backed reason. The parent preserves reviewer-returned payloads and
-coverage; GO may have empty finding arrays, while non-GO needs a finding.
+an evidence-backed reason. CONDITIONAL-GO means GO once the returned findings are
+fixed; every gate counts it as non-GO. The parent preserves reviewer-returned
+payloads and coverage; GO may have empty finding arrays, while non-GO needs a finding.
 
 ## Focused Recheck
 

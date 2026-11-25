@@ -63,7 +63,7 @@ GO requires all of the following:
 
 ```text
 every required reviewer returned a complete GO on the same current revision
-open blockers = 0; open should-fix findings = 0; unvalidated findings = 0
+open blockers = 0; open should_fix findings = 0; unvalidated findings = 0
 every optional finding has a disposition
 verification gaps satisfy their closure or outside-scope deferral contract
 active reviewer invocations = 0; no material change after those reviews
@@ -111,7 +111,7 @@ severity. Split when owner, remediation or disposition can differ; group gaps by
 missing authority and next check. Classify by consequence, independently of cost:
 
 - `blocker`: unsafe, wrong, unexecutable or unverifiable result;
-- `should-fix`: material execution, compatibility, migration/rollback,
+- `should_fix`: material execution, compatibility, migration/rollback,
   acceptance-evidence or decision defect;
 - `optional`: non-material wording, readability, precision or convenience;
 - `verification_gap`: missing evidence, with its missing check, scope and reason.
@@ -128,7 +128,8 @@ The parent independently validates the whole round in one evidence pass against
 the frozen candidate, rubric and authority. Disclose one `confirmed`, `challenged`
 or `needs_evidence` result per finding, with `parent_evidence_and_reason`; preserve
 the reviewer's claim separately. A challenge stays open until the reviewer accepts
-the evidence-backed rebuttal. Missing evidence stays open or becomes a named gap.
+the evidence-backed rebuttal. A `needs_evidence` finding stays open at its
+returned severity; only a later reviewer return can restate it as a gap.
 When a rebuttal adds no evidence or narrows no disagreement, preserve both claims
 and suspend the disputed gate.
 
@@ -166,6 +167,9 @@ tracks, with prose qualifications kept separate:
 technical_verdict: GO | NO_GO | SUSPENDED | NONE
 implementation_decision: BUILD | DEFER | NO_BUILD | UNCHANGED
 ```
+
+Only this delivery track writes `NO_GO`; reviewer returns and the ledger keep
+the reviewer vocabulary's `NO-GO`.
 
 Correctness-only always uses `UNCHANGED`, naming the standing decision or its
 absence. Authorization scope reports only a still-valid frozen decision; after

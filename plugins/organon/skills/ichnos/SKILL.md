@@ -36,10 +36,10 @@ Leave the folder unstaged. Commit the trail only when the user wants it in histo
 | Column | Content |
 | --- | --- |
 | `timestamp` | ISO 8601 with offset; the helper stamps it. |
-| `phase` | The stage or workstream: `plan`, `slice-2`, `review`, `verify`. `start` marks run boundaries only. |
+| `phase` | The stage or workstream: `plan`, `slice-2`, `review`, `verify`. Reserved: `start` marks run boundaries; `pivot` and `correction` are below. |
 | `decision` | What was chosen or done, in one line, in the words you would use with a teammate. |
 | `reason` | Why, in plain words. |
-| `evidence` | Pointers that resolve: a path relative to the task folder or repository root, or absolute for a file outside both; `file:line`, a commit, a URL. Wrap a path that contains spaces in backticks. |
+| `evidence` | Pointers that resolve: a path relative to the task folder or repository root, or absolute for a file outside both; `file:line`, a commit, a URL. Wrap a path that contains spaces, or a bare file name, in backticks; an unwrapped bare name is checked only when it exists. |
 | `result` | The outcome or state: `focused 48/48 green`, `reverted`, `17/17 mutants detected`, `open`, `blocked: <what>`. |
 
 Record decisions that materially change the contract, approach, authorization
