@@ -93,10 +93,10 @@ smallest assembly that preserves the conditions deciding the outcome, and
 verify the requested outcome at its final consumer. A claim left unchecked is
 reported as unverified.
 
-Fault injection ([Fault injection](references/FAULTS.md)) and independent review
-([Evidence](references/EVIDENCE.md#independent-review)) are for changes to
+Run fault injection ([Fault injection](references/FAULTS.md)) and independent
+review ([Evidence](references/EVIDENCE.md#independent-review)) for changes to
 concurrency, authorization, data spanning versions, hard-to-recover effects or
-a shared guard, and for a task or repository that requires either.
+a shared guard, and when the task or repository requires either.
 
 ## Load branch details when needed
 

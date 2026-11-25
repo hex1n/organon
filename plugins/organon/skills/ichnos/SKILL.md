@@ -64,7 +64,8 @@ or save the decisive command and output.
 
 The trail is append-only. A revert or replaced design is a new `pivot` row that
 names the row it replaces; the replaced row stays checked, because its evidence
-still shows what happened then. A `correction` row repairs a row that is wrong as
+still shows what happened then. If the revert removed that evidence, add a
+`correction` row pointing to the commit that holds it. A `correction` row repairs a row that is wrong as
 written or whose evidence moved: its decision names that row's timestamp, and
 `check` stops checking that row's evidence. Backfill an earlier consequential
 decision only when supported by visible evidence; mark its result `backfilled`.
