@@ -6,9 +6,9 @@
 // The schema owns the structural layer: which fields exist, their types, and
 // the closed vocabularies. It is a separate file rather than constants here
 // because it has two consumers — this script interprets it, and REFERENCE.md's
-// round-receipt block hands the same field list to the agent that must emit
-// one. A vocabulary that lives only in this file is a vocabulary the author
-// was never given.
+// round-receipt section points the agent that must emit one at this schema
+// instead of copying its field list. A vocabulary that lives only in this file
+// is a vocabulary the author was never given.
 //
 // Everything the schema cannot express stays below: receipt-to-report-to-finding
 // binding, receipt ordering (a diagnostic follows the FAILED second-model
