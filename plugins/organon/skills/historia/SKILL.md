@@ -26,7 +26,7 @@ conclusion and name the gap.
 Use this skill when the job is to determine what is true, why it works or fails, how a system behaves, or which option is supported by evidence.
 
 Use another workflow first when:
-- The user asks to reproduce and fix a live bug: use a diagnosis workflow, then return here only for broader synthesis.
+- The user asks to reproduce and fix a live bug: use the implementation workflow that fixes it, then return here only for broader synthesis.
 - The user asks for code review: use review stance and lead with findings.
 - The user already selected an implementation task: investigate only the uncertainties needed for it, then continue the authorized implementation using the appropriate workflow. A workflow transition does not end the user task.
 - The question is a single file, tiny snippet, or direct local fact: read the source and answer directly as a Quick answer, skipping the rest of this workflow.
@@ -100,7 +100,7 @@ not proof of closure. Before a new read, identify which uncertainty it could
 resolve. For Quick depth, skip the diagram unless one line of structure
 clarifies the answer.
 
-Escalate mid-flight, not only at entry, when the real task has shifted out of research: a live bug reproduction belongs to a diagnosis workflow and an approved implementation to the implementation workflow — carry the evidence forward and continue the authorized task. An adopt/replace/upgrade decision belongs to a first-principles planning workflow: carry the evidence findings into that workflow and complete the requested decision without asking the user to repeat the request.
+Escalate mid-flight, not only at entry, when the real task has shifted out of research: a live bug to reproduce and fix, or an approved implementation, belongs to the implementation workflow — carry the evidence forward and continue the authorized task. An adopt/replace/upgrade decision belongs to a first-principles planning workflow: carry the evidence findings into that workflow and complete the requested decision without asking the user to repeat the request.
 
 Use [REFERENCE.md](REFERENCE.md) for diagram examples, a compressed worked example, current-state research, session-history analysis, broad-task staging, output patterns, saved artifact headers, and research-to-work handoff.
 
