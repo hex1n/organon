@@ -2,6 +2,9 @@
 
 Read only for authorized candidate edits or another revision round. Use the shared
 [Evidence Loop](SKILL.md#evidence-loop) for disclosure, validation and disposition.
+Entering this mode, at the start or after a review-only verdict, freezes the
+[Exact Gate](SKILL.md#exact-gate) for the loop with a budget counted in complete
+rounds: three at full depth unless calibration or the user sets another.
 
 ## Revise from evidence
 
@@ -27,15 +30,20 @@ or decision-blocking gap remains, run a complete review on the same revision.
 
 ## Re-review and stop
 
-Send the complete revised candidate and ledger for re-review. Mid-loop, a reviewer
-that has returned GO or optional-only findings on consecutive revisions may pause
-while still-falsifying lanes continue. The closing round includes every required
-reviewer on the exact final bytes, all dimensions and severities; a justified
-non-GO does not end the search for other findings.
+Send the complete revised candidate and ledger for re-review in each required
+reviewer's existing session, which already holds the evidence it verified.
+Mid-loop, a reviewer that has returned GO or optional-only findings on
+consecutive revisions may pause while still-falsifying lanes continue. The
+closing round includes every required reviewer on the exact final bytes, all
+dimensions and severities; a justified non-GO does not end the search for other
+findings.
 
-Continue within budget only while the review request remains active and the next
-round can close a gate-blocking finding or change a technical/implementation
-decision. New or narrowing findings count as progress. Suspend when the same
-blocker survives three consecutive revisions, or under
-[the shared stop conditions](SKILL.md#close-or-continue). If a confirmed material
-defect is no longer worth fixing, suspend or withdraw; never call that GO.
+The frozen budget authorizes its rounds: continue while the review request
+remains active and the next round can close a gate-blocking finding or change a
+technical/implementation decision, and return to the user at a stop condition.
+A round whose gate-blocking findings all target text the previous revision added
+is churn: the revision, not the candidate, is generating the work. Suspend after
+two churn rounds in a row, when the same blocker survives three consecutive
+revisions, or under [the shared stop conditions](SKILL.md#close-or-continue).
+If a confirmed material defect is no longer worth fixing, suspend or withdraw;
+never call that GO.

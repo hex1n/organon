@@ -1,17 +1,17 @@
 ---
 name: ichnos
 description: >
-  Record consequential decisions, reversals and blockers as they arise
-  when their reasons or evidence matter to later work, such as material
-  choices about scope, approach, authorization or acceptance. Also use for
+  Record a decision when the user picks between options, overrides a plan or
+  reviewed design, or gives background that changes a conclusion, and when
+  the work itself forces a pivot or hits a blocker: what later work must
+  honor as an ADR in project docs, the rest in the task's trail. Also use for
   explicit decision-trail requests (留痕 / 决策记录).
 ---
 
 # Ichnos — Decision Trail
 
-Decide as work progresses which choices, pivots and blockers need a record.
-Start or append to the trail when the event happens and its rationale or
-evidence matters to what happens next. Start one when the user asks.
+Start or append to the trail in the turn the decision, pivot or blocker
+happens, before the next edit, or when the user asks for one.
 Use native logs for routine work. A brief Markdown handoff carries the
 current decision, evidence links, open checks and next action.
 
@@ -37,7 +37,7 @@ Leave the folder unstaged. Commit the trail only when the user wants it in histo
 | `phase` | The stage or workstream: `plan`, `slice-2`, `review`, `verify`. Reserved: `start` marks run boundaries; `pivot` and `correction` are below. |
 | `decision` | What was chosen or done, in one line, in the words you would use with a teammate. |
 | `reason` | Why, in plain words. |
-| `evidence` | Pointers that resolve: a path relative to the task folder or repository root, `file:line`, a commit, a URL. Wrap a path that contains spaces, or a bare file name that may not exist, in backticks. |
+| `evidence` | Pointers that resolve: a path relative to the task folder or repository root, or absolute for a file outside both; `file:line`, a commit, a URL. Wrap a path that contains spaces, or a bare file name that may not exist, in backticks. |
 | `result` | The outcome or state: `focused 48/48 green`, `reverted`, `17/17 mutants detected`, `open`, `blocked: <what>`. |
 
 Record decisions that materially change the contract, approach, authorization
@@ -51,8 +51,9 @@ or acceptance:
 
 Group related commands and checks. Add scripts when they aid execution.
 
-Append through the helper, which keeps every cell on one line and writes each
-row in one write, so parallel writers do not interleave:
+Append through the helper. It stamps the time, keeps every cell on one line,
+turns away a row whose evidence does not resolve, and writes each row whole, so
+parallel writers do not interleave:
 
 ```
 node <skill-dir>/scripts/trail.cjs append <decision-trail.tsv> <phase> <decision> <reason> <evidence> <result>
