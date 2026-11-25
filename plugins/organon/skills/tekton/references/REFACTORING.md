@@ -87,4 +87,4 @@ retirement; unresolved external exits retain their compatibility surface.
 Remove obsolete implementations, expired adapters and flags, generated artifacts
 and tests tied solely to retired internals. Preserve behavioral cases at the
 target interface and rerun affected checks after removal. Report remaining stages
-and exits under Tekton's hand-off rule.
+and exits under [Close the requested outcomes](../SKILL.md#close-the-requested-outcomes).
