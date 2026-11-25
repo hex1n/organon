@@ -33,7 +33,8 @@ untouched (existing entries, published interfaces, shared build and run
 configuration; verification-only needs stay out of it). An edit outside it, or
 an interpretation that changes scope, observable behavior or operating
 responsibilities, is the user's decision: raise it with basis and consequence
-first, and read a correction as its class.
+first. When the user corrects one such decision, apply the correction to every
+decision of the same kind in this task, not only the instance raised.
 
 Trace the affected entry points through decisions, state changes and effects
 to their consumers. Inspect the boundaries that establish identity, order,
