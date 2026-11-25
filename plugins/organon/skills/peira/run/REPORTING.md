@@ -1,6 +1,6 @@
 # Report and delivery
 
-Keep one canonical report, `{yyyy-mm-dd}-{feature}-e2e-test-report.md` in the run directory,
+Keep one canonical report, `{yyyymmdd}-{feature}-e2e-test-report.md` in the run directory,
 mirroring the plan's name; it is the default home for the run's facts.
 Apply the language policy in [RUN.md](RUN.md); only identifiers, closed status
 vocabularies, commands, and quoted evidence retain their original spelling.
