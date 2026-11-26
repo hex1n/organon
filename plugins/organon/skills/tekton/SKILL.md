@@ -66,6 +66,13 @@ and required dependencies recognizable in executable structure. Trace reused
 helpers through their implementations; matching output shapes alone do not
 establish those relationships.
 
+When moving a rule leaves an old entry point for callers that cannot move yet,
+record in the task folder `.scratch/YYYYMMDD-task-name/` the entry point, its
+owner, its removal condition and the evidence that removal is safe, then read
+[Refactoring](references/REFACTORING.md) before choosing how callers move. For
+any other moving, merging or splitting of existing code, or a compatibility or
+data migration, read the same file first.
+
 Hide coherent complexity behind a small interface. Dependencies lead toward
 the rule owner; adapters translate at that boundary. Do a job the way the
 project, or the reference the user names, already does it. A seam, type, layer or switch needs variation,
@@ -88,9 +95,6 @@ A newly affected contract expands the scope before earlier evidence is reused.
 Once a slice verifies, start the next authorized one. Stop only for a user
 decision, a blocker or the end of scope, and report done, remaining and blocked
 with its next action, in the plan's units.
-Before choosing the transition for structural refactoring, read
-[Refactoring](references/REFACTORING.md); for compatibility/data migration alone,
-start at [Choose the transition](references/REFACTORING.md#choose-the-transition).
 For structural work, verify the actual ownership and caller obligations as well
 as values; names and comments do not establish the requested improvement.
 
