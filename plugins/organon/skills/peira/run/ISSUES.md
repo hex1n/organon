@@ -40,10 +40,9 @@ requirements are recorded as overridden, never as product failures.
 Each issue names its business impact, category, source run/build, affected scenarios,
 disposition and owner (or unassigned), reproduction inputs/steps, expected/actual,
 evidence, known or suspected cause, fix constraints, and post-fix verification/closure
-rule. Missing authority or fix permission remains an explicit disposition; recording
-the issue does not authorize repair. Add an index only when several issues need a
-queue; the report already provides the ordinary entry point.
+rule. Missing authority or fix permission remains an explicit disposition. Add an
+index only when several issues need a queue; the report already provides the ordinary entry point.
 
 Link affected results to that issue. Close a product defect only after the fix
 is loaded and its required E2E scenarios and affected dependents have fresh passing
-evidence; preserve earlier reports. Issues live only as these local documents.
+evidence; preserve earlier reports.

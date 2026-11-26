@@ -111,9 +111,7 @@ eight effective facts.
 The first five facts are the execution anchors. Resolve business facts here; the
 execution stage resolves live targets, credentials, commands, safety wait bounds,
 owner markers, and cleanup implementations. Keep a known project command when it
-is the stable entry interface. Missing business decisions stay `NEEDS-DECISION`;
-missing source anchors stay `BLOCKED`. Either can be planned, but neither is
-execution-ready.
+is the stable entry interface.
 
 When the repository keeps a harness (`docs/verify/HARNESS.md`), cite it for the
 entry address, authentication, and identity mapping. State in the plan only the
@@ -144,8 +142,9 @@ record.
   that starts from another variant's end state names that variant. A variant
   that stops early, uses a different fixture, or changes what is observed,
   written, or needed (Actions, Preconditions, Observes, State Footprint,
-  Capabilities) is a child block that states those fields. A
-  held variant carries its `NEEDS-DECISION` or `BLOCKED` token beside its ID.
+  Capabilities) is a child block that states those fields. An undecided or
+  blocked case is its own variant, its `NEEDS-DECISION` or `BLOCKED` token beside
+  its ID, so the base and its other variants stay ready.
 - **A scenario states only the fields it defines, each in full.** Inheriting is
   leaving the field out, so a one-step scenario is a heading and a few lines. A
   field that adds to its parent's value restates the whole value; "same as the
@@ -227,9 +226,7 @@ in-scope obligations and their readiness visible.
 
 Use `NEEDS-DECISION` for unresolved authority, `BLOCKED` for unavailable execution
 evidence or capability, and `OUT-OF-SCOPE` for a stated exclusion. `ASSUMED` requires
-an explicitly accepted temporary premise and the accepting owner. Give an undecided
-or blocked case its own variant ID, so the executor holds that ID while the base
-scenario and its other variants stay ready. Keep unresolved
+an explicitly accepted temporary premise and the accepting owner. Keep unresolved
 items and missing lower-layer tests visible without inflating the E2E tree.
 
 Save Markdown as `.scratch/{feature}/e2e/{yyyymmdd}-{feature}-e2e-test-plan.md` unless the
@@ -257,9 +254,7 @@ plan keeps the repaired fields and the gaps.
 ## 5. Hand off to execution (run mode only)
 
 Continue to execution only when the selected mode includes it. Pass on the user's
-scenario selection when there is one; otherwise the executor applies RUN.md's
-default selection, which holds every ID carrying a `NEEDS-DECISION` or `BLOCKED`
-item. Report what each held ID is missing while ready work continues.
+scenario selection when there is one.
 
 Use [the execution handoff](../run/HANDOFF.md) for fresh context, the brief,
 parent/executor responsibilities and the no-subagent fallback.

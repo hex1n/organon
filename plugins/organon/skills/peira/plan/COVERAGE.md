@@ -1,14 +1,9 @@
 # Coverage reference
 
-The planning workflow lives in `PLAN.md`. Read Coverage Models for interacting
-coverage obligations and Operation coverage map when the scope is a set of
-operations.
-
 ## Coverage Models
 
-Use explicit models when interactions make omissions hard to see in a short tree.
-Choose the applicable rows below and state the reason for the added analysis. Leave
-unused models absent; unknown behavior remains a named gap, not proof of absence.
+Choose the applicable rows below and state the reason for the added analysis.
+Unknown behavior remains a named gap, not proof of absence.
 
 | Model | Build for | Record |
 |---|---|---|
@@ -16,8 +11,7 @@ unused models absent; unknown behavior remains a named gap, not proof of absence
 | Input space | Several characteristics or partitions whose interactions can change outcomes or must preserve an invariant. | Characteristic, affected observable, feasible accepted/rejected blocks, boundaries and interior values, and constraints. |
 | Decision logic | Overlapping rules, independent conditions, error precedence, or competing outcomes. | Rule/error, conditions, expected outcome, and judgment order. Each independent condition of an OR rule needs its own obligation. |
 
-Each row distinguishes the expected authority from implementation evidence. Cite
-shared sources once and link rows to them. Model business outcomes rather than
+Cite shared sources once and link rows to them. Model business outcomes rather than
 internal call stacks. A changed contract may span files, and a shared file may
 affect several contracts; direct-flow coverage does not close neighboring flows.
 
@@ -58,8 +52,7 @@ the independent expected result.
 
 Use a ledger when a selected criterion generates combinations or many-to-many
 mappings that are hard to inspect in the tree, or when the user/consumer requires
-formal traceability. A small model with direct mappings can use annotated scenarios
-and coverage notes. Recording more tables is not itself stronger coverage.
+formal traceability.
 
 | Requirement | Model / criterion | Obligation and observable | Layer | Coverage reference | Disposition |
 |---|---|---|---|---|---|
@@ -67,12 +60,9 @@ and coverage notes. Recording more tables is not itself stronger coverage.
 
 `covered` means mapped to a defined scenario or an inspected lower-layer assertion,
 not executed. `planned` identifies a missing or uninspected lower-layer test, its
-needed assertion, and next step. Keep it in gaps. Framework names and file paths
-alone do not prove coverage. Preserve the requested boundary and distinct system
-risks when allocating local permutations to lower layers.
+needed assertion, and next step. Keep it in gaps.
 
-Every covered ledger row resolves to a scenario that cites it or an inspected test
-that asserts it; every scenario requirement link resolves back to its row. Keep IDs
+Keep IDs
 stable when revising a referenced plan; document retired obligations when existing
 references need them. Consecutive numbering is unnecessary. Old plans without layer
 columns or a ledger remain valid; preserve their established coverage mappings.

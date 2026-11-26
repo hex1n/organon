@@ -66,5 +66,4 @@ State the mode and its starting artifacts first, then open that stage's file.
 
 Deliver a run's result in the reply: how many scenarios passed, failed, and were
 blocked, each problem found, and what stays uncovered, with the canonical Markdown
-linked. A plan and a harness are delivered as their Markdown files; a harness also
-delivers its proof run's result.
+linked.
