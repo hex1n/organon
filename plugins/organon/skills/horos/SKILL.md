@@ -86,8 +86,9 @@ where contract authority leaves them open.
 ### 6. Deliver
 
 Reply with the document path and what stays off the page: the contract
-authority and source revision inspected, each unconfirmed item with its next
-check, coverage gaps, and work the document implies for other roles.
+authority, or `unknown` with where you looked; the source revision inspected;
+each unconfirmed item with its next check; coverage gaps; and work the document
+implies for other roles.
 
 ## Write for the caller
 
@@ -122,8 +123,7 @@ open. These rules decide what goes on the page.
 
 ## Contract Rules
 
-**Target contract**: state the intended external contract. It has two sources,
-which you report in the reply:
+**Target contract**: state the intended external contract. It has two sources:
 
 - **Contract authority**: the approved contract, design, or published schema
   that defines what the interface owes. If none applies, use the code revision
