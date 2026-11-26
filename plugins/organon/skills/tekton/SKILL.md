@@ -23,7 +23,9 @@ resolve a concrete decision or risk.
 
 Identify the requested outcome, preserved contracts and evidence that would
 distinguish a plausible wrong implementation. Characterization supports
-preservation; a bug fix needs an expectation independent of the defect. Use a
+preservation; a bug fix needs an expectation independent of the defect. Before
+fixing a defect, read [Closing a defect](references/EVIDENCE.md#closing-a-defect);
+it closes where it was reproduced. Use a
 justified invariant, comparison or replay when exact values are unavailable.
 For a replaced entry, the oracle is what the old entry sends and does,
 captured first, not a declared type; the new entry declares its own inputs and
@@ -71,16 +73,24 @@ isolation or migration this change demonstrates; retained state and
 intermediate values need an owner, lifetime and need. Logical dependencies and observable order constrain
 physical execution without prescribing incidental syntax.
 
+Before writing or changing a test, a test double or a slice, read
+[Tests](references/TESTS.md).
+
 Choose a slice with an observable result and keep reachable intermediate states
 valid for callers and data. Distinguish preserved behavior from intentional
 semantic change. Move behavioral cases with the behavior; retire old-internal
 assertions after equivalent coverage exists at the relevant interface.
 
 After each meaningful slice, inspect the diff and run focused verification.
+When a check fails or earlier evidence is being reused, read
+[Reusing evidence](references/EVIDENCE.md#reusing-evidence-and-retrying).
 A newly affected contract expands the scope before earlier evidence is reused.
 Once a slice verifies, start the next authorized one. Stop only for a user
 decision, a blocker or the end of scope, and report done, remaining and blocked
 with its next action, in the plan's units.
+Before choosing the transition for structural refactoring, read
+[Refactoring](references/REFACTORING.md); for compatibility/data migration alone,
+start at [Choose the transition](references/REFACTORING.md#choose-the-transition).
 For structural work, verify the actual ownership and caller obligations as well
 as values; names and comments do not establish the requested improvement.
 
@@ -95,33 +105,21 @@ smallest assembly that preserves the conditions deciding the outcome, and
 verify the requested outcome at its final consumer. A claim left unchecked is
 reported as unverified.
 
+For performance work, inspect operation counts, sharing scope, invalidation and
+retained state on effectful and no-effect paths at relevant scale. Reuse may
+change cost only within its valid observation scope. Before reporting measured
+numbers, read [Measured numbers](references/MEASURES.md).
+
 Run fault injection ([Fault injection](references/FAULTS.md)) and independent
 review ([Evidence](references/EVIDENCE.md#independent-review)) for changes to
 concurrency, authorization, data spanning versions, hard-to-recover effects or
 a shared guard, and when the task or repository requires either.
 
-## Load branch details when needed
-
-- **Writing or changing a test, a test double or a slice:** read
-  [Tests](references/TESTS.md) first.
-- **Structural refactoring:** read [Refactoring](references/REFACTORING.md) before
-  choosing the transition. For compatibility/data migration alone, start at
-  [Choose the transition](references/REFACTORING.md#choose-the-transition).
-- **Fixing a defect:** read
-  [Closing a defect](references/EVIDENCE.md#closing-a-defect); it closes where
-  it was reproduced.
-- **A check failed, or earlier evidence is being reused:** read
-  [Reusing evidence](references/EVIDENCE.md#reusing-evidence-and-retrying).
-- **Performance work:** inspect operation counts, sharing scope, invalidation and
-  retained state on effectful and no-effect paths at relevant scale. Reuse may
-  change cost only within its valid observation scope. Before reporting measured
-  numbers, read [Measured numbers](references/MEASURES.md).
-- **Diagrams or interactive views:** before delivering one, read
-  [Derived views](references/DERIVED-VIEWS.md).
-
 ## Close the requested outcomes
 
-Check the final diff against the footprint and for unintended changes. Lead with the user-visible
+Check the final diff against the footprint and for unintended changes. Before
+delivering a diagram or interactive view, read
+[Derived views](references/DERIVED-VIEWS.md). Lead with the user-visible
 outcome, its verification boundary and material gaps in the user's language.
 Carry still-material choices and scope interpretations into delivery, distinguishing
 user decisions from implementation assumptions. A progress record establishes what
