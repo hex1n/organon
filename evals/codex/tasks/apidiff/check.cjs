@@ -1,7 +1,12 @@
 "use strict";
-const AUTH = /契约|设计文档|OpenAPI|schema|以.{0,6}代码为准|contract/i;
+// The authority named in the reply: a contract/design/schema, or the code when
+// none exists ("以 `feature/x`（abc1234）的代码为准"). "Based on the code at X"
+// alone names evidence, not authority, so it does not count.
+const AUTH = /契约|设计文档|OpenAPI|schema|代码为准|按代码|权威|contract|authorit|source of truth/i;
+// Any document the run added or rewrote in docs/interfaces/, whatever its name.
+const isNewDoc = (f) => /^docs\/interfaces\/[^/]+\.md$/i.test(f) && !/^docs\/interfaces\/User_API_Doc\.md$/.test(f);
 module.exports = (ctx, { check }) => {
-  const docs = ctx.glob(/^docs\/interfaces\/.*Order.*\.md$/i);
+  const docs = ctx.glob(/^docs\/interfaces\//).filter(isNewDoc);
   const reply = ctx.final;
   const head = (ctx.setup.head || "").slice(0, 7);
   const body = reply + "\n" + docs.map((d) => ctx.read(d)).join("\n");

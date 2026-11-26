@@ -8,7 +8,8 @@
 
 ## 准备
 
-- Node 18 及以上、git、python3（夹具是 Python 小项目；t1 题会用 pytest 跑测试，没装就记为 n/a）。
+- Node 18 及以上、git、python3（夹具是 Python 小项目）。t1 题判分时要用 pytest 跑测试，没装就记为 n/a；
+  想让这条也判分，先在跑评测的 Python 里装上：`python3 -m pip install pytest`。
 - 本机 Codex 已装好 organon 插件（见仓库根 README 的 Install）。改过技能后先跑
   `node scripts/install-plugin.cjs --apply` 刷新 Codex 缓存，否则测的是旧版本。
 - 先确认 `codex exec` 能在本机非交互地跑通，例如 `codex exec --json "say hi"`。

@@ -118,6 +118,30 @@ const GOOD = {
   },
 };
 
+// Compliant runs worded another way than GOOD, so the graders do not hinge on
+// one phrasing: a doc named in Chinese, the code named as authority with a
+// branch in between, arche's own DEFER token, a suspend said in English.
+const ALT = {
+  apidoc: (d, s) => {
+    put(d, "docs/interfaces/订单接口文档.md", "# 订单接口\n\n## 通用约定\n\n## 接口列表\n");
+    return [...ev.write(["docs/interfaces/订单接口文档.md"]), ...ev.msg(`仓库里没有接口设计，以 \`main\`（${s.sha}）的代码为准。`)];
+  },
+  apidiff: (d, s) => {
+    put(d, "docs/interfaces/order-v2-changes.md", "# 变更\n\n- remark 改名为 note，前端必须改\n");
+    return [
+      ...ev.cmd(`sed -n '1,80p' ${SKILLS}/horos/COMPATIBILITY.md`),
+      ...ev.msg(`没有 OpenAPI，按代码写（${s.sha}）。`),
+    ];
+  },
+  sched: () => [
+    ...ev.cmd(`sed -n '120,200p' ${SKILLS}/arche/REFERENCE.md`),
+    ...ev.msg("decision: DEFER。先给 cron 加失败告警，三个月后再评估。"),
+  ],
+  plan: () => [
+    ...ev.msg("This session cannot spawn independent reviewers, so the review is SUSPENDED and docs/plan.md is left as is."),
+  ],
+};
+
 function eventsOf(list) {
   return list.map((e) => JSON.stringify(e)).join("\n");
 }
@@ -153,18 +177,19 @@ function main() {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), "organon-codex-selftest-"));
   try {
     for (const task of loadTasks([])) {
-      for (const mode of ["good", "empty"]) {
+      for (const mode of ["good", "alt", "empty"]) {
+        if (mode === "alt" && !ALT[task.id]) continue;
         const dir = path.join(root, `${task.id}-${mode}`);
         const setup = build(task.dir, dir, task.frozen || []);
         const sha = setup.head.slice(0, 7);
-        const events = mode === "good" ? GOOD[task.id](dir, { sha }) : ev.msg("完成。");
+        const events = mode === "empty" ? ev.msg("完成。") : (mode === "good" ? GOOD : ALT)[task.id](dir, { sha });
         const run = parse(eventsOf(events));
         const checks = grade(task, dir, run, run.final, setup);
         const failed = checks.filter((c) => c.result === false);
-        const ok = mode === "good" ? failed.length === 0 : failed.length > 0 && !checks.some((c) => c.name === "grader ran");
+        const ok = mode !== "empty" ? failed.length === 0 : failed.length > 0 && !checks.some((c) => c.name === "grader ran");
         if (!ok) failures += 1;
         const na = checks.filter((c) => c.result === null).map((c) => c.name);
-        console.log(`${ok ? "ok  " : "FAIL"} ${task.id.padEnd(9)} ${mode.padEnd(5)} ${checks.length - failed.length - na.length}/${checks.length - na.length} pass${na.length ? `, ${na.length} n/a` : ""}${mode === "good" && failed.length ? `: ${failed.map((c) => `${c.name} [${c.evidence}]`).join("; ")}` : ""}`);
+        console.log(`${ok ? "ok  " : "FAIL"} ${task.id.padEnd(9)} ${mode.padEnd(5)} ${checks.length - failed.length - na.length}/${checks.length - na.length} pass${na.length ? `, ${na.length} n/a` : ""}${mode !== "empty" && failed.length ? `: ${failed.map((c) => `${c.name} [${c.evidence}]`).join("; ")}` : ""}`);
       }
     }
   } finally {

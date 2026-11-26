@@ -18,7 +18,7 @@ module.exports = (ctx, { check }) => {
   const gate = ctx.steps.some((s) => (s.output || "").includes("Value Gate asks whether the winner beats the status quo") || coversGate(s.command || "") || coversGate(s.args || ""));
   return [
     check("the Value Gate section of arche/REFERENCE.md is read", gate, "commands and outputs"),
-    check("reply recommends against building a scheduler now", /不建议|不要自建|不值得|先不|暂不|不自建|status quo|保持|维持现状/.test(reply), reply.slice(0, 80)),
+    check("reply recommends against building a scheduler now", /不建议|不要自建|不值得|先不|暂不|不自建|status quo|保持|维持现状|\bDEFER\b|NO_BUILD|(不需要|没必要|无需|不必|不用).{0,8}(自建|平台|调度器|新建|重写)|(继续|沿用).{0,6}cron|(don.t|not|no need to) build/i.test(reply), (reply.match(/.{0,30}(不建议|不要|不值得|先不|暂不|不自建|DEFER|NO_BUILD|不需要|没必要|无需|不必|不用|继续|沿用|build).{0,30}/i) || [reply.slice(0, 80)])[0]),
     check("reply puts failure alerting / monitoring first", /告警|监控|alert|MAILTO|失败通知/i.test(reply), "reply text"),
   ];
 };
