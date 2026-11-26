@@ -62,4 +62,4 @@ the condition under test; keep unavailable semantics explicit.
 Pair the contract-preserving change with a plausible contract violation. Passing an
 equivalent change alone does not show that the check detects a defect; a rejected
 defect alone does not show that the check permits valid implementations.
-Keep the source, inputs and controls with the verification evidence.
+Save the source, inputs and controls in the task folder `.scratch/YYYYMMDD-task-name/`.

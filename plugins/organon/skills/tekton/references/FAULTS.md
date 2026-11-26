@@ -50,5 +50,5 @@ A scripted batch records this for every fault.
 Investigate meaningful survivors rather than optimizing a score. A result
 belongs to the exact test and implementation it ran against: editing,
 renaming, or retargeting a test afterwards invalidates it, so rerun the fault
-against the final test before citing it. Keep the property, decisive command
-and result, and remaining gap with the task's evidence.
+against the final test before citing it. Save the property, decisive command
+and result, and remaining gap in the task folder `.scratch/YYYYMMDD-task-name/`.
