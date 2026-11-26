@@ -215,19 +215,23 @@ function main() {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), "organon-codex-selftest-"));
   try {
     for (const task of loadTasks([])) {
-      for (const mode of ["good", "alt", "bad", "empty"]) {
+      for (const mode of ["good", "alt", "bad", "empty", "nofiles"]) {
         if ((mode === "alt" && !ALT[task.id]) || (mode === "bad" && !BAD[task.id])) continue;
         const dir = path.join(root, `${task.id}-${mode}`);
         const setup = build(task.dir, dir, task.frozen || []);
         const sha = setup.head.slice(0, 7);
-        const events = mode === "empty" ? ev.msg("完成。") : { good: GOOD, alt: ALT, bad: BAD }[mode][task.id](dir, { sha });
+        // nofiles: a compliant run whose files were not archived, graded on a
+        // bare fixture; the file checks must turn n/a, not fail.
+        const scratch = mode === "nofiles" ? path.join(root, `${task.id}-nofiles-scratch`) : dir;
+        if (mode === "nofiles") build(task.dir, scratch, task.frozen || []);
+        const events = mode === "empty" ? ev.msg("完成。") : { good: GOOD, alt: ALT, bad: BAD, nofiles: GOOD }[mode][task.id](scratch, { sha });
         const run = parse(eventsOf(events));
-        const checks = grade(task, dir, run, run.final, setup);
+        const checks = grade(task, dir, run, run.final, setup, { artifacts: mode !== "nofiles" });
         const failed = checks.filter((c) => c.result === false);
-        const ok = mode === "good" || mode === "alt" ? failed.length === 0 : failed.length > 0 && !checks.some((c) => c.name === "grader ran");
+        const ok = mode === "good" || mode === "alt" || mode === "nofiles" ? failed.length === 0 : failed.length > 0 && !checks.some((c) => c.name === "grader ran");
         if (!ok) failures += 1;
         const na = checks.filter((c) => c.result === null).map((c) => c.name);
-        console.log(`${ok ? "ok  " : "FAIL"} ${task.id.padEnd(9)} ${mode.padEnd(5)} ${checks.length - failed.length - na.length}/${checks.length - na.length} pass${na.length ? `, ${na.length} n/a` : ""}${(mode === "good" || mode === "alt") && failed.length ? `: ${failed.map((c) => `${c.name} [${c.evidence}]`).join("; ")}` : ""}`);
+        console.log(`${ok ? "ok  " : "FAIL"} ${task.id.padEnd(9)} ${mode.padEnd(5)} ${checks.length - failed.length - na.length}/${checks.length - na.length} pass${na.length ? `, ${na.length} n/a` : ""}${mode !== "empty" && mode !== "bad" && failed.length ? `: ${failed.map((c) => `${c.name} [${c.evidence}]`).join("; ")}` : ""}`);
       }
     }
   } finally {

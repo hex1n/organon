@@ -45,8 +45,9 @@ prompt 与 Claude 上用的相同，前面加技能调用：默认模板 `$organ
 - `results.csv`：每次运行每条检查一行，`result` 为 1 / 0 / NA，附判据。
 - `runs.csv`：每次运行一行，含退出码、耗时、token 用量和通过数。
 - `summary.md`：按 题 × 模型 × 检查 汇总的通过率。
-- `runs/<ID>/`：每次运行的 prompt、`events.jsonl`、`stderr.txt`、`last.txt`、`checks.json`；
-  失败的运行另有 `diff.txt` 和改动过的文件副本，临时工作目录也保留（路径在 `checks.json`）。
+- `runs/<ID>/`：每次运行的 prompt、`events.jsonl`、`stderr.txt`、`last.txt`、`checks.json`，
+  以及这次运行产生的改动：`diff.txt` 和改动过的文件副本 `files/`（判分要读的就是这些，单个文件
+  超过 256 KB 不存）。失败的运行还保留临时工作目录（路径在 `checks.json`）。
 
 把 `send-back/` 整个发回即可：里面是上面三个汇总文件，加上失败那几次的 `runs/<ID>/`。
 
@@ -102,8 +103,10 @@ node evals/codex/selftest.cjs
 node evals/codex/run.cjs --regrade evals/codex/out/<时间戳>
 ```
 
-工作目录还在就直接用；不在就重建夹具，再铺上保存下来的改动文件。新结果写到各运行目录的
-`checks.regraded.json`，终端打印前后有变化的检查。
+工作目录还在就直接用；不在就重建夹具，再铺上存档的改动文件。旧版本跑出来、没有存档的运行，
+要读产物的检查（各题 `task.json` 的 `artifactChecks`）记为 n/a，不判失败；`artifactOrReply`
+里的检查回复本身能证明时仍算通过。新结果写到各运行目录的 `checks.regraded.json`，汇总写到
+`regraded/`（`summary.md` 有按 题 × 模型 的通过次数），终端打印前后有变化的检查。
 
 单独重判一次运行：
 

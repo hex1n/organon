@@ -1,5 +1,10 @@
 {
   "skill": "ichnos",
   "rule": "ichnos: write the decision as the next ADR with its edge case, and keep the trail with scripts/trail.cjs append and check",
-  "prompt": "刚才和财务、产品讨论定了：以后退款一律原路退回原支付渠道，不再支持退到账户余额。原因是退到余额让对账口径对不上，财务要求统一。已经退到余额的历史订单不追溯、不改。这次先不改代码，下个迭代再做。帮我把这个决定记下来。"
+  "prompt": "刚才和财务、产品讨论定了：以后退款一律原路退回原支付渠道，不再支持退到账户余额。原因是退到余额让对账口径对不上，财务要求统一。已经退到余额的历史订单不追溯、不改。这次先不改代码，下个迭代再做。帮我把这个决定记下来。",
+  "artifactChecks": [
+    "ADR 0003 is written in docs/decisions",
+    "the ADR records the no-backfill edge case (不追溯)",
+    "no code is changed"
+  ]
 }

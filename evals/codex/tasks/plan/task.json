@@ -2,5 +2,15 @@
   "skill": "dokimasia",
   "rule": "dokimasia: fresh read-only reviewers (or a suspension when none can run), candidate left unchanged, ledger written and validated, both closed tracks reported",
   "prompt": "评审一下 docs/plan.md 这个缓存方案，下周要上。",
-  "frozen": ["docs/plan.md"]
+  "frozen": [
+    "docs/plan.md"
+  ],
+  "artifactChecks": [
+    "the candidate docs/plan.md is unchanged",
+    "a review ledger with round receipts is written"
+  ],
+  "artifactOrReply": [
+    "the cross-instance staleness blocker is found",
+    "the candidate's hash is recorded"
+  ]
 }

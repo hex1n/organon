@@ -90,14 +90,21 @@ function codexArgs(opts, task, model, workdir, lastFile) {
   return args;
 }
 
-function grade(task, workdir, run, final, setup) {
+// With artifacts false (a saved run whose files were not kept), checks that
+// read the run's files cannot be decided: task.json lists them. Checks listed
+// under artifactOrReply also read the reply, so a pass from the reply stands.
+function grade(task, workdir, run, final, setup, { artifacts = true } = {}) {
   const ctx = makeContext({ dir: workdir, run, final, task, setup });
+  let list;
   try {
-    const list = require(path.join(task.dir, "check.cjs"))(ctx, { check, na });
-    return list;
+    list = require(path.join(task.dir, "check.cjs"))(ctx, { check, na });
   } catch (error) {
     return [check("grader ran", false, error.stack || String(error))];
   }
+  if (artifacts) return list;
+  const only = new Set(task.artifactChecks || []);
+  const either = new Set(task.artifactOrReply || []);
+  return list.map((c) => ((only.has(c.name) || (either.has(c.name) && c.result === false)) && c.result !== null ? na(c.name, "the run's files were not archived") : c));
 }
 
 function csv(value) {
@@ -158,6 +165,9 @@ function regrade(outDir) {
   const tasks = Object.fromEntries(loadTasks([]).map((t) => [t.id, t]));
   const runsDir = path.join(outDir, "runs");
   const fmt = (c) => (c.result === null ? "NA" : c.result ? "1" : "0");
+  const rows = [];
+  const records = [];
+  let meta = { version: "(regrade)", invoke: "" };
   for (const id of fs.readdirSync(runsDir).sort()) {
     const runDir = path.join(runsDir, id);
     let saved;
@@ -168,31 +178,44 @@ function regrade(outDir) {
     try {
       const fresh = path.join(scratch, "w");
       const setup = build(task.dir, fresh, task.frozen || []);
-      let workdir = saved.workdir && fs.existsSync(saved.workdir) ? saved.workdir : fresh;
-      if (workdir === fresh) {
+      // A kept workdir, else the archived changes (diff.txt marks an archive),
+      // else only the fixture: then the file checks cannot be decided.
+      let workdir = fresh;
+      let where = "fixture only, file checks n/a";
+      let artifacts = false;
+      if (saved.workdir && fs.existsSync(saved.workdir)) { workdir = saved.workdir; where = "kept workdir"; artifacts = true; }
+      else if (fs.existsSync(path.join(runDir, "diff.txt"))) {
         if (fs.existsSync(path.join(runDir, "files"))) copyDir(path.join(runDir, "files"), fresh);
-        const diff = fs.existsSync(path.join(runDir, "diff.txt")) ? fs.readFileSync(path.join(runDir, "diff.txt"), "utf8") : "";
+        const diff = fs.readFileSync(path.join(runDir, "diff.txt"), "utf8");
         for (const line of diff.split("\n")) if (/^( D|D ) /.test(line)) fs.rmSync(path.join(fresh, line.slice(3).trim()), { force: true });
+        where = "archived files"; artifacts = true;
       }
       const run = parse(fs.readFileSync(path.join(runDir, "events.jsonl"), "utf8"));
       run.rollout = rolloutAgents(run.threadId);
       const lastFile = path.join(runDir, "last.txt");
       const last = fs.existsSync(lastFile) ? fs.readFileSync(lastFile, "utf8").trim() : "";
-      const checks = grade(task, workdir, run, last || run.final, setup);
+      const checks = grade(task, workdir, run, last || run.final, setup, { artifacts });
       const counted = checks.filter((c) => c.result !== null);
-      const ok = counted.length > 0 && counted.every((c) => c.result);
-      const where = workdir === fresh ? "saved files" : "kept workdir";
-      const spawns = run.rollout.found ? `, rollout: ${run.rollout.spawns} subagent spawns` : ", no rollout";
-      console.log(`${ok ? "pass" : "FAIL"} ${id} (${where}${spawns})`);
+      const passed = counted.filter((c) => c.result).length;
+      const ok = saved.exit_code === 0 && !saved.turn_failed && counted.length > 0 && passed === counted.length;
+      const spawns = run.rollout.found ? `rollout: ${run.rollout.spawns} subagent spawns` : "no rollout";
+      console.log(`${ok ? "pass" : "FAIL"} ${id} (${where}; ${spawns})`);
       for (const c of checks) {
         const before = (saved.checks || []).find((o) => o.name === c.name);
         if (!before || fmt(before) !== fmt(c) || c.result === false) console.log(`  ${before ? fmt(before) : "-"} -> ${fmt(c)}  ${c.name}: ${c.evidence}`);
+        rows.push({ task: task.id, skill: task.skill, model: saved.model, run: saved.run, check: c.name, result: fmt(c), evidence: c.evidence });
       }
-      fs.writeFileSync(path.join(runDir, "checks.regraded.json"), JSON.stringify({ rollout: { found: run.rollout.found, spawns: run.rollout.spawns, names: run.rollout.names }, checks }, null, 2));
+      records.push({ ...saved, subagent_spawns: run.rollout.found ? run.rollout.spawns : "", passed, failed: counted.length - passed, na: checks.length - counted.length, pass: ok ? 1 : 0 });
+      fs.writeFileSync(path.join(runDir, "checks.regraded.json"), JSON.stringify({ artifacts: where, rollout: { found: run.rollout.found, spawns: run.rollout.spawns, names: run.rollout.names }, checks }, null, 2));
     } finally {
       fs.rmSync(scratch, { recursive: true, force: true });
     }
   }
+  const dest = path.join(outDir, "regraded");
+  fs.mkdirSync(dest, { recursive: true });
+  meta = { version: "regraded with the current checks", invoke: "see the original summary.md" };
+  writeSummary(dest, rows, records, meta);
+  console.log(`\n${records.filter((r) => r.pass === 1).length}/${records.length} runs pass. Summary: ${path.relative(process.cwd(), dest)}/summary.md`);
 }
 
 function writeSummary(outDir, rows, runs, meta) {
@@ -207,7 +230,16 @@ function writeSummary(outDir, rows, runs, meta) {
     if (r.result !== "NA") { g.total += 1; if (r.result === "1") g.pass += 1; }
     groups.set(key, g);
   }
-  const lines = [`# Codex probe results`, "", `codex: ${meta.version}`, `invoke: \`${meta.invoke}\``, `runs: ${runs.length}, all checks passed: ${runs.filter((r) => r.pass === 1).length}`, "", "| task | model | check | passed |", "|---|---|---|---|"];
+  const lines = [`# Codex probe results`, "", `codex: ${meta.version}`, `invoke: \`${meta.invoke}\``, `runs: ${runs.length}, all checks passed: ${runs.filter((r) => r.pass === 1).length}`, "", "| task | model | runs passed |", "|---|---|---|"];
+  const byRun = new Map();
+  for (const r of runs) {
+    const key = `${r.task}\u0000${r.model}`;
+    const g = byRun.get(key) || { task: r.task, model: r.model, pass: 0, total: 0 };
+    g.total += 1; if (r.pass === 1) g.pass += 1;
+    byRun.set(key, g);
+  }
+  for (const g of byRun.values()) lines.push(`| ${g.task} | ${g.model} | ${g.pass}/${g.total} |`);
+  lines.push("", "| task | model | check | passed |", "|---|---|---|---|");
   for (const g of groups.values()) lines.push(`| ${g.task} | ${g.model} | ${g.check} | ${g.total ? `${g.pass}/${g.total}` : "n/a"} |`);
   const failed = runs.filter((r) => r.pass !== 1).map((r) => r.id);
   lines.push("", failed.length ? `Runs with a failed check (kept under runs/): ${failed.join(", ")}` : "No failed runs.");
@@ -290,8 +322,9 @@ async function main() {
         const record = { id, task: task.id, skill: task.skill, model, run: rep, exit_code: code, turn_failed: run.turnFailed ? 1 : 0, seconds, input_tokens: run.usage.input, cached_input_tokens: run.usage.cached, output_tokens: run.usage.output, reasoning_tokens: run.usage.reasoning, events: run.events, parse_errors: run.parseErrors, subagent_spawns: run.rollout.found ? run.rollout.spawns : "", passed, failed: counted.length - passed, na: checks.length - counted.length, pass: ok ? 1 : 0 };
         runs.push(record);
         fs.writeFileSync(path.join(runDir, "checks.json"), JSON.stringify({ ...record, workdir, setup, checks }, null, 2));
-        if (!ok) saveWorkdirChanges(workdir, runDir);
-        else if (!opts.keep) fs.rmSync(workdir, { recursive: true, force: true });
+        // Archive the files every run produced, so --regrade can grade them later.
+        saveWorkdirChanges(workdir, runDir);
+        if (ok && !opts.keep) fs.rmSync(workdir, { recursive: true, force: true });
         console.log(`${ok ? "pass" : "FAIL"} ${passed}/${counted.length} checks, exit ${code}, ${seconds}s${ok ? "" : ` (workdir ${workdir})`}`);
         writeSummary(outDir, rows, runs, { version, invoke: opts.invoke });
       }

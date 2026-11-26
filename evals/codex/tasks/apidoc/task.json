@@ -1,5 +1,9 @@
 {
   "skill": "horos",
   "rule": "horos: write beside the existing interface docs in their shape, and name the source revision and the document's authority in the reply",
-  "prompt": "给订单相关的接口写一份 API 文档，前端要对接。"
+  "prompt": "给订单相关的接口写一份 API 文档，前端要对接。",
+  "artifactChecks": [
+    "the order API doc sits in docs/interfaces/ beside the existing doc",
+    "the doc keeps the existing doc's layout (通用约定, 接口列表)"
+  ]
 }

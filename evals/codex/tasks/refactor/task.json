@@ -1,5 +1,9 @@
 {
   "skill": "tekton",
   "rule": "tekton: structural change reads references/REFACTORING.md and records the old entry point (orders.calc_total) that must stay for the external caller",
-  "prompt": "把折扣规则从 orders.py、cart.py、invoice.py 三处重复实现收拢到一个地方。orders.calc_total 最终要去掉，但 README 里说的外部 billing-export 这个月还改不了。"
+  "prompt": "把折扣规则从 orders.py、cart.py、invoice.py 三处重复实现收拢到一个地方。orders.calc_total 最终要去掉，但 README 里说的外部 billing-export 这个月还改不了。",
+  "artifactChecks": [
+    "a .scratch record names the old entry point calc_total",
+    "orders.calc_total still exists for the external caller"
+  ]
 }

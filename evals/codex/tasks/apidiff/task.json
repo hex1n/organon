@@ -1,5 +1,12 @@
 {
   "skill": "horos",
   "rule": "horos --diff: read COMPATIBILITY.md, mark breaking changes, and name the revision and authority in the reply",
-  "prompt": "--diff main 这个分支改了订单接口，给前端出一份变更说明，他们要据此改对接代码。"
+  "prompt": "--diff main 这个分支改了订单接口，给前端出一份变更说明，他们要据此改对接代码。",
+  "artifactChecks": [
+    "the change document sits in docs/interfaces/"
+  ],
+  "artifactOrReply": [
+    "reply or doc flags the incompatible changes",
+    "reply or doc names remark -> note"
+  ]
 }
