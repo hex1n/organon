@@ -1,0 +1,6 @@
+?? .scratch/notes/e2e/runs/20261126-1810/notes-harness-proof.md
+?? docs/verify/HARNESS.md
+?? docs/verify/features/index.md
+?? docs/verify/features/notes.md
+?? docs/verify/verify.py
+

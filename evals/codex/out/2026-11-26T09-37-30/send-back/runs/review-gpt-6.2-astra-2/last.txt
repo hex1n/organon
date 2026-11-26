@@ -1,0 +1,8 @@
+**建议暂缓合并。** 本次改动引入了两处可通过 `payable` 复现的计价错误。
+
+1. **P1-1 · 会员用券可能少收，也可能多收。** 当前先用商品原价判断门槛，再对扣券后的余额打九五折。以满 100 减 20、运费 10 元为例：会员买 100 元商品，折后 95 元未达门槛，应付 **105 元**，实际返回 **86 元**；买 120 元商品，折后 114 元已达门槛，应付 **104 元**，实际返回 **105 元**。[计价入口](/private/var/folders/8x/2zb93d5x3qx2fml_5zbv2hnr0000gn/T/organon-codex-review-DZlX29/shop/pricing.py:15) · [会员用券规则](/private/var/folders/8x/2zb93d5x3qx2fml_5zbv2hnr0000gn/T/organon-codex-review-DZlX29/docs/coupons.md:7)
+2. **P1-2 · 优惠额能抵掉运费，甚至产生负应付。** 达到门槛后，代码直接扣除整张券的面额。公开接口接受满 10 减 20 的券，非会员买 10 元商品、运费 5 元，应付 **5 元**，实际返回 **−5 元**。产品规则明确要求保留全部运费。[优惠额计算](/private/var/folders/8x/2zb93d5x3qx2fml_5zbv2hnr0000gn/T/organon-codex-review-DZlX29/shop/coupons.py:16) · [运费下限](/private/var/folders/8x/2zb93d5x3qx2fml_5zbv2hnr0000gn/T/organon-codex-review-DZlX29/docs/coupons.md:5)
+
+环境中未安装 `pytest`。在临时副本中逐一调用了全部 4 个现有测试函数，均通过。它们覆盖了无券订单和非会员常规用券，遗漏了上述两种组合。
+
+合并前建议先按现有舍入规则算出会员折后商品金额，用同一金额判断门槛并封顶优惠额，最后加运费。将上述三个应付金额补成回归断言，即可同时守住门槛两侧和运费下限。

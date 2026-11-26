@@ -1,0 +1,57 @@
+{
+  "id": "apidiff-gpt-6.2-sol-2",
+  "task": "apidiff",
+  "skill": "horos",
+  "model": "gpt-6.2-sol",
+  "run": 2,
+  "exit_code": 0,
+  "turn_failed": 0,
+  "seconds": 179,
+  "input_tokens": 420416,
+  "cached_input_tokens": 378624,
+  "output_tokens": 10365,
+  "reasoning_tokens": 4366,
+  "events": 48,
+  "parse_errors": 0,
+  "passed": 3,
+  "failed": 3,
+  "na": 0,
+  "pass": 0,
+  "workdir": "/var/folders/8x/2zb93d5x3qx2fml_5zbv2hnr0000gn/T/organon-codex-apidiff-WcZfu9",
+  "setup": {
+    "head": "9e183713287b354359d8520a2697a464cb1ae385",
+    "frozen": {}
+  },
+  "checks": [
+    {
+      "name": "COMPATIBILITY.md is read",
+      "result": true,
+      "evidence": "commands and outputs"
+    },
+    {
+      "name": "the change document sits in docs/interfaces/",
+      "result": false,
+      "evidence": "none"
+    },
+    {
+      "name": "reply or doc flags the incompatible changes",
+      "result": false,
+      "evidence": "reply + doc"
+    },
+    {
+      "name": "reply or doc names remark -> note",
+      "result": true,
+      "evidence": "reply + doc"
+    },
+    {
+      "name": "reply names the code revision",
+      "result": true,
+      "evidence": "HEAD 9e18371"
+    },
+    {
+      "name": "reply states the doc's authority",
+      "result": false,
+      "evidence": "no match"
+    }
+  ]
+}

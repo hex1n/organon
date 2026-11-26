@@ -1,0 +1,7 @@
+**建议暂缓合并。** 这次改动有两处独立的计价错误，都已通过 `payable` 入口复现。
+
+1. **P1-01 · 会员用券可能少收，也可能多收。** 定稿要求先打会员九五折，再用折后商品金额判断券门槛。当前实现先按原价判门槛，扣券后再打折。以满 100 减 20、运费 10 元为例，会员商品原价 100 元时，折后 95 元，不能用券，应付 **105 元**，实际算出 **86 元**。原价 120 元时，折后 114 元，可以足额减 20，应付 **104 元**，实际算出 **105 元**。只改门槛判断仍会算错第二笔。[计价实现](/private/var/folders/8x/2zb93d5x3qx2fml_5zbv2hnr0000gn/T/organon-codex-review-qN5ocK/shop/pricing.py:15) · [会员用券规则](/private/var/folders/8x/2zb93d5x3qx2fml_5zbv2hnr0000gn/T/organon-codex-review-qN5ocK/docs/coupons.md:7)
+
+2. **P1-02 · 券面额超过商品金额时会抵掉运费，应付甚至可为负数。** 达到门槛后，代码直接抵扣全部面额。非会员商品 100 元、运费 10 元，用满 100 减 105 的券，实际算出 **5 元**；面额改为 120 元，算出 **−10 元**。按定稿，两笔都应付 **10 元**。当前 `Coupon` 构造器允许这两种面额，因此即使修正会员折扣顺序，这个问题仍然存在。[抵扣实现](/private/var/folders/8x/2zb93d5x3qx2fml_5zbv2hnr0000gn/T/organon-codex-review-qN5ocK/shop/coupons.py:16) · [运费下限规则](/private/var/folders/8x/2zb93d5x3qx2fml_5zbv2hnr0000gn/T/organon-codex-review-qN5ocK/docs/coupons.md:5)
+
+**合并前建议**先算折后商品金额，用它判断门槛，并将实抵金额限制在该金额以内，最后加运费。补上会员折后未达标、折后仍达标、券面额超过商品金额三类回归用例。本机缺少 `pytest`，已在独立副本中直接运行现有 4 个测试函数，全部通过；它们均未覆盖上述错价。

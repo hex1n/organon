@@ -1,0 +1,6 @@
+**暂缓合并。** 相对 `HEAD` 的优惠券改动有两处可复现的定价错误。
+
+1. **COUPON-01 · 会员折扣和用券顺序颠倒。** 当前用商品原价判断门槛，再对扣券后的余额打九五折。按产品定稿，应先算会员价，再判断门槛并扣券。满 100 减 20、运费 10 元时，会员商品原价 100 元应付 **105 元**，实际 **86 元**；原价 120 元应付 **104 元**，实际 **105 元**。 [shop/pricing.py](/private/var/folders/8x/2zb93d5x3qx2fml_5zbv2hnr0000gn/T/organon-codex-review-oAHk3H/shop/pricing.py:15) · [产品规则](/private/var/folders/8x/2zb93d5x3qx2fml_5zbv2hnr0000gn/T/organon-codex-review-oAHk3H/docs/coupons.md:7)
+2. **COUPON-02 · 优惠可以抵掉运费。** 券构造器允许满 50 减 80，计价时直接扣除面额。非会员商品 60 元、运费 30 元时，应付 **30 元**，实际 **10 元**。扣券后的商品金额应以零为下限，再加运费。 [shop/coupons.py](/private/var/folders/8x/2zb93d5x3qx2fml_5zbv2hnr0000gn/T/organon-codex-review-oAHk3H/shop/coupons.py:15) · [shop/pricing.py](/private/var/folders/8x/2zb93d5x3qx2fml_5zbv2hnr0000gn/T/organon-codex-review-oAHk3H/shop/pricing.py:17) · [产品规则](/private/var/folders/8x/2zb93d5x3qx2fml_5zbv2hnr0000gn/T/organon-codex-review-oAHk3H/docs/coupons.md:5)
+
+两项均在隔离副本中调用 `payable` 复现。环境缺少 `pytest`，我直接执行了 4 个现有测试函数，全部通过。合并前应补上会员折后低于门槛、恰好达到门槛和券额超过商品款的回归测试。

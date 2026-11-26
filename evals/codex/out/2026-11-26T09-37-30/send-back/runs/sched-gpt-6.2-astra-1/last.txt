@@ -1,0 +1,5 @@
+**暂缓自建。保留 cron，先让支付对账失败或漏跑时有人及时接手。** 目前是 1 台 VM、6 个定时任务、4 名后端工程师，没有专职运维。上月支付对账失败两次，过了 3 天才有人发现。这个记录足以支持补告警，还不足以证明值得让团队长期维护一套调度平台。[项目说明](/private/var/folders/8x/2zb93d5x3qx2fml_5zbv2hnr0000gn/T/organon-codex-sched-Q88zkQ/README.md:3)
+
+**下一步只验证支付对账这一项。** 和负责人定下每天最晚几点必须完成，再用无业务副作用的测试任务演练两种情况：一次执行后返回失败，一次到期仍未上报成功。优先复用团队已有的通知渠道，由 VM 外的监控检查是否逾期。验收看负责人能否在约定时限内收到告警、确认受影响的账期并接手。仓库里的 `MAILTO` 未配置，单看配置无法判断邮件能否送到负责人手里。[当前调度表](/private/var/folders/8x/2zb93d5x3qx2fml_5zbv2hnr0000gn/T/organon-codex-sched-Q88zkQ/jobs/crontab:3) · [Cronie 邮件行为说明](https://raw.githubusercontent.com/cronie-crond/cronie/master/man/crontab.5)
+
+**值得重开选型的信号是反复出现的人工编排成本。** 例如，订单导出排在 02:00，对账排在 02:15。如果业务确认对账必须等待导出成功，而且导出延迟已反复导致人工补跑，就用这条链试用现成调度服务。只有它也满足不了关键要求，且事故损失和补跑工时足以覆盖开发与持续运维，才值得自建。即使走到那一步，也先迁这一条链，验证依赖和安全补跑后再扩大范围。[任务时序](/private/var/folders/8x/2zb93d5x3qx2fml_5zbv2hnr0000gn/T/organon-codex-sched-Q88zkQ/jobs/crontab:2)

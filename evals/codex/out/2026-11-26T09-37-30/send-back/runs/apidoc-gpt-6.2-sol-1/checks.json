@@ -1,0 +1,47 @@
+{
+  "id": "apidoc-gpt-6.2-sol-1",
+  "task": "apidoc",
+  "skill": "horos",
+  "model": "gpt-6.2-sol",
+  "run": 1,
+  "exit_code": 0,
+  "turn_failed": 0,
+  "seconds": 178,
+  "input_tokens": 542133,
+  "cached_input_tokens": 500352,
+  "output_tokens": 9210,
+  "reasoning_tokens": 2671,
+  "events": 54,
+  "parse_errors": 0,
+  "passed": 3,
+  "failed": 1,
+  "na": 0,
+  "pass": 0,
+  "workdir": "/var/folders/8x/2zb93d5x3qx2fml_5zbv2hnr0000gn/T/organon-codex-apidoc-amAAuT",
+  "setup": {
+    "head": "bf37e6cee8079fadfe7565344d096a3c7a25f0c0",
+    "frozen": {}
+  },
+  "checks": [
+    {
+      "name": "the order API doc sits in docs/interfaces/ beside the existing doc",
+      "result": true,
+      "evidence": "docs/interfaces/Order_API_Doc.md"
+    },
+    {
+      "name": "the doc keeps the existing doc's layout (通用约定, 接口列表)",
+      "result": true,
+      "evidence": "doc headings"
+    },
+    {
+      "name": "reply names the code revision the doc was written from",
+      "result": true,
+      "evidence": "HEAD bf37e6c"
+    },
+    {
+      "name": "reply states the doc's authority (contract, design or code)",
+      "result": false,
+      "evidence": "no match"
+    }
+  ]
+}

@@ -1,0 +1,7 @@
+已生成可交给前端的 [订单接口变更说明](/private/var/folders/8x/2zb93d5x3qx2fml_5zbv2hnr0000gn/T/organon-codex-apidiff-WcZfu9/docs/interfaces/API_Changes_2026-11-26.md)，覆盖 3 个接口。
+
+- **创建订单**改传 `note`、改读 `data.note`。旧 `remark` 会被忽略。单项数量须为 `1–99` 的整数，超限返回 HTTP `400`、`code=40002`。
+- **订单详情**改读 `data.note`，当前固定返回空字符串。
+- **下单金额与物流**方面，下单新增字符串 `data.payAmount`，当前固定为 `"0.00"`。新增物流查询目前返回空物流信息。
+
+以 `main`（`fb14a06`）和 `feature/order-v2`（`9e18371`）的代码为依据，已用本地路由函数核对 JSON 示例、数量边界和错误返回。网关行为需联调复核，新增字段对严格解码器的兼容性需在前端回归。实付金额、币种以及物流事件的字段和顺序待后端确认。
