@@ -29,11 +29,14 @@ facts; leave a genuine policy choice with the user while reviewing the independe
 parts. With no specification, use supported caller/data contracts and state what
 business intent remains unknown.
 
-Before the detailed review, show a brief starting point in the user's language:
-the supported business intent and its sources, the outcomes and preserved
-obligations to judge, the comparison scope, and material open assumptions.
-Distinguish confirmed rules from reconstruction. Continue the review and update
-this starting point when investigation changes its basis.
+Your first message, before any tool call on the code or its sources (a git
+status or a quick look counts), is a brief starting point in chat in the user's
+language, built from the request: the intent as stated, the outcomes and
+preserved obligations to judge, the comparison scope, the sources you will check
+and material open assumptions. The user reads it to correct the basis before the
+review rests on it. Once the sources are read, post the corrected basis before
+opening the changed code if it changed, distinguishing confirmed rules from
+reconstruction. Update it when investigation changes its basis.
 
 ## Enter a fresh review context
 
