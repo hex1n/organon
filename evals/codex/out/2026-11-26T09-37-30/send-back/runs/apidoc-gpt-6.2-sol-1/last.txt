@@ -1,5 +1,0 @@
-已写好 [订单 API 文档](/private/var/folders/8x/2zb93d5x3qx2fml_5zbv2hnr0000gn/T/organon-codex-apidoc-amAAuT/docs/interfaces/Order_API_Doc.md)，覆盖创建、详情、列表和取消 4 个接口，包含鉴权、请求字段、响应示例、分页和错误码。
-
-文档以 `bf37e6c` 的实现为依据。已核对路由、示例和错误分支。本地缺少 Flask，真实 HTTP 响应仍需在联调环境验证。
-
-当前创建返回固定订单号，列表始终为空。联调前需向网关确认域名和浏览器登录凭证，向后端确认可选字段和列表项类型、优惠券规则，以及订单持久化、归属、取消和重试行为。

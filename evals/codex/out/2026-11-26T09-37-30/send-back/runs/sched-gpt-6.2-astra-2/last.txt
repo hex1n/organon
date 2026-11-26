@@ -1,5 +1,0 @@
-**先保留 cron，暂缓自建平台。** 现在一台 VM 上有 6 个定时任务，团队有 4 名后端工程师，没有专职运维。上个月支付对账失败两次，过了 3 天才有人发现。最值得先解决的是让负责对账的人及时知道失败。换调度器也得解决告警送达和接手问题，还会增加一个需要团队维护的服务。[项目说明](/private/var/folders/8x/2zb93d5x3qx2fml_5zbv2hnr0000gn/T/organon-codex-sched-VECU9n/README.md:3)
-
-**下一步就验证每天 02:15 的支付对账。** 找到负责接手的人，约定最晚发现时间，用同一台 VM 上无业务副作用的测试任务模拟一次失败，记录从失败到对方确认的耗时。可以先试 `MAILTO`，但要验证邮件实际送达，并且静默返回非零也能触发通知。若任务根本没启动也必须有人知道，就在 VM 外检查当日对账是否按时完成。[任务配置](/private/var/folders/8x/2zb93d5x3qx2fml_5zbv2hnr0000gn/T/organon-codex-sched-VECU9n/jobs/crontab:3) · [cron 邮件行为说明](https://man.openbsd.org/crontab.5#MAILTO)
-
-**重开平台选型的信号**是出现告警解决不了的实际损失。例如，订单导出排在 02:00、对账排在 02:15。如果对账必须等导出成功，而且导出延迟已经反复造成错账或人工补跑，就值得拿这条链路试用现成调度器。只有当现成工具也满足不了已验证的要求，且持续补救的成本高于自建和维护成本时，再自建。届时先迁这一条链路，用一次上游延迟和一次安全补跑验证收益。[任务配置](/private/var/folders/8x/2zb93d5x3qx2fml_5zbv2hnr0000gn/T/organon-codex-sched-VECU9n/jobs/crontab:2)
