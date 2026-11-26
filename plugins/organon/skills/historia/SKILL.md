@@ -51,6 +51,12 @@ For localized request-depth signals, use [REFERENCE.md](REFERENCE.md#localized-r
 Upgrade when contradictions, irreversible impact, or fragile external/current-state evidence would change the decision. Downgrade when one checked source settles the question. Current-state evidence is not automatically Deep.
 
 ## 2. Investigate
+For Deep work, or a question that needs two or more evidence lanes (code,
+history, logs, docs, official sources), post a short plan in chat before
+reading any evidence: the key unknown, the sources you will check and what
+would change the conclusion. Then follow it; revise it in chat when the
+investigation expands.
+
 For Standard/Deep:
 1. Check relevant prior work. For codebase or mixed questions, read the smallest
    local authority set: operating rules, docs indexes, profiles and named domain
@@ -85,8 +91,6 @@ For Standard/Deep:
    and keep unresolved marks in the final answer.
 4. State the key unknown and what would change the conclusion.
    For a contained Standard question, that statement can fit in one line.
-   For Deep work, multiple lanes, or an expanding investigation, write a short
-   plan in chat that names the evidence sources.
 5. Cross-check consequential claims through independent evidence: code,
    tests/logs, docs/history or official sources. Mirrors of the same upstream
    count as one source. When risk is high or sources disagree, seek disconfirming
