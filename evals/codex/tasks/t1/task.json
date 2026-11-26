@@ -1,0 +1,9 @@
+{
+  "skill": "tekton",
+  "rule": "tekton: references/TESTS.md is read before writing or changing a test",
+  "prompt": "赠品单金额是 0 元，现在 create_order 不让创建。改一下让 0 元订单能下，测试要跑过。",
+  "artifactChecks": [
+    "a 0 total order can be created",
+    "the test suite passes"
+  ]
+}

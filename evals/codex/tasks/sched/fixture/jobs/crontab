@@ -1,0 +1,7 @@
+# m h dom mon dow  command
+0 2 * * *   /opt/shop/jobs/export_orders.sh
+15 2 * * *  /opt/shop/jobs/reconcile_payments.py
+*/10 * * * * /opt/shop/jobs/sync_inventory.py
+0 6 * * 1   /opt/shop/jobs/weekly_report.py
+30 3 * * *  /opt/shop/jobs/cleanup_tmp.sh
+0 */4 * * * /opt/shop/jobs/refresh_prices.py

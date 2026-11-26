@@ -18,9 +18,16 @@ tools/java-formatter/target/
 
 # Local research and evaluation artifacts may contain private project data.
 docs/
-evals/
+evals/*
 
 # Local test suites and test/spec files are not published.
 tests/
 **/*.test.*
 **/*.spec.*
+
+# The Codex probe package (synthetic fixtures, no project data) is published.
+# Its fixtures carry their own docs/ and tests/; run output stays local.
+!evals/codex/
+!evals/codex/tasks/*/fixture/**/docs/
+!evals/codex/tasks/*/fixture/**/tests/
+evals/codex/out/
