@@ -263,8 +263,6 @@ For each approach:
 - Failure mode, cost, or risk
 - Evidence that supports or weakens it
 
-If only one approach is viable, explain why alternatives fail.
-
 ### Independent Context
 
 An independent context is a fresh-context subagent where the runtime supports
@@ -360,20 +358,6 @@ Answer these five checks compactly:
 | Closest alternative | What is the strongest competing mechanism? |
 | Defeat condition | What new fact would make the closest alternative better? |
 | Marginal-gain stop | What further improvement would be too small, too costly, or not decision-relevant? |
-
-If the answer changed since the previous recommendation, name the new criterion
-or evidence that changed it. If it did not change, say "current best under these
-constraints" and give the next verification step instead of inventing a new
-variant.
-
-### Dissenting Path
-
-When recommending against the user's stated approach, also provide:
-
-- Conditions that would justify their approach
-- A concrete "if you still want to proceed" path
-
-The goal is an informed decision, not a veto.
 
 ## Plan Synthesis
 

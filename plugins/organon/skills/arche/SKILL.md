@@ -58,9 +58,8 @@ alternative, failure condition and next verifiable check. Distinguish facts,
 assumptions and proposals. A bounded choice can fit in a few sentences; it needs
 no depth label, fixed template or saved document.
 
-Before recommending against the user's approach, read
-[Dissenting Path](REFERENCE.md#dissenting-path) and give its justifying conditions
-and a concrete proceeding path. Before writing an implementation plan, read
+Before recommending against the user's approach, give the conditions that would
+justify it and a concrete path if they still proceed. Before writing an implementation plan, read
 [Plan Synthesis](REFERENCE.md#plan-synthesis) for changed responsibilities,
 dependencies, relevant migration/recovery and acceptance evidence; include scope
 pricing when it affects the investment decision. Stopping option comparison does

@@ -97,9 +97,7 @@ If enum values come from a lookup interface, point to that interface instead of 
 ## Integration Notes, If Needed
 
 Cross-interface rules the caller follows: call order, fallback behavior,
-parameter priority. If a confirmed defect affects integration, mention it
-briefly and point to the issue or test; keep the main body as the target
-contract.
+parameter priority.
 
 Add an interaction diagram only when it clarifies the caller's contract; read
 [DERIVED-VIEWS.md](DERIVED-VIEWS.md) before drawing one.

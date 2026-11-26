@@ -35,8 +35,6 @@ requirements and design notes for scope, business terms and caller constraints.
 
 Use `docs/api-doc-profile.md`, or root `.api-doc-profile.md`, as a discovery
 index. Recheck conventions relevant to this task against current sources.
-For missing or contradictory facts, detect the protocol and read
-[RPC](adapters/RPC.md) or [HTTP](adapters/HTTP.md).
 Update stale facts in an existing profile; create `docs/api-doc-profile.md`
 when reusable project conventions warrant it. Its fields are protocol, base
 endpoint, operation identifier, RPC request envelope, response wrapper, auth,

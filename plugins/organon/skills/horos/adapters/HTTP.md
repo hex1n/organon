@@ -29,15 +29,14 @@ For a request body, follow object fields to their leaves and mark them `body`.
 Read existing declarations only: method or class annotations, route guards,
 middleware, filters, interceptors, security configuration, and path-prefix
 rules. If auth cannot be established, mark it `unconfirmed` and name the missing
-source in the reply. Ask only when finishing the requested scope needs a
-user-owned decision.
+source in the reply.
 
 ## Requiredness
 
 + Resolve requiredness per concrete route and active parameter binding, including optional parameter types and declared defaults; document the effective default.
 + A path variable in a matched route template is required. Where a framework lets one handler serve a route without the variable, document the routes separately.
 + Query and header parameters: read the binding's own rule and any validation that can still reject the bound value.
-+ Body fields: inspect the validation that actually runs on this route, whether a schema library, validation annotations with their groups, a deserializer, or hand-written checks. A cascade into a nested object validates it when present; it does not make the object required. Record conditional constraints explicitly. A missing rule alone does not prove optionality.
++ Body fields: inspect the validation that actually runs on this route, whether a schema library, validation annotations with their groups, a deserializer, or hand-written checks. A cascade into a nested object validates it when present; it does not make the object required. Record conditional constraints explicitly.
 + Distinguish an absent request body from an absent, null, or empty field.
 
 ## ID Type
