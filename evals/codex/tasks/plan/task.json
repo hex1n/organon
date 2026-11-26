@@ -1,0 +1,6 @@
+{
+  "skill": "dokimasia",
+  "rule": "dokimasia: fresh read-only reviewers (or a suspension when none can run), candidate left unchanged, ledger written and validated, both closed tracks reported",
+  "prompt": "评审一下 docs/plan.md 这个缓存方案，下周要上。",
+  "frozen": ["docs/plan.md"]
+}

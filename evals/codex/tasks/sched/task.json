@@ -1,0 +1,5 @@
+{
+  "skill": "arche",
+  "rule": "arche: before recommending a build, read the Value Gate section of REFERENCE.md and compare the winner with the status quo",
+  "prompt": "要不要自建一个任务调度平台来替换现在这些 cron 脚本？"
+}

@@ -1,0 +1,5 @@
+{
+  "skill": "historia",
+  "rule": "historia: for a question that needs two or more evidence lanes, the first message is a short plan, before any tool call on the subject",
+  "prompt": "上周开始每天的退款对账都有几分钱差额，而且越来越多。帮我深入查清楚原因：从哪天开始、是哪次改动引起的、影响哪些币种，结论要能拿去和财务对账。"
+}

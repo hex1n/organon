@@ -1,0 +1,6 @@
+{
+  "skill": "euthyna",
+  "rule": "euthyna: the first message, before any tool call on the code, is a brief starting point; one context reviews in separate passes and says so",
+  "prompt": "帮我审一下工作区里还没提交的优惠券改动，看能不能合。",
+  "frozen": ["shop/pricing.py", "shop/coupons.py", "tests/test_coupons.py"]
+}

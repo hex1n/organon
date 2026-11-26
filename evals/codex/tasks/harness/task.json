@@ -1,0 +1,7 @@
+{
+  "skill": "peira",
+  "rule": "peira harness: state the mode first, write docs/verify/HARNESS.md and the feature index, save the proof run under .scratch/{feature}/e2e/runs/{stamp}/ and link it",
+  "prompt": "harness 给这个 notes 服务写验证 harness，并按 harness 跑一遍证明它能用。本地启动就是 python3 app.py，端口 8099，没有外部依赖，也没有测试环境，直接写不用再问我。",
+  "codexConfig": ["sandbox_workspace_write.network_access=true"],
+  "serial": true
+}
