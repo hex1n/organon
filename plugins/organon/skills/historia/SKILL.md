@@ -52,10 +52,11 @@ Upgrade when contradictions, irreversible impact, or fragile external/current-st
 
 ## 2. Investigate
 For Deep work, or a question that needs two or more evidence lanes (code,
-history, logs, docs, official sources), post a short plan in chat before
-reading any evidence: the key unknown, the sources you will check and what
-would change the conclusion. Then follow it; revise it in chat when the
-investigation expands.
+history, logs, docs, official sources), your first message, before any tool
+call on the subject (a git log, a file listing or a quick look counts), is a
+short plan in chat: the key unknown, the sources you will check and what
+would change the conclusion. The user reads it to redirect you early. Then
+follow it; revise it in chat when the investigation expands.
 
 For Standard/Deep:
 1. Check relevant prior work. For codebase or mixed questions, read the smallest
