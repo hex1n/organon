@@ -80,7 +80,7 @@ For Standard/Deep:
 4. State the key unknown and what would change the conclusion.
    For a contained Standard question, that statement can fit in one line.
    For Deep work, multiple lanes, or an expanding investigation, write a short
-   plan that names the evidence sources.
+   plan in chat that names the evidence sources.
 5. Cross-check consequential claims through independent evidence: code,
    tests/logs, docs/history or official sources. Mirrors of the same upstream
    count as one source. When risk is high or sources disagree, seek disconfirming
