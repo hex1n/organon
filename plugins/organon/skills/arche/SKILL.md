@@ -17,13 +17,22 @@ Treat a proposed solution as a candidate; preserve choices the user has confirme
 
 Connect a requested action or deliverable to the decision or behavior it should
 change and an observable measure of success. Preserve confirmed form and scope;
-where the mechanism remains open, compare improving the deliverable with changing
-the process that serves that outcome. Establish the load-bearing constraints,
-conventions and unverified assumptions. Check an unknown before relying on it
-when it could rule out the approach. Connect local capabilities to the outcome across the
-relevant boundaries; check the first missing connection that could change
-the recommendation. Missing user intent can leave a conditional recommendation
-with its deciding fact visible.
+where the mechanism remains open, compare improving the deliverable with
+changing the process that serves that outcome. When whether to build is open,
+read [Value Gate](REFERENCE.md#value-gate-and-decision-envelope) and compare the
+status quo, viable existing capabilities, process changes and the cheapest
+credible system change; unsupported economics stay unknown. Inherit an explicit
+build decision; reopen it only when new evidence materially breaks its
+assumptions. Establish the load-bearing constraints, conventions and unverified
+assumptions. When the root problem is unclear or a constraint is disputed, read
+[Root Trace](REFERENCE.md#root-trace), [Assumption
+Audit](REFERENCE.md#assumption-audit) or [Constraint
+Provenance](REFERENCE.md#constraint-provenance) for the one that resolves it,
+rather than applying each technique to every choice. Check an unknown before
+relying on it when it could rule out the approach. Connect local capabilities to
+the outcome across the relevant boundaries; check the first missing connection
+that could change the recommendation. Missing user intent can leave a
+conditional recommendation with its deciding fact visible.
 
 Compare the simplest complete mechanism with the strongest credible alternative
 under the same obligations. Explain when only one path is viable. Added state,
@@ -31,45 +40,35 @@ coordination or layers must close a concrete gap in outcome, operating limits
 or cost; include work transferred to callers and operators. Test where the
 leading option fails and what part of the original problem remains.
 
+Before designing a mechanism or architecture, read
+[Business Operation Model](REFERENCE.md#business-operation-model) to derive the
+business subjects, rule owners, condition scopes and required dependencies, and
+compare [Option Categories](REFERENCE.md#option-categories); for close or coupled
+tradeoffs, use [Bestness Check](REFERENCE.md#bestness-check). When reversal is
+costly and a short comparison cannot settle consequential uncertainty, or the user
+asks for independent drafts, run the
+[Independent Option Tournament](REFERENCE.md#independent-option-tournament).
+When a source framework defines what the plan must answer, map every source item,
+at its original meaning, to a plan item or a named non-goal, and have an
+[independent context](REFERENCE.md#independent-context) check that coverage using
+only the source and final plan.
+
 Answer in the user's language: recommendation, decisive evidence, closest
 alternative, failure condition and next verifiable check. Distinguish facts,
 assumptions and proposals. A bounded choice can fit in a few sentences; it needs
 no depth label, fixed template or saved document.
 
+Before recommending against the user's approach, read
+[Dissenting Path](REFERENCE.md#dissenting-path) and give its justifying conditions
+and a concrete proceeding path. Before writing an implementation plan, read
+[Plan Synthesis](REFERENCE.md#plan-synthesis) for changed responsibilities,
+dependencies, relevant migration/recovery and acceptance evidence; include scope
+pricing when it affects the investment decision. Stopping option comparison does
+not waive this content.
+
 Stop refining options when further comparison cannot change the winner or next
 check. On a repeated challenge, name the new evidence or criterion that changes
 the answer; otherwise keep the supported recommendation and its next check.
-
-## Expand when the decision needs it
-
-Read only the relevant reference sections:
-
-- **Unclear root or disputed constraints:** use [Root Trace](REFERENCE.md#root-trace),
-  [Assumption Audit](REFERENCE.md#assumption-audit) or
-  [Constraint Provenance](REFERENCE.md#constraint-provenance) to resolve the
-  uncertainty, rather than applying each technique to every choice.
-- **Whether to build is open:** compare the status quo, viable existing
-  capabilities, process changes and the cheapest credible system change using
-  [Value Gate](REFERENCE.md#value-gate-and-decision-envelope). Unsupported
-  economics stay unknown. Inherit an explicit build decision; reopen it only
-  when new evidence materially breaks its assumptions.
-- **Mechanism or architecture design:** derive the business subjects, rule owners,
-  condition scopes and required dependencies with [Business Operation Model](REFERENCE.md#business-operation-model)
-  and compare [Option Categories](REFERENCE.md#option-categories).
-  For close or coupled tradeoffs, use [Bestness Check](REFERENCE.md#bestness-check).
-- **Costly reversal and consequential uncertainty that a short comparison cannot
-  settle, or explicitly requested independent drafts:** use the
-  [Independent Option Tournament](REFERENCE.md#independent-option-tournament).
-- **A source framework defines what the plan must answer:** map every source item,
-  at its original meaning, to a plan item or a named non-goal. Have an
-  [independent context](REFERENCE.md#independent-context) check that coverage
-  using only the source and final plan.
-- **Recommending against the user's approach:** give its justifying conditions
-  and a concrete proceeding path using [Dissenting Path](REFERENCE.md#dissenting-path).
-- **An implementation plan is requested:** use [Plan Synthesis](REFERENCE.md#plan-synthesis)
-  for changed responsibilities, dependencies, relevant migration/recovery and
-  acceptance evidence. Include scope pricing when it affects the investment
-  decision. Stopping option comparison does not waive this content.
 
 ## Continue settled work
 
