@@ -51,7 +51,7 @@ or acceptance:
 - a blocker or finding that changes the next action or leaves acceptance open;
 - a completed workstream's decisive verification and remaining gaps.
 
-Group related commands and checks. Add scripts when they aid execution.
+Group related commands and checks.
 
 Append through the helper. It stamps the time, keeps every cell on one line,
 turns away a row whose evidence does not resolve, and writes each row whole, so
@@ -86,8 +86,7 @@ open choices that affect the task.
 
 ## Runs
 
-A run is one agent conversation, including later turns and compaction. Reuse
-the task's folder and trail when work resumes.
+A run is one agent conversation, including later turns and compaction.
 
 - A run that adds to a trail holding another run's rows writes a `start` row
   first. Its decision names the timestamp range of the rows this run did not
@@ -108,7 +107,6 @@ When this run added or corrected material rows:
      the row says.
    - Add missing consequential choices, pivots and gaps.
 
-   Make corrections as new superseding rows; existing rows stay as written.
    Consult this run's transcript only when the receipts leave a material claim
    or decision unresolved. Disclose an unavailable source if it limits acceptance.
 2. **Review** when the user or governing workflow requires it. Include the trail

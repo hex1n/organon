@@ -14,7 +14,7 @@ RPC path. Use project facts rather than assumed framework defaults.
 ## Address And Envelope
 
 + Operation identifier: if the method has a gateway or dispatch annotation whose value is the external operation key, use that value; otherwise use service interface plus method name.
-+ Base endpoint: read configuration, gateway setup, README, or deployment docs. If it remains unknown, name the missing source. Ask only when finishing the scope requires a user-owned decision.
++ Base endpoint: read configuration, gateway setup, README, or deployment docs. If it remains unknown, name the missing source.
 + Request envelope: if calls go through a gateway dispatch object, read the outer request object that carries operation identifier and business payload.
 + Response envelope: read the common wrapper returned by the interface or implementation, including success flag, code, message, data, trace id, or equivalent fields.
 + RPC request fields live in the request object or envelope. Omit the Position column unless the verified transport envelope needs it.
@@ -25,14 +25,12 @@ Read existing declarations only. Leave missing auth unchanged in code.
 Identify method/class annotations, gateway filters, interceptors, or AOP checks
 that validate identity, token, role, or permission.
 If auth cannot be established, mark it `unconfirmed` and name the missing source in the reply.
-Ask only when finishing the requested scope needs a user-owned decision.
 
 ## Requiredness
 
 Inspect active entry validation, validation groups, schema presence semantics,
 custom assertions and defaults. `@Valid` cascades into a present object;
-it does not require non-null. Distinguish omitted, null, empty and conditionally
-required values. Record intended requirements separately from enforcement
+it does not require non-null. Record intended requirements separately from enforcement
 discrepancies. If the active validation path cannot be established, mark the
 field `unconfirmed`.
 
