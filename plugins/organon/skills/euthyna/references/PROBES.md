@@ -74,8 +74,7 @@ limits.
 before changing the validation copy. Preserve required observations and vary the
 deciding mechanism. A second guard producing the same rejection can hide an
 untested first guard; deletion passing tests can reveal either redundancy or a
-missing oracle. A failure caused by missing data, compilation or harness setup
-does not show detection of the intended business fault.
+missing oracle.
 
 **Comments and contracts:** compare documented claims and preserved comments
 with current signatures, behavior and remaining work. A stated precondition

@@ -139,7 +139,7 @@ separately. Explain structural gains in rule ownership, caller knowledge or
 coordinated edit points; name any remaining migration stage and exit condition.
 
 Bind each claim's check, and required review with findings dispositioned, to the
-final material revision; name each claim left unverified. Classify failed checks as introduced, pre-existing or
+final material revision. Classify failed checks as introduced, pre-existing or
 environmental. A missing essential check or required review leaves the affected
 acceptance open; report what is implemented and locally verified, and continue
 independent work.
