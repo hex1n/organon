@@ -25,7 +25,9 @@ module.exports = (ctx, { check, na }) => {
     // dokimasia runs the validator before reporting GO; a NO_GO needs none.
     const go = /technical_verdict:?\s*`?GO\b/.test(text) && !/NO[_-]GO/.test(reply);
     out.push(go ? check("the ledger validator is run before GO", ctx.commands().some((c) => /validate-review-ledger/.test(c)), "commands") : na("the ledger validator is run before GO", "no GO verdict"));
-    out.push(check("both closed tracks are reported: NO_GO and UNCHANGED", /NO_GO/.test(reply) && /UNCHANGED/.test(reply), "reply"));
+    // dokimasia keeps two vocabularies: the delivery track writes NO_GO, reviewer returns NO-GO.
+    const tracks = [/NO_GO/.test(reply) ? "NO_GO" : /NO-GO/.test(reply) ? "only reviewer NO-GO, no delivery-track NO_GO" : "no NO_GO", /UNCHANGED/.test(reply) ? "UNCHANGED" : "no UNCHANGED"];
+    out.push(check("both closed tracks are reported: NO_GO and UNCHANGED", /NO_GO/.test(reply) && /UNCHANGED/.test(reply), `reply: ${tracks.join(", ")}`));
     out.push(check("the cross-instance staleness blocker is found", /(实例|instance|节点|node|server).{0,40}(陈旧|旧价|失效|stale|old|outdated|不一致|缓存)|(只清|只失效|only).{0,30}(本|编辑|当前|this|one)/i.test(text), "reply + review.md"));
     out.push(check("the candidate's hash is recorded", /[0-9a-f]{64}|sha256/i.test(text + "\n" + ledgers.map((f) => ctx.read(f)).join("\n")), "reply + review.md + ledger"));
   } else {
