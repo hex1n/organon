@@ -111,8 +111,10 @@ reported as unverified.
 
 For performance work, inspect operation counts, sharing scope, invalidation and
 retained state on effectful and no-effect paths at relevant scale. Reuse may
-change cost only within its valid observation scope. Before reporting measured
-numbers, read [Measured numbers](references/MEASURES.md).
+change cost only within its valid observation scope. Report each side's
+source revision (commit, plus any uncommitted change) and cold or warm state
+alongside the measured numbers; before reporting them, read
+[Measured numbers](references/MEASURES.md).
 
 Run fault injection ([Fault injection](references/FAULTS.md)) and independent
 review ([Evidence](references/EVIDENCE.md#independent-review)) for changes to
