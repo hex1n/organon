@@ -1,8 +1,5 @@
 # Dokimasia Reference
 
-Read the section named by the current branch. The shared review contract and
-Exact Gate live in [SKILL.md](SKILL.md).
-
 ## Decision Envelope And Entry States
 
 Only an explicitly requested implementation-authorization gate consumes this
@@ -30,17 +27,15 @@ the technical target itself needs a user decision.
 Entry outcomes are NOT_READY for a missing candidate or requested authorization
 without a build decision; DEFERRED for a standing non-BUILD authorization decision;
 WITHDRAWN when the user withdraws; SUSPENDED when a running review cannot close.
-Use the two outcome tracks defined in SKILL.md; none of these states grants GO.
 
 ## Review Artifacts
 
 A short review needing no saved output or continuation may keep its complete
-ledger and findings in chat. The checker accepts stdin when no path is supplied.
+ledger and findings in chat.
 Save when requested, needed for repair/re-review, or needed for complete disclosure
 too long for chat. Use the user's path, otherwise an unused
 `.scratch/review-YYYYMMDD-topic/` under the target repository; reuse it for that
-series's later rounds. Keep records separate from the candidate; saving never
-authorizes editing it.
+series's later rounds. Keep records separate from the candidate.
 
 The parent owns `review-ledger.json`, the authoritative record of attempts,
 receipts, reviewer payloads, validations and dispositions. `review.md` presents
@@ -132,8 +127,8 @@ A complete return covers every frozen rubric dimension and all four severities.
 A blocker sweep covers the rubric with blocker and verification-gap severities
 only. Each gap states `gap_scope: decision_blocking | outside_closing_scope` and
 an evidence-backed reason. CONDITIONAL-GO means GO once the returned findings are
-fixed; every gate counts it as non-GO. The parent preserves reviewer-returned
-payloads and coverage; GO may have empty finding arrays, while non-GO needs a finding.
+fixed; every gate counts it as non-GO. GO may have empty finding arrays, while
+non-GO needs a finding.
 
 ## Focused Recheck
 
@@ -145,9 +140,8 @@ cross-cutting impact requires a complete review.
 
 ## Round Receipt
 
-Record one receipt immediately after each attempt, before parent validation,
-including failed, timed-out, cancelled and discarded attempts. Take the fields and
-closed vocabularies from `round_receipts` in
+A receipt precedes parent validation and covers timed-out, cancelled and discarded
+attempts too. Take the fields and closed vocabularies from `round_receipts` in
 [review-ledger-schema.json](review-ledger-schema.json), not a copied field list.
 
 Prefer runtime counters. Otherwise measure exact submitted/returned characters
@@ -180,9 +174,9 @@ arrays and maintain these relationships:
   A stronger independence lane is acceptable. Legacy `second_model_availability`
   does not decide the gate.
 
-Run `node <skill>/scripts/validate-review-ledger.cjs <ledger.json>` or pipe the
-ledger to stdin. It prints `{ "pass": boolean, "failures": [...] }`, exits zero
-only on a pass, and checks structure and links rather than the truth of evidence.
+The checker also reads the ledger from stdin. It prints
+`{ "pass": boolean, "failures": [...] }`, exits zero only on a pass, and checks
+structure and links rather than the truth of evidence.
 
 ## Verification Gap Closure
 

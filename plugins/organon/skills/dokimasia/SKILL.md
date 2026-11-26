@@ -80,7 +80,7 @@ Post-GO translations or reformats are `derived-unreviewed` unless byte-identical
 Give each first-pass reviewer the frozen request, outcome authority, candidate,
 constraints, rubric and evidence scope, without the author's reasoning.
 The reviewer returns in-band and writes
-neither the candidate nor review records. Self-rereading cannot satisfy the gate.
+neither the candidate nor review records.
 Use [the compact packet](REFERENCE.md#compact-review-packet) for long or remote
 transfer and [invocation handling](REFERENCE.md#runtime-and-invocation) for
 runtime binding, retries, unavailable reviewers or helper agents.
@@ -149,12 +149,10 @@ changing the candidate. For authorized revisions, read
 
 Suspend for an unavailable required reviewer, unresolved disagreement, exhausted
 budget, required user input, or an invalidated implementation-authorization
-envelope. Withdrawal is not a pass. Review-and-revise's additional continuation
-and stopping rules live in [REVISION.md](REVISION.md#re-review-and-stop).
+envelope.
 
 Before reporting GO, run `node <skill>/scripts/validate-review-ledger.cjs <ledger>`
-when Node is available. This mechanical check supplements parent validation and
-reviewer judgment. Restart all required closing reviews after a late material edit.
+when Node is available.
 
 Every delivery includes the exact final revision and the revision each reviewer
 last read, reviewers and independence,

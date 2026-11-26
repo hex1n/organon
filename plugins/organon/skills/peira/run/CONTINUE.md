@@ -11,38 +11,34 @@ source revision. Carry forward applicable user overrides and retained-state fact
 
 ## Choose and validate the continuation
 
-Honor the user's explicit scenario selection. Otherwise resume the requested
+Without an explicit scenario selection, resume the requested
 outcome's outstanding obligations, including in-scope scenarios never selected or
 executed in the previous slice. For focused fix verification, select previous
 `failed`, `blocked`, and `unverified` scenarios plus dependents that consumed the
 fixed behavior. Explain affected dependents excluded by the requested scope; do not
 claim their regressions were checked. Expand to the entire plan only when impact or
-the user requires it. A subset never waives shared prerequisites or safety gates.
+the user requires it.
 
-Re-derive only mechanics invalidated by changed code, environment, or evidence. Keep
-unchanged business expectations pinned to their approved authority, recording any
-approved expectation changes separately. Resolve a never-executed dependent from the
+Re-derive only mechanics invalidated by changed code, environment, or evidence.
+Resolve a never-executed dependent from the
 same anchors as any other scenario, preserving the safety edges its plan records.
 
 Prove the fix is loaded in the actual command/process before judging it. Use the
 expected version, loaded source/build identity, or a discriminating behavioral
-fingerprint; reachability alone does not prove freshness. Reuse prior metadata only
+fingerprint. Reuse prior metadata only
 when it still describes the effective target.
 
 Read retained identifiers, ownership, TTL, cleanup commands, and do-not-clean items
-before creating or reusing fixtures. Read [EXECUTION.md](EXECUTION.md) for any writes,
-async/dependent work, or retained-state cleanup. A previous failure becomes passed
+before creating or reusing fixtures. A previous failure becomes passed
 only with this run's fresh outcome and retained proof. Record the new disposition
 and evidence here while preserving the original verdict.
 
 ## Authorized repair loops
 
-This stage supplies execution and diagnosis; the calling agent owns separately
-authorized product fixes. For an explicit iterate-until-green request, retain each
+For an explicit iterate-until-green request, retain each
 iteration's report as an immutable handoff. Continue from actionable defects and
 affected dependents; stop when no actionable defects remain, an external decision
 blocks progress, or the user's cap is reached (default eight full E2E rerun cycles).
 When a scenario still fails after two fixes that share one premise, write that
 premise as one sentence. Before the next fix, test it with an observation that
 comes out differently if the premise is false.
-Report skipped/unverified/blocked work even when no actionable fix remains.

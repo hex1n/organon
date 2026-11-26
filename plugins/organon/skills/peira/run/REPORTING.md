@@ -85,7 +85,7 @@ Create only artifacts with a concrete consumer or payload need:
 - Machine-readable metadata/results only for a named machine consumer; they project
   the canonical facts, not a second independent verdict.
 
-A rerun uses a fresh continuation directory. Its instructions are the project's
+Rerun instructions are the project's
 existing commands or the recorded adapter sequence, replayed step by step with each
 result inspected before dependent actions or cleanup.
 

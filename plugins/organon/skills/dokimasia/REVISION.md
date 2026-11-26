@@ -1,8 +1,7 @@
 # Review-and-revise
 
-Read only for authorized candidate edits or another revision round. Use the shared
-[Evidence Loop](SKILL.md#evidence-loop) for disclosure, validation and disposition.
-Entering this mode, at the start or after a review-only verdict, freezes the
+Read only for authorized candidate edits or another revision round. Entering this
+mode, at the start or after a review-only verdict, freezes the
 [Exact Gate](SKILL.md#exact-gate) for the loop with a budget counted in complete
 rounds: three at full depth and two at shallow depth, unless calibration or the
 user sets another. Two is the least that lets a fix be re-reviewed.
@@ -18,11 +17,11 @@ Hash the new candidate or return evidence-backed rebuttals to their reviewers.
 An edit affecting the BUILD decision follows
 [envelope invalidation](REFERENCE.md#decision-envelope-and-entry-states).
 Use a [focused recheck](REFERENCE.md#focused-recheck) only for eligible contained
-edits; it cannot replace complete closing reviews.
+edits.
 
 ## Blocker sweep
 
-Complete review is the default. For a large candidate with unsettled foundational
+For a large candidate with unsettled foundational
 assumptions or interacting failure paths, an initial blocker sweep may save work;
 record that reason. It examines every rubric dimension for blockers and verification
 gaps, deferring independent should-fix and optional findings. Return the
@@ -49,5 +48,4 @@ A round whose gate-blocking findings all target text the previous revision added
 is churn: the revision, not the candidate, is generating the work. Suspend after
 two churn rounds in a row, when the same blocker survives three consecutive
 revisions, or under [the shared stop conditions](SKILL.md#close-or-continue).
-If a confirmed material defect is no longer worth fixing, suspend or withdraw;
-never call that GO.
+If a confirmed material defect is no longer worth fixing, suspend or withdraw.

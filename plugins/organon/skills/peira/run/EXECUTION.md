@@ -6,15 +6,9 @@ harness receipt; a named table is unnecessary unless it clarifies the run.
 
 ## Environment and dependency readiness
 
-When the repository keeps `docs/verify/HARNESS.md`, its Launch, Doctor, and Drive
-sections are the authority for starting, checking, and reaching the system; use them
-before deriving commands from source. Harness drift follows
-[RUN.md](RUN.md#2-resolve-the-execution-context).
-
 Use effective targets for the reached stores, queues, services, and external effects.
-Verify the schema/fields actually used, the tool paths/versions the run's shell loads,
-and the intended build in the running process. Omit irrelevant capabilities. After
-changing configuration, services, fixtures, or deployment, recheck readiness and prove
+Verify the schema/fields actually used and the tool paths/versions the run's shell
+loads. Omit irrelevant capabilities. After changing configuration, services, fixtures, or deployment, recheck readiness and prove
 the next response or state reflects the new setup.
 
 In local scope, repair reversible setup issues: start declared services/workers/stubs,
@@ -23,8 +17,8 @@ migrations/seeds. Retain the actual commands and changes. Downloads/cache failur
 remain setup problems unless product code ran and violated an expectation. Preserve
 business logic and existing authorization/validation boundaries.
 
-Prefer declared harnesses and adapters; use their safe describe/probe surfaces to
-resolve invocation details. Record only the selected target, operation, inputs,
+Use declared harnesses' and adapters' safe describe/probe surfaces to resolve
+invocation details. Record only the selected target, operation, inputs,
 relevant options, and actual permissions. Localize blockers to credentials, tooling,
 network, routing, or dependency readiness from evidence instead of a generic failure.
 
@@ -82,9 +76,8 @@ checks.
 ## Preserve and clean up
 
 Before cleanup, persist and verify the diagnostic evidence, owned identifiers, and
-observed verdict in the canonical report or its linked durable receipts. Capture
-failure state before further actions can overwrite it. If capture fails or required
-diagnosis still needs the scene, preserve owned state under its permitted lifecycle,
+observed verdict in the canonical report or its linked durable receipts. If capture
+fails or required diagnosis still needs the scene, preserve owned state under its permitted lifecycle,
 record the failure and recovery path, and report any lifecycle obligation still unmet.
 Never trade lost evidence for an apparently clean run.
 
@@ -94,4 +87,4 @@ reject traversal/symlink escape, and verify the matching owner before deletion.
 After cleanup, perform an independent absence/restoration check and record its exact
 invocation and output. Distinguish not attempted, retained, pending, and verified
 completed cleanup. Remove empty ownership scaffolding only after its owned data is
-settled. Cleanup success does not convert a failed scenario into a pass.
+settled.
