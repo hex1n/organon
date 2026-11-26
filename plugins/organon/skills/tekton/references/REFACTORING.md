@@ -60,7 +60,8 @@ suppressed or isolated. Keep one authoritative result and effect path while
 comparing observable behavior.
 
 Track each temporary surface's purpose, accountable owner, removal condition and
-safety evidence in existing task records. Keep removal pending while the owner
+safety evidence in the task folder `.scratch/YYYYMMDD-task-name/`, or in the
+ichnos decision trail when ichnos is installed. Keep removal pending while the owner
 or exit is unknown; continue independent reversible preparations.
 
 ## Migrate and recover

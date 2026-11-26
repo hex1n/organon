@@ -123,8 +123,8 @@ Prove the cheapest target that serves the request at hand; the other rows stay
 On a shared target, drive a read-only
 feature unless the user authorizes writes; authorized writes follow
 [business data and ownership](../run/EXECUTION.md#business-data-and-ownership).
-Fix the harness where the run deviated and run again. Keep the run's commands and output with the task's evidence; the harness
-points to them.
+Fix the harness where the run deviated and run again. Save the run's commands and output as its record in
+`.scratch/{feature}/e2e/runs/{yyyymmdd-hhmm}/`; the harness points to them.
 
 A rejection path that ran is `verified` for that path and leaves the end state
 `derived from source`. A feature left undriven names

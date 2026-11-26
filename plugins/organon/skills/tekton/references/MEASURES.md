@@ -8,8 +8,9 @@ may use one run: check correct output, errors, and completed work, label it
 single-run, and leave variation and any unknown limiter explicit. It does not
 establish which alternative is better.
 
-- **Comparable work.** Record each side's source revision, dependency versions,
-  build mode, configuration, workload, data, concurrency, and cold or warm state.
+- **Comparable work.** Report each side's source revision, dependency versions,
+  build mode, configuration, workload, data, concurrency, and cold or warm state
+  alongside the numbers in the delivery.
   Control differences outside the claim; different revisions are expected in a
   before/after comparison. Use production-relevant settings. An as-shipped
   comparison may intentionally retain default settings; attribute its result
