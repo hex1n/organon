@@ -10,8 +10,9 @@ const os = require("node:os");
 const path = require("node:path");
 const { spawn, spawnSync } = require("node:child_process");
 const { parse } = require("./lib/events.cjs");
+const { rolloutAgents } = require("./lib/rollout.cjs");
 const { makeContext, check, na } = require("./lib/check.cjs");
-const { build } = require("./lib/fixture.cjs");
+const { build, copyDir } = require("./lib/fixture.cjs");
 
 const HERE = __dirname;
 const TASKS = path.join(HERE, "tasks");
@@ -33,7 +34,8 @@ const USAGE = `usage: node evals/codex/run.cjs --models <m1,m2> [options]
   -- ARGS             anything after -- is passed to codex exec as is
 
   Grade one finished run again:
-  node evals/codex/run.cjs --check <task> --events <events.jsonl> --workdir <dir> [--last <last.txt>]`;
+  node evals/codex/run.cjs --check <task> --events <events.jsonl> --workdir <dir> [--last <last.txt>] [--rollout <rollout.jsonl>]
+  node evals/codex/run.cjs --regrade <out or send-back dir>   (regrade saved runs with the current checks)`;
 
 function parseArgs(argv) {
   const opts = { models: [], runs: 1, tasks: [], codex: "codex", invoke: "$organon:{skill} {prompt}", sandbox: "workspace-write", config: [], timeout: 30, extra: [] };
@@ -54,9 +56,11 @@ function parseArgs(argv) {
     else if (a === "--dry-run") opts.dryRun = true;
     else if (a === "--list") opts.list = true;
     else if (a === "--check") opts.check = next();
+    else if (a === "--regrade") opts.regrade = path.resolve(next());
     else if (a === "--events") opts.events = path.resolve(next());
     else if (a === "--workdir") opts.workdir = path.resolve(next());
     else if (a === "--last") opts.last = path.resolve(next());
+    else if (a === "--rollout") opts.rollout = path.resolve(next());
     else if (a === "-h" || a === "--help") opts.help = true;
     else throw new Error(`unknown option ${a}`);
   }
@@ -146,10 +150,55 @@ function saveWorkdirChanges(workdir, dest) {
   }
 }
 
+// Regrade saved runs with the current checks: use the kept workdir when it is
+// still there, else rebuild the fixture and lay the saved changed files over it.
+// The rollout is looked up by thread id, so on the machine that ran Codex the
+// hidden subagent spawns are counted too.
+function regrade(outDir) {
+  const tasks = Object.fromEntries(loadTasks([]).map((t) => [t.id, t]));
+  const runsDir = path.join(outDir, "runs");
+  const fmt = (c) => (c.result === null ? "NA" : c.result ? "1" : "0");
+  for (const id of fs.readdirSync(runsDir).sort()) {
+    const runDir = path.join(runsDir, id);
+    let saved;
+    try { saved = JSON.parse(fs.readFileSync(path.join(runDir, "checks.json"), "utf8")); } catch { continue; }
+    const task = tasks[saved.task];
+    if (!task) continue;
+    const scratch = fs.mkdtempSync(path.join(os.tmpdir(), "organon-codex-regrade-"));
+    try {
+      const fresh = path.join(scratch, "w");
+      const setup = build(task.dir, fresh, task.frozen || []);
+      let workdir = saved.workdir && fs.existsSync(saved.workdir) ? saved.workdir : fresh;
+      if (workdir === fresh) {
+        if (fs.existsSync(path.join(runDir, "files"))) copyDir(path.join(runDir, "files"), fresh);
+        const diff = fs.existsSync(path.join(runDir, "diff.txt")) ? fs.readFileSync(path.join(runDir, "diff.txt"), "utf8") : "";
+        for (const line of diff.split("\n")) if (/^( D|D ) /.test(line)) fs.rmSync(path.join(fresh, line.slice(3).trim()), { force: true });
+      }
+      const run = parse(fs.readFileSync(path.join(runDir, "events.jsonl"), "utf8"));
+      run.rollout = rolloutAgents(run.threadId);
+      const lastFile = path.join(runDir, "last.txt");
+      const last = fs.existsSync(lastFile) ? fs.readFileSync(lastFile, "utf8").trim() : "";
+      const checks = grade(task, workdir, run, last || run.final, setup);
+      const counted = checks.filter((c) => c.result !== null);
+      const ok = counted.length > 0 && counted.every((c) => c.result);
+      const where = workdir === fresh ? "saved files" : "kept workdir";
+      const spawns = run.rollout.found ? `, rollout: ${run.rollout.spawns} subagent spawns` : ", no rollout";
+      console.log(`${ok ? "pass" : "FAIL"} ${id} (${where}${spawns})`);
+      for (const c of checks) {
+        const before = (saved.checks || []).find((o) => o.name === c.name);
+        if (!before || fmt(before) !== fmt(c) || c.result === false) console.log(`  ${before ? fmt(before) : "-"} -> ${fmt(c)}  ${c.name}: ${c.evidence}`);
+      }
+      fs.writeFileSync(path.join(runDir, "checks.regraded.json"), JSON.stringify({ rollout: { found: run.rollout.found, spawns: run.rollout.spawns, names: run.rollout.names }, checks }, null, 2));
+    } finally {
+      fs.rmSync(scratch, { recursive: true, force: true });
+    }
+  }
+}
+
 function writeSummary(outDir, rows, runs, meta) {
   const header = "task,skill,model,run,check,result,evidence\n";
   fs.writeFileSync(path.join(outDir, "results.csv"), header + rows.map((r) => [r.task, r.skill, r.model, r.run, r.check, r.result, r.evidence].map(csv).join(",")).join("\n") + "\n");
-  const runCols = ["id", "task", "skill", "model", "run", "exit_code", "turn_failed", "seconds", "input_tokens", "cached_input_tokens", "output_tokens", "reasoning_tokens", "events", "parse_errors", "passed", "failed", "na", "pass"];
+  const runCols = ["id", "task", "skill", "model", "run", "exit_code", "turn_failed", "seconds", "input_tokens", "cached_input_tokens", "output_tokens", "reasoning_tokens", "events", "parse_errors", "subagent_spawns", "passed", "failed", "na", "pass"];
   fs.writeFileSync(path.join(outDir, "runs.csv"), runCols.join(",") + "\n" + runs.map((r) => runCols.map((c) => csv(r[c])).join(",")).join("\n") + "\n");
   const groups = new Map();
   for (const r of rows) {
@@ -181,10 +230,12 @@ async function main() {
     for (const t of loadTasks([])) console.log(`${t.id.padEnd(9)} ${t.skill.padEnd(10)} ${t.rule}`);
     return 0;
   }
+  if (opts.regrade) { regrade(opts.regrade); return 0; }
   if (opts.check) {
     const [task] = loadTasks([opts.check]);
     if (!opts.events || !opts.workdir) throw new Error("--check needs --events and --workdir");
     const run = parse(fs.readFileSync(opts.events, "utf8"));
+    run.rollout = rolloutAgents(run.threadId, opts.rollout);
     const last = opts.last && fs.existsSync(opts.last) ? fs.readFileSync(opts.last, "utf8").trim() : "";
     const scratch = fs.mkdtempSync(path.join(os.tmpdir(), "organon-codex-setup-"));
     const setup = build(task.dir, path.join(scratch, "w"), task.frozen || []);
@@ -229,13 +280,14 @@ async function main() {
         const { code } = await runCodex(opts, args, prompt, path.join(runDir, "events.jsonl"), path.join(runDir, "stderr.txt"));
         const seconds = Math.round((Date.now() - started) / 1000);
         const run = parse(fs.readFileSync(path.join(runDir, "events.jsonl"), "utf8"));
+        run.rollout = rolloutAgents(run.threadId);
         const last = fs.existsSync(lastFile) ? fs.readFileSync(lastFile, "utf8").trim() : "";
         const checks = grade(task, workdir, run, last || run.final, setup);
         const counted = checks.filter((c) => c.result !== null);
         const passed = counted.filter((c) => c.result).length;
         const ok = code === 0 && !run.turnFailed && counted.length > 0 && passed === counted.length;
         for (const c of checks) rows.push({ task: task.id, skill: task.skill, model, run: rep, check: c.name, result: c.result === null ? "NA" : c.result ? "1" : "0", evidence: c.evidence });
-        const record = { id, task: task.id, skill: task.skill, model, run: rep, exit_code: code, turn_failed: run.turnFailed ? 1 : 0, seconds, input_tokens: run.usage.input, cached_input_tokens: run.usage.cached, output_tokens: run.usage.output, reasoning_tokens: run.usage.reasoning, events: run.events, parse_errors: run.parseErrors, passed, failed: counted.length - passed, na: checks.length - counted.length, pass: ok ? 1 : 0 };
+        const record = { id, task: task.id, skill: task.skill, model, run: rep, exit_code: code, turn_failed: run.turnFailed ? 1 : 0, seconds, input_tokens: run.usage.input, cached_input_tokens: run.usage.cached, output_tokens: run.usage.output, reasoning_tokens: run.usage.reasoning, events: run.events, parse_errors: run.parseErrors, subagent_spawns: run.rollout.found ? run.rollout.spawns : "", passed, failed: counted.length - passed, na: checks.length - counted.length, pass: ok ? 1 : 0 };
         runs.push(record);
         fs.writeFileSync(path.join(runDir, "checks.json"), JSON.stringify({ ...record, workdir, setup, checks }, null, 2));
         if (!ok) saveWorkdirChanges(workdir, runDir);

@@ -22,6 +22,10 @@ function isAction(step) {
   return ["file_change", "tool", "web_search", "subagent"].includes(step.kind);
 }
 
+// A subagent step that starts an agent (not a wait or a message to one).
+const SPAWN_TOOL = /wait|send|close|list|kill|cancel|resume|status/i;
+const CLAIMS_REVIEWERS = /(两|二|2)\s*(位|个|名)\s*(独立的?)?(审查|审阅|评审)(者|员|人)?|reviewers? [AB12]\b|two (independent |fresh )?reviewers/i;
+
 function rel(dir, file) {
   return path.relative(dir, file).split(path.sep).join("/");
 }
@@ -91,6 +95,18 @@ function makeContext({ dir, run, final, task, setup }) {
       return run.steps.some((s) => nameRe.test(s.command || "") || nameRe.test(s.args || "") || (marker && (s.output || "").includes(marker)));
     },
     indexWhere(pred) { return run.steps.findIndex(pred); },
+    // Reviewer agents started by the run. codex exec --json hides spawns (only
+    // "wait" shows), so the rollout count wins when run.cjs found the rollout;
+    // otherwise the event count is a lower bound and "unknown" is set when the
+    // run waited on agents or says it had reviewers.
+    reviewers(text = "") {
+      const seen = run.steps.filter((s) => (s.kind === "subagent" && !SPAWN_TOOL.test(s.tool || "")) || (s.kind === "command" && /\bcodex\s+(exec|e)\b/.test(s.command || ""))).length;
+      const rollout = run.rollout && run.rollout.found ? run.rollout.spawns : null;
+      if (rollout !== null) return { count: Math.max(seen, rollout), unknown: false, source: "rollout" };
+      const activity = run.steps.some((s) => s.kind === "subagent");
+      const claimed = CLAIMS_REVIEWERS.test(text) || CLAIMS_REVIEWERS.test(run.steps.filter((s) => s.kind === "message").map((s) => s.text || "").join("\n"));
+      return { count: seen, unknown: seen < 2 && (activity || claimed), source: "events" };
+    },
     // Writes to a path: a file_change item, an apply_patch command, or a shell redirect.
     writes(pathRe) {
       const out = [];

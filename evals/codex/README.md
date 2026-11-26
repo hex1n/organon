@@ -55,7 +55,7 @@ prompt 与 Claude 上用的相同，前面加技能调用：默认模板 `$organ
 | 题 | 技能 | 检查的规则 |
 |---|---|---|
 | ledger | historia | 多证据面的问题，第一条消息先贴计划，再动手查 |
-| review | euthyna | 第一条消息先贴审查起点；找出两个缺陷；披露分遍审查；不改被审代码 |
+| review | euthyna | 第一条消息先贴审查起点；找出两个缺陷；起两名审查者或披露分遍审查；不改被审代码 |
 | refactor | tekton | 读 REFACTORING.md；在 .scratch 记下要保留的旧入口 calc_total |
 | t1 | tekton | 改测试前读 TESTS.md；0 元订单能下；测试通过 |
 | perf | tekton | 读 MEASURES.md；报两边的版本和冷/热状态 |
@@ -76,8 +76,13 @@ prompt 与 Claude 上用的相同，前面加技能调用：默认模板 `$organ
   模式下不在工具调用之间输出消息，这类检查会因为格式而失败，看 `events.jsonl` 即可分辨。
 - harness 题需要在本机起服务并访问 localhost，因此给这一题加了
   `-c sandbox_workspace_write.network_access=true`。
-- plan 题：Codex 若能起子代理，事件里应出现子代理条目或嵌套的 `codex exec`；两者都没有时，
-  技能要求暂停并说明缺少独立审查者，这样也算通过，台账类检查记为 NA。
+- 子代理：Codex CLI 0.172 的 `exec --json` 不输出起子代理的调用，只输出不带接收方的 `wait`。
+  所以 run.cjs 跑完每次运行后，会按 thread id 到 `~/.codex/sessions/`（或 `$CODEX_HOME/sessions/`）
+  找这次会话的 rollout 文件，数里面起子代理的调用，只把次数记进 `runs.csv` 的 `subagent_spawns`，
+  不复制 rollout 本身。找不到 rollout、而运行又等过子代理或自称有审查者时，review 和 plan 的
+  审查者检查记为 NA，不判对错。
+- plan 题：两名审查者都跑了，或者技能按要求暂停并说明缺少独立审查者，都算通过；暂停时台账类检查
+  记为 NA。台账校验脚本只在结论为 GO 时要求运行。
 - 你的 `~/.codex` 用户配置照常生效（插件就装在那里）；夹具目录不受信任，不加载项目级配置。
 
 ## 自检
@@ -90,6 +95,15 @@ node evals/codex/selftest.cjs
 
 它为每题建夹具，回放一段合规的假事件流（并留下合规运行会写的文件），要求全部检查通过；
 再回放一段空运行，要求规则检查失败且判分不报错；另外校验事件读取对各种字段写法的容错。
+
+用当前的判分规则重判一批已保存的运行（在跑 Codex 的那台机器上执行，才能读到 rollout）：
+
+```bash
+node evals/codex/run.cjs --regrade evals/codex/out/<时间戳>
+```
+
+工作目录还在就直接用；不在就重建夹具，再铺上保存下来的改动文件。新结果写到各运行目录的
+`checks.regraded.json`，终端打印前后有变化的检查。
 
 单独重判一次运行：
 

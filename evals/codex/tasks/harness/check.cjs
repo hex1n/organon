@@ -11,6 +11,6 @@ module.exports = (ctx, { check }) => {
     check("the proof run is saved under .scratch/{feature}/e2e/runs/{stamp}/", runs.length > 0, runs.slice(0, 2).join(", ") || "none"),
     check("HARNESS.md links that run record", /\.scratch\/[^)\s`]*\/e2e\/runs\//.test(h), "HARNESS.md text"),
     check("docs/verify/features/index.md and a feature file are written", features.includes("docs/verify/features/index.md") && features.length >= 2, features.join(", ") || "none"),
-    check("claims carry a dated verified status", /verified 20\d\d-\d\d-\d\d/.test(h), "HARNESS.md text"),
+    check("claims carry a dated verified status", /verified\**\s+20\d\d-\d\d-\d\d/i.test(h), "HARNESS.md text"),
   ];
 };

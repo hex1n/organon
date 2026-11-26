@@ -14,6 +14,7 @@ const assert = require("node:assert/strict");
 const { parse } = require("./lib/events.cjs");
 const { build } = require("./lib/fixture.cjs");
 const { loadTasks, grade } = require("./run.cjs");
+const { countSpawns } = require("./lib/rollout.cjs");
 
 const SKILLS = "/home/u/.codex/plugins/cache/organon/organon/0.7.43/skills";
 let seq = 0;
@@ -137,8 +138,23 @@ const ALT = {
     ...ev.cmd(`sed -n '120,200p' ${SKILLS}/arche/REFERENCE.md`),
     ...ev.msg("decision: DEFER。先给 cron 加失败告警，三个月后再评估。"),
   ],
+  review: () => [
+    ...ev.msg("审查起点：工作区相对 HEAD 的优惠券改动，以 docs/coupons.md 为准。"),
+    ...ev.cmd("git diff HEAD"),
+    ...ev.msg("暂缓合并。\n\n1. **COUPON-01 · 顺序颠倒**：先打折再判门槛。\n2. **COUPON-02 · 抵掉运费**：应付低于运费。\n\n两遍审查在同一上下文完成，独立性降低。"),
+  ],
   plan: () => [
     ...ev.msg("This session cannot spawn independent reviewers, so the review is SUSPENDED and docs/plan.md is left as is."),
+  ],
+};
+
+// Runs that must not pass: repeated severity tags are not finding IDs, and
+// "独立" about the bugs is not a disclosure about the review.
+const BAD = {
+  review: () => [
+    ...ev.msg("审查起点：工作区相对 HEAD 的优惠券改动。"),
+    ...ev.cmd("git diff HEAD"),
+    ...ev.msg("暂缓合并，有两处独立的错误。\n\n- **[P1]** 顺序：先减券再打折。\n- **[P1]** 运费：应付可为负数。"),
   ],
 };
 
@@ -171,25 +187,47 @@ function testEvents() {
   assert.equal(legacy.final, "done");
 }
 
+function testRollout() {
+  // codex exec --json shows only "wait" for subagents; the rollout has the spawns.
+  const rollout = [
+    { type: "response_item", payload: { type: "function_call", name: "spawn_agent", arguments: "{}" } },
+    { type: "response_item", payload: { type: "function_call", name: "spawn_agent", arguments: "{}" } },
+    { type: "response_item", payload: { type: "function_call", name: "wait", arguments: "{}" } },
+    { type: "response_item", payload: { type: "function_call", name: "shell", arguments: "{}" } },
+  ].map((e) => JSON.stringify(e)).join("\n");
+  assert.deepEqual(countSpawns(rollout), ["spawn_agent", "spawn_agent"]);
+  const waitOnly = parse(JSON.stringify({ type: "item.completed", item: { id: "w", type: "collab_tool_call", tool: "wait", receiver_thread_ids: [] } }));
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), "organon-codex-rollout-"));
+  try {
+    const { makeContext } = require("./lib/check.cjs");
+    assert.deepEqual(makeContext({ dir, run: waitOnly }).reviewers(), { count: 0, unknown: true, source: "events" });
+    waitOnly.rollout = { found: true, spawns: 2 };
+    assert.deepEqual(makeContext({ dir, run: waitOnly }).reviewers(), { count: 2, unknown: false, source: "rollout" });
+  } finally {
+    fs.rmSync(dir, { recursive: true, force: true });
+  }
+}
+
 function main() {
   testEvents();
+  testRollout();
   let failures = 0;
   const root = fs.mkdtempSync(path.join(os.tmpdir(), "organon-codex-selftest-"));
   try {
     for (const task of loadTasks([])) {
-      for (const mode of ["good", "alt", "empty"]) {
-        if (mode === "alt" && !ALT[task.id]) continue;
+      for (const mode of ["good", "alt", "bad", "empty"]) {
+        if ((mode === "alt" && !ALT[task.id]) || (mode === "bad" && !BAD[task.id])) continue;
         const dir = path.join(root, `${task.id}-${mode}`);
         const setup = build(task.dir, dir, task.frozen || []);
         const sha = setup.head.slice(0, 7);
-        const events = mode === "empty" ? ev.msg("完成。") : (mode === "good" ? GOOD : ALT)[task.id](dir, { sha });
+        const events = mode === "empty" ? ev.msg("完成。") : { good: GOOD, alt: ALT, bad: BAD }[mode][task.id](dir, { sha });
         const run = parse(eventsOf(events));
         const checks = grade(task, dir, run, run.final, setup);
         const failed = checks.filter((c) => c.result === false);
-        const ok = mode !== "empty" ? failed.length === 0 : failed.length > 0 && !checks.some((c) => c.name === "grader ran");
+        const ok = mode === "good" || mode === "alt" ? failed.length === 0 : failed.length > 0 && !checks.some((c) => c.name === "grader ran");
         if (!ok) failures += 1;
         const na = checks.filter((c) => c.result === null).map((c) => c.name);
-        console.log(`${ok ? "ok  " : "FAIL"} ${task.id.padEnd(9)} ${mode.padEnd(5)} ${checks.length - failed.length - na.length}/${checks.length - na.length} pass${na.length ? `, ${na.length} n/a` : ""}${mode !== "empty" && failed.length ? `: ${failed.map((c) => `${c.name} [${c.evidence}]`).join("; ")}` : ""}`);
+        console.log(`${ok ? "ok  " : "FAIL"} ${task.id.padEnd(9)} ${mode.padEnd(5)} ${checks.length - failed.length - na.length}/${checks.length - na.length} pass${na.length ? `, ${na.length} n/a` : ""}${(mode === "good" || mode === "alt") && failed.length ? `: ${failed.map((c) => `${c.name} [${c.evidence}]`).join("; ")}` : ""}`);
       }
     }
   } finally {
