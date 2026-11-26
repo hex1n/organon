@@ -31,7 +31,7 @@ Use this when local code/config/runtime evidence and external documentation both
 | Conflict | Name any mismatch between local evidence and external source, or state `none found`. |
 | Next check | Name the smallest local or external check that would change the result; use `none` only when the result is settled inside the decision boundary. |
 
-If local and external evidence conflict, the settled answer uses the local behavior for this repo and marks the external claim's applicability as unresolved or version-bound. The scenario-gate rules above govern what each side of evidence may claim.
+If local and external evidence conflict, the settled answer uses the local behavior for this repo and marks the external claim's applicability as unresolved or version-bound.
 
 ## Localized Request and Output Rules
 
@@ -370,7 +370,7 @@ A compressed Standard run in one domain — the same transactional service as th
 
 Request: "为什么这个接口偶尔超时？" No reproduction or fix was asked, so this stays in historia; had the user said "帮我修一下", it would route to the implementation workflow instead.
 
-Standard, not Deep: several components and a causal question, but no irreversible decision rides on the answer. No written plan either — the whole investigation hangs on one unknown, stated in one line: is event publishing inside the transaction boundary?
+Standard, not Deep: several components and a causal question, but no irreversible decision rides on the answer. The plan fits one line: is event publishing inside the transaction boundary? Code first; traces only if a rival explanation survives.
 
 Reading `OrderService.create()` settled that directly: publish happens inside the transaction boundary (`src/.../OrderService.java:88`). The same read produced the orientation for free — Client → API → OrderService → DB in one transaction, publish inside it — so no separate diagram pass was needed; one structural sentence carried it.
 

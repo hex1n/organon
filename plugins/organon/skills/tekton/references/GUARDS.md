@@ -1,8 +1,6 @@
 # Guards
 
-Read before adding, removing, narrowing or moving a guard: a null/empty, duplicate,
-range or state check, a cross-store equality, a fail-closed branch. Establish
-its real entry, owner and oracle:
+Establish each guard's real entry, owner and oracle:
 
 - **Real entry:** the production path that delivers the illegal shape. A value
   that could theoretically be absent, or that a sample happens to lack, is not an

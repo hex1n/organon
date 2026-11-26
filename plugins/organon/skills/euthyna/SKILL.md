@@ -11,8 +11,6 @@ description: >
 
 Judge whether the code fulfills a justified business intent, preserves affected
 system obligations, and expresses its rules with reasonable implementation cost.
-Review business behavior and implementation structure independently, then resolve
-their evidence into an actionable account.
 
 ## Establish what correct means
 
@@ -33,10 +31,8 @@ Your first message, before any tool call on the code or its sources (a git
 status or a quick look counts), is a brief starting point in chat in the user's
 language, built from the request: the intent as stated, the outcomes and
 preserved obligations to judge, the comparison scope, the sources you will check
-and material open assumptions. The user reads it to correct the basis before the
-review rests on it. Once the sources are read, post the corrected basis before
-opening the changed code if it changed, distinguishing confirmed rules from
-reconstruction. Update it when investigation changes its basis.
+and material open assumptions. Update it when investigation changes its basis,
+distinguishing confirmed rules from reconstruction.
 
 ## Enter a fresh review context
 
@@ -145,7 +141,7 @@ verdict could cause serious business or system harm, obtain a fresh falsifier on
 the current model. Supply the claim, its necessary premises and relevant raw
 sources at the same reviewed scope, within existing access constraints. The
 falsifier tests the claim without restarting the full review or inheriting an
-expected verdict. Genuine business-policy choices remain with the user.
+expected verdict.
 
 Resolve each challenged conclusion as defeated, still supported by named
 evidence, or unresolved with its deciding gap. Finding no counterexample alone
