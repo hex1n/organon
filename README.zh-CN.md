@@ -59,7 +59,6 @@ CI 矩阵在 Windows、Linux、macOS 上使用 Node.js 24 运行门禁和 `--sel
 | [`historia`](plugins/organon/skills/historia/) | 调研 | 以证据为支撑的调研，交付书面结论而非修复：判断事实真相、行为成因、证据支持哪个选项。 |
 | [`tekton`](plugins/organon/skills/tekton/) | 实现 | 实现、修复、重构、迁移代码，或落地设计文档、已裁决的方案，新写和修改已有代码都适用；不破坏改动波及的调用方、已存数据和测试。先追踪受影响的契约，再按可验证的切片修改；缺陷只在原复现处确认修复；守卫只有找得到真实入口、归属方和一个去掉它就会失败的测试才保留；在最终版本上用证据证明契约仍成立。 |
 | [`euthyna`](plugins/organon/skills/euthyna/) | 审查 | 先建立正确性的判断依据，再由两位独立 reviewer 分别审查业务与系统行为、实现与结构；调查缺陷、不必要的复杂度和实质风险，综合证据，只读报告。 |
-| [`peira`](plugins/organon/skills/peira/) | 验证 | 规划、执行并呈现端到端测试：可溯源的业务场景树、把缺陷交回调用方另行授权修复的证据化执行报告，明确要求时才做有上限的直至全绿循环。开头带 `plan`、`run` 或 `harness` 时选定模式：plan 出计划；run 执行，无计划时先规划；harness 在 `docs/verify/` 下写出项目的验证配方，并以一次端到端实跑证明其可用。 |
 | [`horos`](plugins/organon/skills/horos/) | 落地/验证 | 基于代码契约生成跨 RPC 与 HTTP 协议的后端 API 文档，范围可为单个接口、一个需求的后端 API 或一个分支的 API 变更。 |
 | [`ichnos`](plugins/organon/skills/ichnos/) | 留痕 | 重要决定、转向或阻断发生时，主动判断理由和证据是否影响下一步，需要时当场记录。普通接手用简短的 Markdown 交接。 |
 
@@ -76,7 +75,6 @@ CI 矩阵在 Windows、Linux、macOS 上使用 Node.js 24 运行门禁和 `--sel
 | `euthyna`（εὔθυνα） | `scrutineer` | 雅典官员卸任时的问责审计；审计官只驳回指控或移交法庭 | 代码建成后受审，发现交回，不代为修复 |
 | `historia`（ἱστορία） | `deep-research` | 调查；希罗多德称其著作为"调查的展示" | 以书面结论交付的调研 |
 | `horos`（ὅρος） | `generating-api-docs` | 界石；雅典的 horos 公示地块上的负担 | 在边界上写调用方契约，不写实现 |
-| `peira`（πεῖρα） | `e2e-test-workflow` | 试验、尝试；empirical 一词的来源 | 在真实环境中试跑场景 |
 | `ichnos`（ἴχνος） | —（新增） | 足迹、踪迹；猎人循迹找到猎物 | 复核者顺着留痕找回每个决策及其证据 |
 
 `dokimasia` 与 `euthyna` 是雅典官员上任和卸任时各受的一次审查。在这里，它们把审查分成
@@ -129,18 +127,6 @@ CI 矩阵在 Windows、Linux、macOS 上使用 Node.js 24 运行门禁和 `--sel
 - **消融与测试预言机**：用针对性实验调查复杂度和防御的必要性，同时核实观察结果能支持什么结论。
 - **独立反证**：交叉挑战重大结论，包括一致与通过判断；按证据裁定，保留决定性缺口、不同受影响结果与覆盖边界。
 
-### `peira`
-
-- 规划
-  - **基于模型的测试设计（Ammann & Offutt）**：对输入空间（Base-Choice、Pairwise）、状态图、决策逻辑施加覆盖准则；复合规则的每个独立条件各欠一条义务，判定条件思想取自 MC/DC。
-  - **独立预言机**：期望结果权威与实现证据分离。
-  - **变更影响分析（Bohner & Arnold）**：沿共享写者、读者、调用方与订阅者追踪变更可达的路径。
-- 执行
-  - **RIPR 模型的骨架**：每个场景写明可达的触发、传播到系统级结果、有界的可观测完成谓词。
-  - **按易失性顺序采证（数字取证）**：易失的失败现场在重试或清理前先采集。
-  - **PROV 式溯源**：计划、运行、产物仅凭产物即可重建。
-  - **显式的 SUT 边界**：声明每个真实依赖与替身。
-
 ### `horos`
 
 - **契约式设计（Meyer）与信息隐藏（Parnas）**：只写调用方契约，不写实现。
@@ -159,7 +145,7 @@ CI 矩阵在 Windows、Linux、macOS 上使用 Node.js 24 运行门禁和 `--sel
 规划   arche → dokimasia   ← 先定方案，再证伪
 实现   tekton              ← 先追根系，再做最小安全改造
 审查   euthyna             ← 证伪实现，也核实发现；只读报告
-验证   peira（plan → run）· horos
+文档   horos              ← 说明后端接口契约
 调研   historia            ← 按需求证
         ↑ 新发现的未知回馈下一轮规划
 按需   ichnos              ← 留下可审计的决策变更历史
@@ -174,10 +160,6 @@ CI 矩阵在 Windows、Linux、macOS 上使用 Node.js 24 运行门禁和 `--sel
 `dokimasia` 在两个宿主复用同一套可移植流程：fresh-context reviewer 使用 runtime 的只读
 agent 能力，second-model reviewer 使用 runtime 提供的只读第二模型能力，可用性在冻结时
 一次判定并记录；reviewer 始终只读。
-
-`peira` 在两个宿主中都由模型自动触发；手动输入时开头的 `plan`、`run`
-或 `harness` 选定模式：Claude Code 用 `/organon:peira plan …`，Codex 用
-`$organon:peira plan …`。它取代已退役的 `e2e-test-planner` 与 `e2e-test-executor`。
 
 `node scripts/install-plugin.cjs --apply` 安装插件，并清理指向本仓库的单个 skill 链接，
 包括旧名链接。

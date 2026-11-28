@@ -100,13 +100,6 @@ const GOOD = {
       ...ev.msg("已记录为 ADR 0003。"),
     ];
   },
-  harness: (d) => {
-    put(d, ".scratch/notes/e2e/runs/20261126-1000/run.log", "ok\n");
-    put(d, "docs/verify/HARNESS.md", "# Harness\n\n| target | how |\n|---|---|\n| notes | python3 app.py |\n\n## Launch\n## Doctor\n## Drive\n## Evidence\n[run](../../.scratch/notes/e2e/runs/20261126-1000/)\n## Cleanup\n\nverified 2026-11-26\n");
-    put(d, "docs/verify/features/index.md", "- notes\n");
-    put(d, "docs/verify/features/notes.md", "notes\n");
-    return [...ev.msg("模式：harness。起点：notes 服务，python3 app.py，端口 8099。"), ...ev.cmd("python3 app.py &"), ...ev.msg("harness 已写好并跑通。")];
-  },
   plan: (d) => {
     put(d, ".scratch/review-cache/review-ledger.json", JSON.stringify({ round_receipts: [{}, {}] }));
     put(d, ".scratch/review-cache/review.md", "candidate sha256 " + "a".repeat(64) + "\n");

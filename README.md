@@ -68,7 +68,6 @@ for the distribution vocabulary.
 | [`historia`](plugins/organon/skills/historia/) | investigate | Evidence-backed investigation whose deliverable is written findings, not a fix: what is true, why behavior occurs, which option the evidence supports. |
 | [`tekton`](plugins/organon/skills/tekton/) | implement | Implement, fix, refactor, or migrate code, new or existing, or land a design document or adjudicated plan, without breaking the callers, stored data, or tests the change reaches. Traces the affected contracts first, changes code in verifiable slices, closes a defect only where it was reproduced, keeps a guard only with a real entry, an owner and a test that fails without it, and delivers evidence on the final version that the contracts hold. |
 | [`euthyna`](plugins/organon/skills/euthyna/) | review | Establish what correct means, then independently review business and system behavior alongside implementation and structure; investigate defects, unnecessary complexity and material risks, and synthesize the evidence without editing the candidate. |
-| [`peira`](plugins/organon/skills/peira/) | verify | Plan, execute, and present end-to-end tests: source-backed scenario trees, evidence-backed execution reports that hand defects back for separately authorized fixes, with a capped iterate-until-green loop on explicit request. Typed first, `plan`, `run`, or `harness` selects the mode: plan; run, planning first when no plan exists; or write the project's verification harness under `docs/verify/`, proved by one end-to-end run. |
 | [`horos`](plugins/organon/skills/horos/) | land/verify | Generate backend API docs across RPC and HTTP protocols from code-backed contracts, for one interface, one requirement's backend API, or a branch's API changes. |
 | [`ichnos`](plugins/organon/skills/ichnos/) | record | Record consequential decisions, reversals or blockers as they arise when their reasons or evidence matter to what happens next. Use a brief Markdown handoff for routine continuation. |
 
@@ -86,7 +85,6 @@ survive only in history and in install links made before the rename; see
 | `euthyna` (εὔθυνα) | `scrutineer` | Athenian accounting of an official at the end of a term; its examiners dismissed a charge or referred it to a court | code is examined after it is built, and findings go back without repairs |
 | `historia` (ἱστορία) | `deep-research` | inquiry; Herodotus called his work the display of his inquiry | investigation delivered as written findings |
 | `horos` (ὅρος) | `generating-api-docs` | boundary stone; Athenian horoi publicly declared the obligation on a plot | the caller contract at the boundary, never the implementation |
-| `peira` (πεῖρα) | `e2e-test-workflow` | trial, attempt; the root of *empirical* | scenarios are tried against a real environment |
 | `ichnos` (ἴχνος) | — (new) | track, footprint; the trace a hunter reads back to the animal | a reviewer follows the trail back to each decision and its evidence |
 
 `dokimasia` and `euthyna` were the two scrutinies an Athenian official faced, on
@@ -142,18 +140,6 @@ look when extending it.
 - **Ablation and test oracles:** investigate disputed complexity and defenses with focused experiments, while checking what their observations can establish.
 - **Independent falsification:** challenge material conclusions, including agreement and favorable judgments; resolve them by evidence and retain deciding gaps, distinct affected outcomes and coverage limits.
 
-### `peira`
-
-- Planning
-  - **Model-based test design (Ammann & Offutt):** coverage criteria over the input space (Base-Choice, Pairwise), the state graph, and decision logic; a rule firing on several independent conditions owes one obligation per condition, the deciding-condition idea from MC/DC.
-  - **Independent oracle:** expected-result authority is separated from implementation evidence.
-  - **Change impact analysis (Bohner & Arnold):** follow affected contracts through shared writers, readers, callers, and subscribers.
-- Execution
-  - **RIPR model's shape:** per scenario, a reachable trigger, propagation to a system-level outcome, and a bounded observable completion predicate.
-  - **Order of volatility (digital forensics):** volatile failure scenes are captured before retries or cleanup can destroy them.
-  - **PROV-style provenance:** plan, run, and artifacts reconstruct from the artifacts alone.
-  - **Explicit SUT boundary:** every real dependency and double is declared.
-
 ### `horos`
 
 - **Design by contract (Meyer) and information hiding (Parnas):** document the caller contract, never the implementation.
@@ -172,7 +158,7 @@ look when extending it.
 plan         arche → dokimasia   ← decide the plan, then falsify it
 implement    tekton              ← trace the roots, then shape the smallest safe change
 review-code  euthyna             ← challenge the code and the findings; report without editing
-verify       peira (plan → run) · horos
+document     horos               ← describe the backend API contract
 investigate  historia            ← answer questions from evidence
               ↑ discovered unknowns feed the next plan
 as needed    ichnos              ← keep an auditable decision history
@@ -190,11 +176,6 @@ independently distributable.
 a fresh-context reviewer uses the runtime's read-only agent capability, a
 second-model reviewer uses the read-only second-model capability the runtime
 offers, and availability is resolved and recorded once at freeze time.
-
-`peira` is model-invoked in both hosts; typed by hand, a leading `plan`,
-`run`, or `harness` selects the mode: `/organon:peira plan …` in Claude Code,
-`$organon:peira plan …` in Codex. It replaces the retired `e2e-test-planner` and
-`e2e-test-executor`.
 
 `node scripts/install-plugin.cjs --apply` installs the plugin and removes
 per-skill links targeting this checkout, including former names.

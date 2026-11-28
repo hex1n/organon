@@ -23,9 +23,9 @@ node evals/codex/run.cjs --models astra-6.2,sol --runs 2
 ```
 
 - `--models` 原样传给 `codex exec -m`，写法以你本机 Codex 认的模型名为准；写 `default` 表示不传 `-m`。
-- `--tasks ledger,review` 只跑部分题，`node evals/codex/run.cjs --list` 列出全部 11 题。
+- `--tasks ledger,review` 只跑部分题，`node evals/codex/run.cjs --list` 列出全部 10 题。
 - `--dry-run` 只建夹具并打印将要执行的命令，不调 Codex，适合先核对参数。
-- 每次运行串行执行（harness 题固定用 8099 端口），默认每次最多 30 分钟（`--timeout`）。
+- 每次运行串行执行，默认每次最多 30 分钟（`--timeout`）。
 
 每次运行的命令形如：
 
@@ -64,7 +64,6 @@ prompt 与 Claude 上用的相同，前面加技能调用：默认模板 `$organ
 | apidoc | horos | 文档放在 docs/interfaces/ 并沿用现有版式；回复写版本和权威来源 |
 | apidiff | horos | `--diff`：读 COMPATIBILITY.md；标出不兼容变更；回复写版本和权威来源 |
 | decision | ichnos | 写 ADR 0003 并记下不追溯；用 trail.cjs append 和 check |
-| harness | peira | 先说明模式；HARNESS.md 五节与目标表；证明运行存到 .scratch/…/e2e/runs/ 并链接 |
 | plan | dokimasia | 起独立审查者（Codex 无法起时应暂停并说明）；不改方案；台账与校验；两条结论轨 |
 
 ## 假设与容错
@@ -75,8 +74,6 @@ prompt 与 Claude 上用的相同，前面加技能调用：默认模板 `$organ
 - “先说再动手”类检查看的是第一个动作之前有没有 `agent_message`。读取技能自身文件
   （路径含 `skills/`、`.codex/`、`plugins/cache`）不算动手。如果你的 Codex 在 `exec`
   模式下不在工具调用之间输出消息，这类检查会因为格式而失败，看 `events.jsonl` 即可分辨。
-- harness 题需要在本机起服务并访问 localhost，因此给这一题加了
-  `-c sandbox_workspace_write.network_access=true`。
 - 子代理：Codex CLI 0.172 的 `exec --json` 不输出起子代理的调用，只输出不带接收方的 `wait`。
   所以 run.cjs 跑完每次运行后，会按 thread id 到 `~/.codex/sessions/`（或 `$CODEX_HOME/sessions/`）
   找这次会话的 rollout 文件，数里面起子代理的调用，只把次数记进 `runs.csv` 的 `subagent_spawns`，

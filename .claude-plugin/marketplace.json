@@ -1,7 +1,7 @@
 {
   "name": "organon",
   "metadata": {
-    "description": "Instruments of method for coding agents: planning, implementation, review, research, API docs, and acceptance testing."
+    "description": "Instruments of method for coding agents: planning, implementation, review, research, API docs, and decision trails."
   },
   "owner": {
     "name": "hex1n"
