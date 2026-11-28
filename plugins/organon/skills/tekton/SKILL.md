@@ -88,10 +88,10 @@ valid for callers and data. Distinguish preserved behavior from intentional
 semantic change. Move behavioral cases with the behavior; retire old-internal
 assertions after equivalent coverage exists at the relevant interface.
 
-After each meaningful slice, inspect the diff and run focused verification.
-When a check fails or earlier evidence is being reused, read
+After each meaningful slice, inspect the diff and verify the smallest target
+covering affected contracts and consumers. Expand verification as contracts change.
+For builds, service starts, retries or reused results, read
 [Reusing evidence](references/EVIDENCE.md#reusing-evidence-and-retrying).
-A newly affected contract expands the scope before earlier evidence is reused.
 Once a slice verifies, start the next authorized one. Stop only for a user
 decision, a blocker or the end of scope, and report done, remaining and blocked
 with its next action, in the plan's units.
@@ -100,14 +100,12 @@ as values; names and comments do not establish the requested improvement.
 
 ## Verify what the delivery will claim
 
-List the claims the delivery will make: the requested outcome, each preserved
-contract and, unless the user narrows it, that the whole application still
-builds and starts. Give each claim the cheapest check that fails if the claim
-is false, and run no check that supports no claim. Run it where the project's
-verification notes (`docs/verify/`) place that kind of change, otherwise in the
-smallest assembly that preserves the conditions deciding the outcome, and
-verify the requested outcome at its final consumer. A claim left unchecked is
-reported as unverified.
+List the requested outcome, each preserved contract and, unless the user narrows
+scope, whole-application build and startup as delivery claims. Verify the
+outcome at its final consumer. Run required gates. For each claim use the
+cheapest check that could falsify it, at the target in `docs/verify/` or
+otherwise the smallest assembly preserving the deciding conditions. Omit checks
+that serve no claim or gate. Report unchecked claims as unverified.
 
 For performance work, inspect operation counts, sharing scope, invalidation and
 retained state on effectful and no-effect paths at relevant scale. Reuse may

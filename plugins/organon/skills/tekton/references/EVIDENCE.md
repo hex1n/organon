@@ -1,7 +1,6 @@
 # Evidence
 
-Read the section the situation names: a defect to close, an independent review to
-dispatch, or a failed check and earlier evidence to reuse.
+Read the section the situation names: defect closure, independent review, or build and evidence reuse.
 
 ## Closing a defect
 
@@ -24,12 +23,15 @@ Other work is self-reviewed.
 
 ## Reusing evidence and retrying
 
-Reuse evidence only while its relevant source, inputs and environment remain
-applicable. Rerun invalidated checks and follow the repository's final-version
-gate rules. Once a failed run establishes a pre-existing or environmental blocker,
-reuse its receipt and keep that gate open. Retry when inputs relevant to the failure
-change, or when the run can distinguish a concrete new diagnostic hypothesis.
-Use a proven focused entry for independent claims; its success does not pass the
-blocked gate. Rederive claims of the same kind when a finding refutes one.
-Test a suspected shared cause before repairing several defects, then validate
-each finding against the repair; keep independent defects separate.
+Reuse a healthy process whose loaded code matches the relevant checkout inputs
+(including uncommitted source, resources, build settings and resolved dependencies).
+Establish the match through build provenance or distinguishing behavior. Otherwise
+start a matching artifact, or build the target and prerequisites with valid outputs and start it
+when the check needs a service.
+Honor required clean builds and fresh starts.
+
+Rerun checks invalidated by source, input or environment changes and follow
+final-version gates. Keep a pre-existing or environmental blocker open with its
+receipt. Retry when relevant inputs change or a run tests a new hypothesis.
+A proven focused check can verify independent claims while the blocked gate stays open. If a finding refutes similar claims, rederive
+them. Test a suspected shared cause before repairs and verify each finding afterward. Keep independent defects separate.
